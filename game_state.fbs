@@ -4,6 +4,13 @@ table Vec2 {
   y:float32;  // y-coordinate
 }
 
+table Block {
+  block_type: uint32;
+  feature_flags: uint64;
+  x: float32;
+  y: float32;
+}
+
 // Define the Entity table for game entities
 table Entity {
   id:uint64;               // Unique identifier for the entity
@@ -14,6 +21,7 @@ table Entity {
   owner:int32;              // Owner of the entity
   rotation:float32;         // Rotation angle of the entity
   angular_velocity:float32; // Angular velocity of the entity
+  blocks:[Block];
 }
 
 // Define the GameState table for the overall game state

@@ -123,6 +123,154 @@ impl core::fmt::Debug for Vec2<'_> {
       ds.finish()
   }
 }
+pub enum BlockOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct Block<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for Block<'a> {
+  type Inner = Block<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> Block<'a> {
+  pub const VT_BLOCK_TYPE: flatbuffers::VOffsetT = 4;
+  pub const VT_FEATURE_FLAGS: flatbuffers::VOffsetT = 6;
+  pub const VT_X: flatbuffers::VOffsetT = 8;
+  pub const VT_Y: flatbuffers::VOffsetT = 10;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    Block { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+    args: &'args BlockArgs
+  ) -> flatbuffers::WIPOffset<Block<'bldr>> {
+    let mut builder = BlockBuilder::new(_fbb);
+    builder.add_feature_flags(args.feature_flags);
+    builder.add_y(args.y);
+    builder.add_x(args.x);
+    builder.add_block_type(args.block_type);
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn block_type(&self) -> u32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u32>(Block::VT_BLOCK_TYPE, Some(0)).unwrap()}
+  }
+  #[inline]
+  pub fn feature_flags(&self) -> u64 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u64>(Block::VT_FEATURE_FLAGS, Some(0)).unwrap()}
+  }
+  #[inline]
+  pub fn x(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(Block::VT_X, Some(0.0)).unwrap()}
+  }
+  #[inline]
+  pub fn y(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(Block::VT_Y, Some(0.0)).unwrap()}
+  }
+}
+
+impl flatbuffers::Verifiable for Block<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<u32>("block_type", Self::VT_BLOCK_TYPE, false)?
+     .visit_field::<u64>("feature_flags", Self::VT_FEATURE_FLAGS, false)?
+     .visit_field::<f32>("x", Self::VT_X, false)?
+     .visit_field::<f32>("y", Self::VT_Y, false)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct BlockArgs {
+    pub block_type: u32,
+    pub feature_flags: u64,
+    pub x: f32,
+    pub y: f32,
+}
+impl<'a> Default for BlockArgs {
+  #[inline]
+  fn default() -> Self {
+    BlockArgs {
+      block_type: 0,
+      feature_flags: 0,
+      x: 0.0,
+      y: 0.0,
+    }
+  }
+}
+
+pub struct BlockBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> BlockBuilder<'a, 'b, A> {
+  #[inline]
+  pub fn add_block_type(&mut self, block_type: u32) {
+    self.fbb_.push_slot::<u32>(Block::VT_BLOCK_TYPE, block_type, 0);
+  }
+  #[inline]
+  pub fn add_feature_flags(&mut self, feature_flags: u64) {
+    self.fbb_.push_slot::<u64>(Block::VT_FEATURE_FLAGS, feature_flags, 0);
+  }
+  #[inline]
+  pub fn add_x(&mut self, x: f32) {
+    self.fbb_.push_slot::<f32>(Block::VT_X, x, 0.0);
+  }
+  #[inline]
+  pub fn add_y(&mut self, y: f32) {
+    self.fbb_.push_slot::<f32>(Block::VT_Y, y, 0.0);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> BlockBuilder<'a, 'b, A> {
+    let start = _fbb.start_table();
+    BlockBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<Block<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for Block<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("Block");
+      ds.field("block_type", &self.block_type());
+      ds.field("feature_flags", &self.feature_flags());
+      ds.field("x", &self.x());
+      ds.field("y", &self.y());
+      ds.finish()
+  }
+}
 pub enum EntityOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -147,6 +295,7 @@ impl<'a> Entity<'a> {
   pub const VT_OWNER: flatbuffers::VOffsetT = 14;
   pub const VT_ROTATION: flatbuffers::VOffsetT = 16;
   pub const VT_ANGULAR_VELOCITY: flatbuffers::VOffsetT = 18;
+  pub const VT_BLOCKS: flatbuffers::VOffsetT = 20;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -159,6 +308,7 @@ impl<'a> Entity<'a> {
   ) -> flatbuffers::WIPOffset<Entity<'bldr>> {
     let mut builder = EntityBuilder::new(_fbb);
     builder.add_id(args.id);
+    if let Some(x) = args.blocks { builder.add_blocks(x); }
     builder.add_angular_velocity(args.angular_velocity);
     builder.add_rotation(args.rotation);
     builder.add_owner(args.owner);
@@ -226,6 +376,13 @@ impl<'a> Entity<'a> {
     // which contains a valid value in this slot
     unsafe { self._tab.get::<f32>(Entity::VT_ANGULAR_VELOCITY, Some(0.0)).unwrap()}
   }
+  #[inline]
+  pub fn blocks(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Block<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Block>>>>(Entity::VT_BLOCKS, None)}
+  }
 }
 
 impl flatbuffers::Verifiable for Entity<'_> {
@@ -243,6 +400,7 @@ impl flatbuffers::Verifiable for Entity<'_> {
      .visit_field::<i32>("owner", Self::VT_OWNER, false)?
      .visit_field::<f32>("rotation", Self::VT_ROTATION, false)?
      .visit_field::<f32>("angular_velocity", Self::VT_ANGULAR_VELOCITY, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Block>>>>("blocks", Self::VT_BLOCKS, false)?
      .finish();
     Ok(())
   }
@@ -256,6 +414,7 @@ pub struct EntityArgs<'a> {
     pub owner: i32,
     pub rotation: f32,
     pub angular_velocity: f32,
+    pub blocks: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Block<'a>>>>>,
 }
 impl<'a> Default for EntityArgs<'a> {
   #[inline]
@@ -269,6 +428,7 @@ impl<'a> Default for EntityArgs<'a> {
       owner: 0,
       rotation: 0.0,
       angular_velocity: 0.0,
+      blocks: None,
     }
   }
 }
@@ -311,6 +471,10 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> EntityBuilder<'a, 'b, A> {
     self.fbb_.push_slot::<f32>(Entity::VT_ANGULAR_VELOCITY, angular_velocity, 0.0);
   }
   #[inline]
+  pub fn add_blocks(&mut self, blocks: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Block<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(Entity::VT_BLOCKS, blocks);
+  }
+  #[inline]
   pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> EntityBuilder<'a, 'b, A> {
     let start = _fbb.start_table();
     EntityBuilder {
@@ -336,6 +500,7 @@ impl core::fmt::Debug for Entity<'_> {
       ds.field("owner", &self.owner());
       ds.field("rotation", &self.rotation());
       ds.field("angular_velocity", &self.angular_velocity());
+      ds.field("blocks", &self.blocks());
       ds.finish()
   }
 }

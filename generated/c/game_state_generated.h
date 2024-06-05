@@ -16,6 +16,9 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 24 &&
 struct Vec2;
 struct Vec2Builder;
 
+struct Block;
+struct BlockBuilder;
+
 struct Entity;
 struct EntityBuilder;
 
@@ -73,6 +76,77 @@ inline ::flatbuffers::Offset<Vec2> CreateVec2(
   return builder_.Finish();
 }
 
+struct Block FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef BlockBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BLOCK_TYPE = 4,
+    VT_FEATURE_FLAGS = 6,
+    VT_X = 8,
+    VT_Y = 10
+  };
+  uint32_t block_type() const {
+    return GetField<uint32_t>(VT_BLOCK_TYPE, 0);
+  }
+  uint64_t feature_flags() const {
+    return GetField<uint64_t>(VT_FEATURE_FLAGS, 0);
+  }
+  float x() const {
+    return GetField<float>(VT_X, 0.0f);
+  }
+  float y() const {
+    return GetField<float>(VT_Y, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint32_t>(verifier, VT_BLOCK_TYPE, 4) &&
+           VerifyField<uint64_t>(verifier, VT_FEATURE_FLAGS, 8) &&
+           VerifyField<float>(verifier, VT_X, 4) &&
+           VerifyField<float>(verifier, VT_Y, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct BlockBuilder {
+  typedef Block Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_block_type(uint32_t block_type) {
+    fbb_.AddElement<uint32_t>(Block::VT_BLOCK_TYPE, block_type, 0);
+  }
+  void add_feature_flags(uint64_t feature_flags) {
+    fbb_.AddElement<uint64_t>(Block::VT_FEATURE_FLAGS, feature_flags, 0);
+  }
+  void add_x(float x) {
+    fbb_.AddElement<float>(Block::VT_X, x, 0.0f);
+  }
+  void add_y(float y) {
+    fbb_.AddElement<float>(Block::VT_Y, y, 0.0f);
+  }
+  explicit BlockBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<Block> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<Block>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<Block> CreateBlock(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint32_t block_type = 0,
+    uint64_t feature_flags = 0,
+    float x = 0.0f,
+    float y = 0.0f) {
+  BlockBuilder builder_(_fbb);
+  builder_.add_feature_flags(feature_flags);
+  builder_.add_y(y);
+  builder_.add_x(x);
+  builder_.add_block_type(block_type);
+  return builder_.Finish();
+}
+
 struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef EntityBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -83,7 +157,8 @@ struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_LINEAR_VELOCITY = 12,
     VT_OWNER = 14,
     VT_ROTATION = 16,
-    VT_ANGULAR_VELOCITY = 18
+    VT_ANGULAR_VELOCITY = 18,
+    VT_BLOCKS = 20
   };
   uint64_t id() const {
     return GetField<uint64_t>(VT_ID, 0);
@@ -109,6 +184,9 @@ struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   float angular_velocity() const {
     return GetField<float>(VT_ANGULAR_VELOCITY, 0.0f);
   }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Block>> *blocks() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Block>> *>(VT_BLOCKS);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_ID, 8) &&
@@ -121,6 +199,9 @@ struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_OWNER, 4) &&
            VerifyField<float>(verifier, VT_ROTATION, 4) &&
            VerifyField<float>(verifier, VT_ANGULAR_VELOCITY, 4) &&
+           VerifyOffset(verifier, VT_BLOCKS) &&
+           verifier.VerifyVector(blocks()) &&
+           verifier.VerifyVectorOfTables(blocks()) &&
            verifier.EndTable();
   }
 };
@@ -153,6 +234,9 @@ struct EntityBuilder {
   void add_angular_velocity(float angular_velocity) {
     fbb_.AddElement<float>(Entity::VT_ANGULAR_VELOCITY, angular_velocity, 0.0f);
   }
+  void add_blocks(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Block>>> blocks) {
+    fbb_.AddOffset(Entity::VT_BLOCKS, blocks);
+  }
   explicit EntityBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -173,9 +257,11 @@ inline ::flatbuffers::Offset<Entity> CreateEntity(
     ::flatbuffers::Offset<Vec2> linear_velocity = 0,
     int32_t owner = 0,
     float rotation = 0.0f,
-    float angular_velocity = 0.0f) {
+    float angular_velocity = 0.0f,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Block>>> blocks = 0) {
   EntityBuilder builder_(_fbb);
   builder_.add_id(id);
+  builder_.add_blocks(blocks);
   builder_.add_angular_velocity(angular_velocity);
   builder_.add_rotation(rotation);
   builder_.add_owner(owner);
@@ -184,6 +270,31 @@ inline ::flatbuffers::Offset<Entity> CreateEntity(
   builder_.add_is_commandable(is_commandable);
   builder_.add_my(my);
   return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<Entity> CreateEntityDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint64_t id = 0,
+    bool my = false,
+    bool is_commandable = false,
+    ::flatbuffers::Offset<Vec2> position = 0,
+    ::flatbuffers::Offset<Vec2> linear_velocity = 0,
+    int32_t owner = 0,
+    float rotation = 0.0f,
+    float angular_velocity = 0.0f,
+    const std::vector<::flatbuffers::Offset<Block>> *blocks = nullptr) {
+  auto blocks__ = blocks ? _fbb.CreateVector<::flatbuffers::Offset<Block>>(*blocks) : 0;
+  return CreateEntity(
+      _fbb,
+      id,
+      my,
+      is_commandable,
+      position,
+      linear_velocity,
+      owner,
+      rotation,
+      angular_velocity,
+      blocks__);
 }
 
 struct GameState FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
