@@ -4,7 +4,7 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-import { Entity } from './entity.ts';
+import { Entity } from './entity';
 
 
 export class GameState {
