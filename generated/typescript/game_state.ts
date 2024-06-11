@@ -2,7 +2,7 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, @typescript-eslint/no-non-null-assertion */
 
-export { Block } from './block.js';
-export { Entity } from './entity.js';
-export { GameState } from './game-state.js';
-export { Vec2 } from './vec2.js';
+export { Block } from './block.ts';
+export { Entity } from './entity.ts';
+export { GameState } from './game-state.ts';
+export { Vec2 } from './vec2.ts';

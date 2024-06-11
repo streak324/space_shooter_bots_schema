@@ -4,8 +4,8 @@
 
 import * as flatbuffers from 'flatbuffers';
 
-import { Block } from './block.js';
-import { Vec2 } from './vec2.js';
+import { Block } from './block.ts';
+import { Vec2 } from './vec2.ts';
 
 
 export class Entity {
