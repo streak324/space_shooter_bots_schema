@@ -1,7 +1,21 @@
 // Define the Vec2 table for 2D vectors
 table Vec2 {
-  x:float32;  // x-coordinate
-  y:float32;  // y-coordinate
+  x: float32;  // x-coordinate
+  y: float32;  // y-coordinate
+}
+
+table MissileSlot {
+  is_loaded: bool;
+  reload_timer: float32;
+  x: float32;
+  y: float32;
+  rotation: float32;
+}
+
+table Shield {
+  is_destroyed: bool;
+  hitpoints: float32;
+  radius: float32;
 }
 
 table Block {
@@ -9,24 +23,48 @@ table Block {
   feature_flags: uint64;
   x: float32;
   y: float32;
+  rotation: float32;
+  hitpoints: float32;
+  applied_thrust: float32;
+  is_destroyed: bool;
+  missile_slots: [MissileSlot];
+  local_turret_rotation: float32; // Relative to entity
+  shield: Shield;
+}
+
+table Projectile {
+  size: float32;
+  damage: float32;
+  block_config_id: uint32; // The config id of the block that created this projectile 
+}
+
+table Explosion {
+  x: float32;
+  y: float32;
+  radius: float32;
+  damage: float32;
 }
 
 // Define the Entity table for game entities
 table Entity {
-  id:uint64;               // Unique identifier for the entity
-  my:bool;                // Flag indicating if the entity is "my" entity
-  is_commandable:bool;    // whether this entity is controllable by a program
-  position:Vec2;          // Position of the entity (Vec2 type)
-  linear_velocity:Vec2;   // Linear velocity of the entity (Vec2 type)
-  owner:int32;              // Owner of the entity
-  rotation:float32;         // Rotation angle of the entity
-  angular_velocity:float32; // Angular velocity of the entity
-  blocks:[Block];
+  id: uint64;               // Unique identifier for the entity
+  my: bool;                // Flag indicating if the entity is "my" entity
+  is_commandable: bool;    // whether this entity is controllable by a program
+  position: Vec2;          // Position of the entity (Vec2 type)
+  linear_velocity: Vec2;   // Linear velocity of the entity (Vec2 type)
+  owner: int32;              // Owner of the entity
+  rotation: float32;         // Rotation angle of the entity
+  angular_velocity: float32; // Angular velocity of the entity
+  blocks: [Block];
+  projectile: Projectile;
 }
 
 // Define the GameState table for the overall game state
 table GameState {
-  entities:[Entity]; // Array of entities in the game state
+  entities: [Entity]; // Array of entities in the game state
+  explosions: [Explosion];
+  my_id: int32; // the id of the script reading this state
+  winner_id: int32; // The id of the script that won the game. Do not consider this value until the very last snapshot of the gamestate.
 }
 
 root_type GameState;
