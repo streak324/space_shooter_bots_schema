@@ -5,6 +5,8 @@
 ## FlatBuffers 
  - refer to https://github.com/google/flatbuffers/tree/v24.3.25 for fetching the flatbuffer dependencies for your language
  - read the tutorial on using flatbuffers for your language of choice: https://flatbuffers.dev/flatbuffers_guide_tutorial.html
+ - C generated code uses https://github.com/dvidelabs/flatcc 
+ - Use the Typescript generated code for [Assemblyscript](https://www.assemblyscript.org/)
 
 ## NOTES
 - the generated header file for C++ is not compatible with C
