@@ -541,13 +541,14 @@ struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_ID = 4,
     VT_MY = 6,
     VT_IS_COMMANDABLE = 8,
-    VT_POSITION = 10,
-    VT_LINEAR_VELOCITY = 12,
-    VT_OWNER = 14,
-    VT_ROTATION = 16,
-    VT_ANGULAR_VELOCITY = 18,
-    VT_BLOCKS = 20,
-    VT_PROJECTILE = 22
+    VT_ENTITY_TYPE = 10,
+    VT_POSITION = 12,
+    VT_LINEAR_VELOCITY = 14,
+    VT_OWNER = 16,
+    VT_ROTATION = 18,
+    VT_ANGULAR_VELOCITY = 20,
+    VT_BLOCKS = 22,
+    VT_PROJECTILE = 24
   };
   uint64_t id() const {
     return GetField<uint64_t>(VT_ID, 0);
@@ -557,6 +558,9 @@ struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool is_commandable() const {
     return GetField<uint8_t>(VT_IS_COMMANDABLE, 0) != 0;
+  }
+  int32_t entity_type() const {
+    return GetField<int32_t>(VT_ENTITY_TYPE, 0);
   }
   const Vec2 *position() const {
     return GetPointer<const Vec2 *>(VT_POSITION);
@@ -584,6 +588,7 @@ struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<uint64_t>(verifier, VT_ID, 8) &&
            VerifyField<uint8_t>(verifier, VT_MY, 1) &&
            VerifyField<uint8_t>(verifier, VT_IS_COMMANDABLE, 1) &&
+           VerifyField<int32_t>(verifier, VT_ENTITY_TYPE, 4) &&
            VerifyOffset(verifier, VT_POSITION) &&
            verifier.VerifyTable(position()) &&
            VerifyOffset(verifier, VT_LINEAR_VELOCITY) &&
@@ -612,6 +617,9 @@ struct EntityBuilder {
   }
   void add_is_commandable(bool is_commandable) {
     fbb_.AddElement<uint8_t>(Entity::VT_IS_COMMANDABLE, static_cast<uint8_t>(is_commandable), 0);
+  }
+  void add_entity_type(int32_t entity_type) {
+    fbb_.AddElement<int32_t>(Entity::VT_ENTITY_TYPE, entity_type, 0);
   }
   void add_position(::flatbuffers::Offset<Vec2> position) {
     fbb_.AddOffset(Entity::VT_POSITION, position);
@@ -650,6 +658,7 @@ inline ::flatbuffers::Offset<Entity> CreateEntity(
     uint64_t id = 0,
     bool my = false,
     bool is_commandable = false,
+    int32_t entity_type = 0,
     ::flatbuffers::Offset<Vec2> position = 0,
     ::flatbuffers::Offset<Vec2> linear_velocity = 0,
     int32_t owner = 0,
@@ -666,6 +675,7 @@ inline ::flatbuffers::Offset<Entity> CreateEntity(
   builder_.add_owner(owner);
   builder_.add_linear_velocity(linear_velocity);
   builder_.add_position(position);
+  builder_.add_entity_type(entity_type);
   builder_.add_is_commandable(is_commandable);
   builder_.add_my(my);
   return builder_.Finish();
@@ -676,6 +686,7 @@ inline ::flatbuffers::Offset<Entity> CreateEntityDirect(
     uint64_t id = 0,
     bool my = false,
     bool is_commandable = false,
+    int32_t entity_type = 0,
     ::flatbuffers::Offset<Vec2> position = 0,
     ::flatbuffers::Offset<Vec2> linear_velocity = 0,
     int32_t owner = 0,
@@ -689,6 +700,7 @@ inline ::flatbuffers::Offset<Entity> CreateEntityDirect(
       id,
       my,
       is_commandable,
+      entity_type,
       position,
       linear_velocity,
       owner,

@@ -984,13 +984,14 @@ impl<'a> Entity<'a> {
   pub const VT_ID: flatbuffers::VOffsetT = 4;
   pub const VT_MY: flatbuffers::VOffsetT = 6;
   pub const VT_IS_COMMANDABLE: flatbuffers::VOffsetT = 8;
-  pub const VT_POSITION: flatbuffers::VOffsetT = 10;
-  pub const VT_LINEAR_VELOCITY: flatbuffers::VOffsetT = 12;
-  pub const VT_OWNER: flatbuffers::VOffsetT = 14;
-  pub const VT_ROTATION: flatbuffers::VOffsetT = 16;
-  pub const VT_ANGULAR_VELOCITY: flatbuffers::VOffsetT = 18;
-  pub const VT_BLOCKS: flatbuffers::VOffsetT = 20;
-  pub const VT_PROJECTILE: flatbuffers::VOffsetT = 22;
+  pub const VT_ENTITY_TYPE: flatbuffers::VOffsetT = 10;
+  pub const VT_POSITION: flatbuffers::VOffsetT = 12;
+  pub const VT_LINEAR_VELOCITY: flatbuffers::VOffsetT = 14;
+  pub const VT_OWNER: flatbuffers::VOffsetT = 16;
+  pub const VT_ROTATION: flatbuffers::VOffsetT = 18;
+  pub const VT_ANGULAR_VELOCITY: flatbuffers::VOffsetT = 20;
+  pub const VT_BLOCKS: flatbuffers::VOffsetT = 22;
+  pub const VT_PROJECTILE: flatbuffers::VOffsetT = 24;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -1010,6 +1011,7 @@ impl<'a> Entity<'a> {
     builder.add_owner(args.owner);
     if let Some(x) = args.linear_velocity { builder.add_linear_velocity(x); }
     if let Some(x) = args.position { builder.add_position(x); }
+    builder.add_entity_type(args.entity_type);
     builder.add_is_commandable(args.is_commandable);
     builder.add_my(args.my);
     builder.finish()
@@ -1036,6 +1038,13 @@ impl<'a> Entity<'a> {
     // Created from valid Table for this object
     // which contains a valid value in this slot
     unsafe { self._tab.get::<bool>(Entity::VT_IS_COMMANDABLE, Some(false)).unwrap()}
+  }
+  #[inline]
+  pub fn entity_type(&self) -> i32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<i32>(Entity::VT_ENTITY_TYPE, Some(0)).unwrap()}
   }
   #[inline]
   pub fn position(&self) -> Option<Vec2<'a>> {
@@ -1098,6 +1107,7 @@ impl flatbuffers::Verifiable for Entity<'_> {
      .visit_field::<u64>("id", Self::VT_ID, false)?
      .visit_field::<bool>("my", Self::VT_MY, false)?
      .visit_field::<bool>("is_commandable", Self::VT_IS_COMMANDABLE, false)?
+     .visit_field::<i32>("entity_type", Self::VT_ENTITY_TYPE, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<Vec2>>("position", Self::VT_POSITION, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<Vec2>>("linear_velocity", Self::VT_LINEAR_VELOCITY, false)?
      .visit_field::<i32>("owner", Self::VT_OWNER, false)?
@@ -1113,6 +1123,7 @@ pub struct EntityArgs<'a> {
     pub id: u64,
     pub my: bool,
     pub is_commandable: bool,
+    pub entity_type: i32,
     pub position: Option<flatbuffers::WIPOffset<Vec2<'a>>>,
     pub linear_velocity: Option<flatbuffers::WIPOffset<Vec2<'a>>>,
     pub owner: i32,
@@ -1128,6 +1139,7 @@ impl<'a> Default for EntityArgs<'a> {
       id: 0,
       my: false,
       is_commandable: false,
+      entity_type: 0,
       position: None,
       linear_velocity: None,
       owner: 0,
@@ -1155,6 +1167,10 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> EntityBuilder<'a, 'b, A> {
   #[inline]
   pub fn add_is_commandable(&mut self, is_commandable: bool) {
     self.fbb_.push_slot::<bool>(Entity::VT_IS_COMMANDABLE, is_commandable, false);
+  }
+  #[inline]
+  pub fn add_entity_type(&mut self, entity_type: i32) {
+    self.fbb_.push_slot::<i32>(Entity::VT_ENTITY_TYPE, entity_type, 0);
   }
   #[inline]
   pub fn add_position(&mut self, position: flatbuffers::WIPOffset<Vec2<'b >>) {
@@ -1205,6 +1221,7 @@ impl core::fmt::Debug for Entity<'_> {
       ds.field("id", &self.id());
       ds.field("my", &self.my());
       ds.field("is_commandable", &self.is_commandable());
+      ds.field("entity_type", &self.entity_type());
       ds.field("position", &self.position());
       ds.field("linear_velocity", &self.linear_velocity());
       ds.field("owner", &self.owner());

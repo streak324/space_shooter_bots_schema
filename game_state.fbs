@@ -50,6 +50,7 @@ table Entity {
   id: uint64;               // Unique identifier for the entity
   my: bool;                // Flag indicating if the entity is "my" entity
   is_commandable: bool;    // whether this entity is controllable by a program
+  entity_type: int32; // Block entity or projectile
   position: Vec2;          // Position of the entity (Vec2 type)
   linear_velocity: Vec2;   // Linear velocity of the entity (Vec2 type)
   owner: int32;              // Owner of the entity
