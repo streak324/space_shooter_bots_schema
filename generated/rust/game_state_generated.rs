@@ -143,7 +143,7 @@ impl<'a> MissileSlot<'a> {
   pub const VT_RELOAD_TIMER: flatbuffers::VOffsetT = 6;
   pub const VT_X: flatbuffers::VOffsetT = 8;
   pub const VT_Y: flatbuffers::VOffsetT = 10;
-  pub const VT_ROTATION: flatbuffers::VOffsetT = 12;
+  pub const VT_LOCAL_ROTATION: flatbuffers::VOffsetT = 12;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -155,7 +155,7 @@ impl<'a> MissileSlot<'a> {
     args: &'args MissileSlotArgs
   ) -> flatbuffers::WIPOffset<MissileSlot<'bldr>> {
     let mut builder = MissileSlotBuilder::new(_fbb);
-    builder.add_rotation(args.rotation);
+    builder.add_local_rotation(args.local_rotation);
     builder.add_y(args.y);
     builder.add_x(args.x);
     builder.add_reload_timer(args.reload_timer);
@@ -193,11 +193,11 @@ impl<'a> MissileSlot<'a> {
     unsafe { self._tab.get::<f32>(MissileSlot::VT_Y, Some(0.0)).unwrap()}
   }
   #[inline]
-  pub fn rotation(&self) -> f32 {
+  pub fn local_rotation(&self) -> f32 {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<f32>(MissileSlot::VT_ROTATION, Some(0.0)).unwrap()}
+    unsafe { self._tab.get::<f32>(MissileSlot::VT_LOCAL_ROTATION, Some(0.0)).unwrap()}
   }
 }
 
@@ -212,7 +212,7 @@ impl flatbuffers::Verifiable for MissileSlot<'_> {
      .visit_field::<f32>("reload_timer", Self::VT_RELOAD_TIMER, false)?
      .visit_field::<f32>("x", Self::VT_X, false)?
      .visit_field::<f32>("y", Self::VT_Y, false)?
-     .visit_field::<f32>("rotation", Self::VT_ROTATION, false)?
+     .visit_field::<f32>("local_rotation", Self::VT_LOCAL_ROTATION, false)?
      .finish();
     Ok(())
   }
@@ -222,7 +222,7 @@ pub struct MissileSlotArgs {
     pub reload_timer: f32,
     pub x: f32,
     pub y: f32,
-    pub rotation: f32,
+    pub local_rotation: f32,
 }
 impl<'a> Default for MissileSlotArgs {
   #[inline]
@@ -232,7 +232,7 @@ impl<'a> Default for MissileSlotArgs {
       reload_timer: 0.0,
       x: 0.0,
       y: 0.0,
-      rotation: 0.0,
+      local_rotation: 0.0,
     }
   }
 }
@@ -259,8 +259,8 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> MissileSlotBuilder<'a, 'b, A> {
     self.fbb_.push_slot::<f32>(MissileSlot::VT_Y, y, 0.0);
   }
   #[inline]
-  pub fn add_rotation(&mut self, rotation: f32) {
-    self.fbb_.push_slot::<f32>(MissileSlot::VT_ROTATION, rotation, 0.0);
+  pub fn add_local_rotation(&mut self, local_rotation: f32) {
+    self.fbb_.push_slot::<f32>(MissileSlot::VT_LOCAL_ROTATION, local_rotation, 0.0);
   }
   #[inline]
   pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> MissileSlotBuilder<'a, 'b, A> {
@@ -284,7 +284,7 @@ impl core::fmt::Debug for MissileSlot<'_> {
       ds.field("reload_timer", &self.reload_timer());
       ds.field("x", &self.x());
       ds.field("y", &self.y());
-      ds.field("rotation", &self.rotation());
+      ds.field("local_rotation", &self.local_rotation());
       ds.finish()
   }
 }

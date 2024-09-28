@@ -98,7 +98,7 @@ struct MissileSlot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_RELOAD_TIMER = 6,
     VT_X = 8,
     VT_Y = 10,
-    VT_ROTATION = 12
+    VT_LOCAL_ROTATION = 12
   };
   bool is_loaded() const {
     return GetField<uint8_t>(VT_IS_LOADED, 0) != 0;
@@ -112,8 +112,8 @@ struct MissileSlot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   float y() const {
     return GetField<float>(VT_Y, 0.0f);
   }
-  float rotation() const {
-    return GetField<float>(VT_ROTATION, 0.0f);
+  float local_rotation() const {
+    return GetField<float>(VT_LOCAL_ROTATION, 0.0f);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -121,7 +121,7 @@ struct MissileSlot FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<float>(verifier, VT_RELOAD_TIMER, 4) &&
            VerifyField<float>(verifier, VT_X, 4) &&
            VerifyField<float>(verifier, VT_Y, 4) &&
-           VerifyField<float>(verifier, VT_ROTATION, 4) &&
+           VerifyField<float>(verifier, VT_LOCAL_ROTATION, 4) &&
            verifier.EndTable();
   }
 };
@@ -142,8 +142,8 @@ struct MissileSlotBuilder {
   void add_y(float y) {
     fbb_.AddElement<float>(MissileSlot::VT_Y, y, 0.0f);
   }
-  void add_rotation(float rotation) {
-    fbb_.AddElement<float>(MissileSlot::VT_ROTATION, rotation, 0.0f);
+  void add_local_rotation(float local_rotation) {
+    fbb_.AddElement<float>(MissileSlot::VT_LOCAL_ROTATION, local_rotation, 0.0f);
   }
   explicit MissileSlotBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -162,9 +162,9 @@ inline ::flatbuffers::Offset<MissileSlot> CreateMissileSlot(
     float reload_timer = 0.0f,
     float x = 0.0f,
     float y = 0.0f,
-    float rotation = 0.0f) {
+    float local_rotation = 0.0f) {
   MissileSlotBuilder builder_(_fbb);
-  builder_.add_rotation(rotation);
+  builder_.add_local_rotation(local_rotation);
   builder_.add_y(y);
   builder_.add_x(x);
   builder_.add_reload_timer(reload_timer);

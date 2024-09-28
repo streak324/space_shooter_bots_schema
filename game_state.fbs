@@ -8,7 +8,7 @@ table MissileSlot {
 	reload_timer: float32;
 	x: float32;
 	y: float32;
-	rotation: float32;
+	local_rotation: float32; // Relative to entity
 }
 
 table Shield {
