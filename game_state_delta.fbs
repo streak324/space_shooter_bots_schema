@@ -1,0 +1,75 @@
+table Vec2 {
+	x: float32;  // x-coordinate
+	y: float32;  // y-coordinate
+}
+
+table FlagUpdate {
+	owner_id: uint8;		
+	x: float32;
+	y: float32;
+}
+
+table EntityUpdate {
+	id: uint64;
+	x: float32;
+	y: float32;
+	rotation: float32;
+	damaged_blocks: [DamagedBlock];
+	shield_updates: [ShieldUpdate];
+	missile_slot_updates: [MissileSlotUpdate];
+	turret_updates: [TurretUpdate];
+}
+
+table DamagedBlock {
+	block_index: uint16;
+	hitpoints: float32;
+	applied_thrust: float32;
+	is_destroyed: bool;
+}
+
+table ShieldUpdate {
+	block_index: uint16;
+	hitpoints: float32;
+	rotation: float32;
+	is_destroyed: bool;
+}
+
+table MissileSlotUpdate {
+	block_index: uint16;
+	slot_index: uint8;
+	is_loaded: bool;
+	rotation: float32;
+}
+
+table TurretUpdate {
+	block_index: uint16;	
+	rotation: float32;
+}
+
+table NewExplosion {
+    position: Vec2;
+    radius: float32;
+    damage: float32;
+}
+
+table NewProjectile {
+	id: uint64;
+    position: Vec2;
+    linear_velocity: Vec2;
+    damage: float32;
+    size: float32;
+}
+
+table DeadProjectile {
+	id: uint64;
+	position: Vec2;
+}
+
+table GameStateDelta {
+	tick: uint32;
+	flag_positions: [FlagUpdate];
+	entity_positions: [EntityUpdate];
+	new_projectiles: [NewProjectile];
+	dead_projectiles: [DeadProjectile];
+	new_explosions: [NewExplosion];
+}

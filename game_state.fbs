@@ -1,7 +1,6 @@
-// Define the Vec2 table for 2D vectors
 table Vec2 {
-	x: float32;  // x-coordinate
-	y: float32;  // y-coordinate
+	x: float32;
+	y: float32;
 }
 
 table MissileSlot {
@@ -44,8 +43,8 @@ table Entity {
 	id: uint64;               // Unique identifier for the entity
 	my: bool;                // Flag indicating if the entity is "my" entity
 	is_commandable: bool;    // whether this entity is controllable by a program
-	position: Vec2;          // Position of the entity (Vec2 type)
-	linear_velocity: Vec2;   // Linear velocity of the entity (Vec2 type)
+	position: Vec2;          // Position of the entity
+	linear_velocity: Vec2;   // Linear velocity of the entity
 	owner: uint8;              // Owner of the entity
 	rotation: float32;         // Rotation angle of the entity
 	angular_velocity: float32; // Angular velocity of the entity

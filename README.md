@@ -12,10 +12,11 @@
 - the generated header file for C++ is not compatible with C
 - generated file for Go leaves package name empty. use whatever package name you want
 
-# C++, Go, Rust
+# Generating
 - `flatc --cpp -r -g --gen-onefile game_state.fbs`
-
-# C
 - For C, you have to use https://github.com/dvidelabs/flatcc. pre-generated files were made with commit `6d21e17e0e3c7b00fb844d737909fabf1e86ea52` as of writing
 - `flatcc --reader --common_reader game_state.fbs`
+- or you cn use `./generate.sh` to generate all of them 
 
+# Game State Delta
+ - `game_state_delta.fbs` is used for delta encoding the game state. it is meant to report changes to the game state since the last game tick. your bot implementation should first get a full copy of the game state in order to take advantage of the delta game state for subsequent game ticks.
