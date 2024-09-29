@@ -246,7 +246,7 @@ func (rcv *EntityUpdate) MutateRotation(n float32) bool {
 	return rcv._tab.MutateFloat32Slot(10, n)
 }
 
-func (rcv *EntityUpdate) DamagedBlocks(obj *DamagedBlock, j int) bool {
+func (rcv *EntityUpdate) BlockUpdate(obj *BlockUpdate, j int) bool {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
 	if o != 0 {
 		x := rcv._tab.Vector(o)
@@ -258,7 +258,7 @@ func (rcv *EntityUpdate) DamagedBlocks(obj *DamagedBlock, j int) bool {
 	return false
 }
 
-func (rcv *EntityUpdate) DamagedBlocksLength() int {
+func (rcv *EntityUpdate) BlockUpdateLength() int {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
 	if o != 0 {
 		return rcv._tab.VectorLen(o)
@@ -341,10 +341,10 @@ func EntityUpdateAddY(builder *flatbuffers.Builder, y float32) {
 func EntityUpdateAddRotation(builder *flatbuffers.Builder, rotation float32) {
 	builder.PrependFloat32Slot(3, rotation, 0.0)
 }
-func EntityUpdateAddDamagedBlocks(builder *flatbuffers.Builder, damagedBlocks flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(4, flatbuffers.UOffsetT(damagedBlocks), 0)
+func EntityUpdateAddBlockUpdate(builder *flatbuffers.Builder, blockUpdate flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(4, flatbuffers.UOffsetT(blockUpdate), 0)
 }
-func EntityUpdateStartDamagedBlocksVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+func EntityUpdateStartBlockUpdateVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(4, numElems, 4)
 }
 func EntityUpdateAddShieldUpdates(builder *flatbuffers.Builder, shieldUpdates flatbuffers.UOffsetT) {
@@ -368,42 +368,42 @@ func EntityUpdateStartTurretUpdatesVector(builder *flatbuffers.Builder, numElems
 func EntityUpdateEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
-type DamagedBlock struct {
+type BlockUpdate struct {
 	_tab flatbuffers.Table
 }
 
-func GetRootAsDamagedBlock(buf []byte, offset flatbuffers.UOffsetT) *DamagedBlock {
+func GetRootAsBlockUpdate(buf []byte, offset flatbuffers.UOffsetT) *BlockUpdate {
 	n := flatbuffers.GetUOffsetT(buf[offset:])
-	x := &DamagedBlock{}
+	x := &BlockUpdate{}
 	x.Init(buf, n+offset)
 	return x
 }
 
-func FinishDamagedBlockBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+func FinishBlockUpdateBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
 	builder.Finish(offset)
 }
 
-func GetSizePrefixedRootAsDamagedBlock(buf []byte, offset flatbuffers.UOffsetT) *DamagedBlock {
+func GetSizePrefixedRootAsBlockUpdate(buf []byte, offset flatbuffers.UOffsetT) *BlockUpdate {
 	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
-	x := &DamagedBlock{}
+	x := &BlockUpdate{}
 	x.Init(buf, n+offset+flatbuffers.SizeUint32)
 	return x
 }
 
-func FinishSizePrefixedDamagedBlockBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+func FinishSizePrefixedBlockUpdateBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
 	builder.FinishSizePrefixed(offset)
 }
 
-func (rcv *DamagedBlock) Init(buf []byte, i flatbuffers.UOffsetT) {
+func (rcv *BlockUpdate) Init(buf []byte, i flatbuffers.UOffsetT) {
 	rcv._tab.Bytes = buf
 	rcv._tab.Pos = i
 }
 
-func (rcv *DamagedBlock) Table() flatbuffers.Table {
+func (rcv *BlockUpdate) Table() flatbuffers.Table {
 	return rcv._tab
 }
 
-func (rcv *DamagedBlock) BlockIndex() uint16 {
+func (rcv *BlockUpdate) BlockIndex() uint16 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
 	if o != 0 {
 		return rcv._tab.GetUint16(o + rcv._tab.Pos)
@@ -411,11 +411,11 @@ func (rcv *DamagedBlock) BlockIndex() uint16 {
 	return 0
 }
 
-func (rcv *DamagedBlock) MutateBlockIndex(n uint16) bool {
+func (rcv *BlockUpdate) MutateBlockIndex(n uint16) bool {
 	return rcv._tab.MutateUint16Slot(4, n)
 }
 
-func (rcv *DamagedBlock) Hitpoints() float32 {
+func (rcv *BlockUpdate) Hitpoints() float32 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
 	if o != 0 {
 		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
@@ -423,11 +423,11 @@ func (rcv *DamagedBlock) Hitpoints() float32 {
 	return 0.0
 }
 
-func (rcv *DamagedBlock) MutateHitpoints(n float32) bool {
+func (rcv *BlockUpdate) MutateHitpoints(n float32) bool {
 	return rcv._tab.MutateFloat32Slot(6, n)
 }
 
-func (rcv *DamagedBlock) AppliedThrust() float32 {
+func (rcv *BlockUpdate) AppliedThrust() float32 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
 	if o != 0 {
 		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
@@ -435,11 +435,11 @@ func (rcv *DamagedBlock) AppliedThrust() float32 {
 	return 0.0
 }
 
-func (rcv *DamagedBlock) MutateAppliedThrust(n float32) bool {
+func (rcv *BlockUpdate) MutateAppliedThrust(n float32) bool {
 	return rcv._tab.MutateFloat32Slot(8, n)
 }
 
-func (rcv *DamagedBlock) IsDestroyed() bool {
+func (rcv *BlockUpdate) IsDestroyed() bool {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
 	if o != 0 {
 		return rcv._tab.GetBool(o + rcv._tab.Pos)
@@ -447,26 +447,26 @@ func (rcv *DamagedBlock) IsDestroyed() bool {
 	return false
 }
 
-func (rcv *DamagedBlock) MutateIsDestroyed(n bool) bool {
+func (rcv *BlockUpdate) MutateIsDestroyed(n bool) bool {
 	return rcv._tab.MutateBoolSlot(10, n)
 }
 
-func DamagedBlockStart(builder *flatbuffers.Builder) {
+func BlockUpdateStart(builder *flatbuffers.Builder) {
 	builder.StartObject(4)
 }
-func DamagedBlockAddBlockIndex(builder *flatbuffers.Builder, blockIndex uint16) {
+func BlockUpdateAddBlockIndex(builder *flatbuffers.Builder, blockIndex uint16) {
 	builder.PrependUint16Slot(0, blockIndex, 0)
 }
-func DamagedBlockAddHitpoints(builder *flatbuffers.Builder, hitpoints float32) {
+func BlockUpdateAddHitpoints(builder *flatbuffers.Builder, hitpoints float32) {
 	builder.PrependFloat32Slot(1, hitpoints, 0.0)
 }
-func DamagedBlockAddAppliedThrust(builder *flatbuffers.Builder, appliedThrust float32) {
+func BlockUpdateAddAppliedThrust(builder *flatbuffers.Builder, appliedThrust float32) {
 	builder.PrependFloat32Slot(2, appliedThrust, 0.0)
 }
-func DamagedBlockAddIsDestroyed(builder *flatbuffers.Builder, isDestroyed bool) {
+func BlockUpdateAddIsDestroyed(builder *flatbuffers.Builder, isDestroyed bool) {
 	builder.PrependBoolSlot(3, isDestroyed, false)
 }
-func DamagedBlockEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+func BlockUpdateEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
 type ShieldUpdate struct {
@@ -641,7 +641,7 @@ func (rcv *MissileSlotUpdate) MutateIsLoaded(n bool) bool {
 	return rcv._tab.MutateBoolSlot(8, n)
 }
 
-func (rcv *MissileSlotUpdate) Rotation() float32 {
+func (rcv *MissileSlotUpdate) LocalRotation() float32 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
 	if o != 0 {
 		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
@@ -649,7 +649,7 @@ func (rcv *MissileSlotUpdate) Rotation() float32 {
 	return 0.0
 }
 
-func (rcv *MissileSlotUpdate) MutateRotation(n float32) bool {
+func (rcv *MissileSlotUpdate) MutateLocalRotation(n float32) bool {
 	return rcv._tab.MutateFloat32Slot(10, n)
 }
 
@@ -665,8 +665,8 @@ func MissileSlotUpdateAddSlotIndex(builder *flatbuffers.Builder, slotIndex byte)
 func MissileSlotUpdateAddIsLoaded(builder *flatbuffers.Builder, isLoaded bool) {
 	builder.PrependBoolSlot(2, isLoaded, false)
 }
-func MissileSlotUpdateAddRotation(builder *flatbuffers.Builder, rotation float32) {
-	builder.PrependFloat32Slot(3, rotation, 0.0)
+func MissileSlotUpdateAddLocalRotation(builder *flatbuffers.Builder, localRotation float32) {
+	builder.PrependFloat32Slot(3, localRotation, 0.0)
 }
 func MissileSlotUpdateEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
@@ -718,7 +718,7 @@ func (rcv *TurretUpdate) MutateBlockIndex(n uint16) bool {
 	return rcv._tab.MutateUint16Slot(4, n)
 }
 
-func (rcv *TurretUpdate) Rotation() float32 {
+func (rcv *TurretUpdate) LocalRotation() float32 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
 	if o != 0 {
 		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
@@ -726,7 +726,7 @@ func (rcv *TurretUpdate) Rotation() float32 {
 	return 0.0
 }
 
-func (rcv *TurretUpdate) MutateRotation(n float32) bool {
+func (rcv *TurretUpdate) MutateLocalRotation(n float32) bool {
 	return rcv._tab.MutateFloat32Slot(6, n)
 }
 
@@ -736,61 +736,60 @@ func TurretUpdateStart(builder *flatbuffers.Builder) {
 func TurretUpdateAddBlockIndex(builder *flatbuffers.Builder, blockIndex uint16) {
 	builder.PrependUint16Slot(0, blockIndex, 0)
 }
-func TurretUpdateAddRotation(builder *flatbuffers.Builder, rotation float32) {
-	builder.PrependFloat32Slot(1, rotation, 0.0)
+func TurretUpdateAddLocalRotation(builder *flatbuffers.Builder, localRotation float32) {
+	builder.PrependFloat32Slot(1, localRotation, 0.0)
 }
 func TurretUpdateEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
-type NewExplosion struct {
+type Explosion struct {
 	_tab flatbuffers.Table
 }
 
-func GetRootAsNewExplosion(buf []byte, offset flatbuffers.UOffsetT) *NewExplosion {
+func GetRootAsExplosion(buf []byte, offset flatbuffers.UOffsetT) *Explosion {
 	n := flatbuffers.GetUOffsetT(buf[offset:])
-	x := &NewExplosion{}
+	x := &Explosion{}
 	x.Init(buf, n+offset)
 	return x
 }
 
-func FinishNewExplosionBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+func FinishExplosionBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
 	builder.Finish(offset)
 }
 
-func GetSizePrefixedRootAsNewExplosion(buf []byte, offset flatbuffers.UOffsetT) *NewExplosion {
+func GetSizePrefixedRootAsExplosion(buf []byte, offset flatbuffers.UOffsetT) *Explosion {
 	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
-	x := &NewExplosion{}
+	x := &Explosion{}
 	x.Init(buf, n+offset+flatbuffers.SizeUint32)
 	return x
 }
 
-func FinishSizePrefixedNewExplosionBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+func FinishSizePrefixedExplosionBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
 	builder.FinishSizePrefixed(offset)
 }
 
-func (rcv *NewExplosion) Init(buf []byte, i flatbuffers.UOffsetT) {
+func (rcv *Explosion) Init(buf []byte, i flatbuffers.UOffsetT) {
 	rcv._tab.Bytes = buf
 	rcv._tab.Pos = i
 }
 
-func (rcv *NewExplosion) Table() flatbuffers.Table {
+func (rcv *Explosion) Table() flatbuffers.Table {
 	return rcv._tab
 }
 
-func (rcv *NewExplosion) Position(obj *Vec2) *Vec2 {
+func (rcv *Explosion) X() float32 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
 	if o != 0 {
-		x := rcv._tab.Indirect(o + rcv._tab.Pos)
-		if obj == nil {
-			obj = new(Vec2)
-		}
-		obj.Init(rcv._tab.Bytes, x)
-		return obj
+		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
 	}
-	return nil
+	return 0.0
 }
 
-func (rcv *NewExplosion) Radius() float32 {
+func (rcv *Explosion) MutateX(n float32) bool {
+	return rcv._tab.MutateFloat32Slot(4, n)
+}
+
+func (rcv *Explosion) Y() float32 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
 	if o != 0 {
 		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
@@ -798,11 +797,11 @@ func (rcv *NewExplosion) Radius() float32 {
 	return 0.0
 }
 
-func (rcv *NewExplosion) MutateRadius(n float32) bool {
+func (rcv *Explosion) MutateY(n float32) bool {
 	return rcv._tab.MutateFloat32Slot(6, n)
 }
 
-func (rcv *NewExplosion) Damage() float32 {
+func (rcv *Explosion) Radius() float32 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
 	if o != 0 {
 		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
@@ -810,23 +809,38 @@ func (rcv *NewExplosion) Damage() float32 {
 	return 0.0
 }
 
-func (rcv *NewExplosion) MutateDamage(n float32) bool {
+func (rcv *Explosion) MutateRadius(n float32) bool {
 	return rcv._tab.MutateFloat32Slot(8, n)
 }
 
-func NewExplosionStart(builder *flatbuffers.Builder) {
-	builder.StartObject(3)
+func (rcv *Explosion) Damage() float32 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
+	if o != 0 {
+		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
+	}
+	return 0.0
 }
-func NewExplosionAddPosition(builder *flatbuffers.Builder, position flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(position), 0)
+
+func (rcv *Explosion) MutateDamage(n float32) bool {
+	return rcv._tab.MutateFloat32Slot(10, n)
 }
-func NewExplosionAddRadius(builder *flatbuffers.Builder, radius float32) {
-	builder.PrependFloat32Slot(1, radius, 0.0)
+
+func ExplosionStart(builder *flatbuffers.Builder) {
+	builder.StartObject(4)
 }
-func NewExplosionAddDamage(builder *flatbuffers.Builder, damage float32) {
-	builder.PrependFloat32Slot(2, damage, 0.0)
+func ExplosionAddX(builder *flatbuffers.Builder, x float32) {
+	builder.PrependFloat32Slot(0, x, 0.0)
 }
-func NewExplosionEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+func ExplosionAddY(builder *flatbuffers.Builder, y float32) {
+	builder.PrependFloat32Slot(1, y, 0.0)
+}
+func ExplosionAddRadius(builder *flatbuffers.Builder, radius float32) {
+	builder.PrependFloat32Slot(2, radius, 0.0)
+}
+func ExplosionAddDamage(builder *flatbuffers.Builder, damage float32) {
+	builder.PrependFloat32Slot(3, damage, 0.0)
+}
+func ExplosionEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
 type NewProjectile struct {
@@ -1054,20 +1068,8 @@ func (rcv *GameStateDelta) Table() flatbuffers.Table {
 	return rcv._tab
 }
 
-func (rcv *GameStateDelta) Tick() uint32 {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
-	if o != 0 {
-		return rcv._tab.GetUint32(o + rcv._tab.Pos)
-	}
-	return 0
-}
-
-func (rcv *GameStateDelta) MutateTick(n uint32) bool {
-	return rcv._tab.MutateUint32Slot(4, n)
-}
-
 func (rcv *GameStateDelta) FlagPositions(obj *FlagUpdate, j int) bool {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
 	if o != 0 {
 		x := rcv._tab.Vector(o)
 		x += flatbuffers.UOffsetT(j) * 4
@@ -1079,7 +1081,7 @@ func (rcv *GameStateDelta) FlagPositions(obj *FlagUpdate, j int) bool {
 }
 
 func (rcv *GameStateDelta) FlagPositionsLength() int {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
 	if o != 0 {
 		return rcv._tab.VectorLen(o)
 	}
@@ -1087,7 +1089,7 @@ func (rcv *GameStateDelta) FlagPositionsLength() int {
 }
 
 func (rcv *GameStateDelta) EntityPositions(obj *EntityUpdate, j int) bool {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
 	if o != 0 {
 		x := rcv._tab.Vector(o)
 		x += flatbuffers.UOffsetT(j) * 4
@@ -1099,7 +1101,7 @@ func (rcv *GameStateDelta) EntityPositions(obj *EntityUpdate, j int) bool {
 }
 
 func (rcv *GameStateDelta) EntityPositionsLength() int {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
 	if o != 0 {
 		return rcv._tab.VectorLen(o)
 	}
@@ -1107,7 +1109,7 @@ func (rcv *GameStateDelta) EntityPositionsLength() int {
 }
 
 func (rcv *GameStateDelta) NewProjectiles(obj *NewProjectile, j int) bool {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
 	if o != 0 {
 		x := rcv._tab.Vector(o)
 		x += flatbuffers.UOffsetT(j) * 4
@@ -1119,7 +1121,7 @@ func (rcv *GameStateDelta) NewProjectiles(obj *NewProjectile, j int) bool {
 }
 
 func (rcv *GameStateDelta) NewProjectilesLength() int {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
 	if o != 0 {
 		return rcv._tab.VectorLen(o)
 	}
@@ -1127,7 +1129,7 @@ func (rcv *GameStateDelta) NewProjectilesLength() int {
 }
 
 func (rcv *GameStateDelta) DeadProjectiles(obj *DeadProjectile, j int) bool {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
 	if o != 0 {
 		x := rcv._tab.Vector(o)
 		x += flatbuffers.UOffsetT(j) * 4
@@ -1139,15 +1141,15 @@ func (rcv *GameStateDelta) DeadProjectiles(obj *DeadProjectile, j int) bool {
 }
 
 func (rcv *GameStateDelta) DeadProjectilesLength() int {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
 	if o != 0 {
 		return rcv._tab.VectorLen(o)
 	}
 	return 0
 }
 
-func (rcv *GameStateDelta) NewExplosions(obj *NewExplosion, j int) bool {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(14))
+func (rcv *GameStateDelta) Explosions(obj *Explosion, j int) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
 	if o != 0 {
 		x := rcv._tab.Vector(o)
 		x += flatbuffers.UOffsetT(j) * 4
@@ -1158,8 +1160,8 @@ func (rcv *GameStateDelta) NewExplosions(obj *NewExplosion, j int) bool {
 	return false
 }
 
-func (rcv *GameStateDelta) NewExplosionsLength() int {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(14))
+func (rcv *GameStateDelta) ExplosionsLength() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
 	if o != 0 {
 		return rcv._tab.VectorLen(o)
 	}
@@ -1167,39 +1169,36 @@ func (rcv *GameStateDelta) NewExplosionsLength() int {
 }
 
 func GameStateDeltaStart(builder *flatbuffers.Builder) {
-	builder.StartObject(6)
-}
-func GameStateDeltaAddTick(builder *flatbuffers.Builder, tick uint32) {
-	builder.PrependUint32Slot(0, tick, 0)
+	builder.StartObject(5)
 }
 func GameStateDeltaAddFlagPositions(builder *flatbuffers.Builder, flagPositions flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(1, flatbuffers.UOffsetT(flagPositions), 0)
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(flagPositions), 0)
 }
 func GameStateDeltaStartFlagPositionsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(4, numElems, 4)
 }
 func GameStateDeltaAddEntityPositions(builder *flatbuffers.Builder, entityPositions flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(2, flatbuffers.UOffsetT(entityPositions), 0)
+	builder.PrependUOffsetTSlot(1, flatbuffers.UOffsetT(entityPositions), 0)
 }
 func GameStateDeltaStartEntityPositionsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(4, numElems, 4)
 }
 func GameStateDeltaAddNewProjectiles(builder *flatbuffers.Builder, newProjectiles flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(3, flatbuffers.UOffsetT(newProjectiles), 0)
+	builder.PrependUOffsetTSlot(2, flatbuffers.UOffsetT(newProjectiles), 0)
 }
 func GameStateDeltaStartNewProjectilesVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(4, numElems, 4)
 }
 func GameStateDeltaAddDeadProjectiles(builder *flatbuffers.Builder, deadProjectiles flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(4, flatbuffers.UOffsetT(deadProjectiles), 0)
+	builder.PrependUOffsetTSlot(3, flatbuffers.UOffsetT(deadProjectiles), 0)
 }
 func GameStateDeltaStartDeadProjectilesVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(4, numElems, 4)
 }
-func GameStateDeltaAddNewExplosions(builder *flatbuffers.Builder, newExplosions flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(5, flatbuffers.UOffsetT(newExplosions), 0)
+func GameStateDeltaAddExplosions(builder *flatbuffers.Builder, explosions flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(4, flatbuffers.UOffsetT(explosions), 0)
 }
-func GameStateDeltaStartNewExplosionsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+func GameStateDeltaStartExplosionsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(4, numElems, 4)
 }
 func GameStateDeltaEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {

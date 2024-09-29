@@ -1083,11 +1083,12 @@ impl<'a> flatbuffers::Follow<'a> for Projectile<'a> {
 }
 
 impl<'a> Projectile<'a> {
-  pub const VT_MY: flatbuffers::VOffsetT = 4;
-  pub const VT_POSITION: flatbuffers::VOffsetT = 6;
-  pub const VT_LINEAR_VELOCITY: flatbuffers::VOffsetT = 8;
-  pub const VT_SIZE_: flatbuffers::VOffsetT = 10;
-  pub const VT_DAMAGE: flatbuffers::VOffsetT = 12;
+  pub const VT_ID: flatbuffers::VOffsetT = 4;
+  pub const VT_MY: flatbuffers::VOffsetT = 6;
+  pub const VT_POSITION: flatbuffers::VOffsetT = 8;
+  pub const VT_LINEAR_VELOCITY: flatbuffers::VOffsetT = 10;
+  pub const VT_SIZE_: flatbuffers::VOffsetT = 12;
+  pub const VT_DAMAGE: flatbuffers::VOffsetT = 14;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -1099,6 +1100,7 @@ impl<'a> Projectile<'a> {
     args: &'args ProjectileArgs<'args>
   ) -> flatbuffers::WIPOffset<Projectile<'bldr>> {
     let mut builder = ProjectileBuilder::new(_fbb);
+    builder.add_id(args.id);
     builder.add_damage(args.damage);
     builder.add_size_(args.size_);
     if let Some(x) = args.linear_velocity { builder.add_linear_velocity(x); }
@@ -1108,6 +1110,13 @@ impl<'a> Projectile<'a> {
   }
 
 
+  #[inline]
+  pub fn id(&self) -> u64 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u64>(Projectile::VT_ID, Some(0)).unwrap()}
+  }
   #[inline]
   pub fn my(&self) -> bool {
     // Safety:
@@ -1152,6 +1161,7 @@ impl flatbuffers::Verifiable for Projectile<'_> {
   ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
     use self::flatbuffers::Verifiable;
     v.visit_table(pos)?
+     .visit_field::<u64>("id", Self::VT_ID, false)?
      .visit_field::<bool>("my", Self::VT_MY, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<Vec2>>("position", Self::VT_POSITION, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<Vec2>>("linear_velocity", Self::VT_LINEAR_VELOCITY, false)?
@@ -1162,6 +1172,7 @@ impl flatbuffers::Verifiable for Projectile<'_> {
   }
 }
 pub struct ProjectileArgs<'a> {
+    pub id: u64,
     pub my: bool,
     pub position: Option<flatbuffers::WIPOffset<Vec2<'a>>>,
     pub linear_velocity: Option<flatbuffers::WIPOffset<Vec2<'a>>>,
@@ -1172,6 +1183,7 @@ impl<'a> Default for ProjectileArgs<'a> {
   #[inline]
   fn default() -> Self {
     ProjectileArgs {
+      id: 0,
       my: false,
       position: None,
       linear_velocity: None,
@@ -1186,6 +1198,10 @@ pub struct ProjectileBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
   start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
 impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ProjectileBuilder<'a, 'b, A> {
+  #[inline]
+  pub fn add_id(&mut self, id: u64) {
+    self.fbb_.push_slot::<u64>(Projectile::VT_ID, id, 0);
+  }
   #[inline]
   pub fn add_my(&mut self, my: bool) {
     self.fbb_.push_slot::<bool>(Projectile::VT_MY, my, false);
@@ -1224,6 +1240,7 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ProjectileBuilder<'a, 'b, A> {
 impl core::fmt::Debug for Projectile<'_> {
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ds = f.debug_struct("Projectile");
+      ds.field("id", &self.id());
       ds.field("my", &self.my());
       ds.field("position", &self.position());
       ds.field("linear_velocity", &self.linear_velocity());
@@ -1559,6 +1576,1093 @@ impl core::fmt::Debug for GameState<'_> {
       ds.field("explosions", &self.explosions());
       ds.field("my_id", &self.my_id());
       ds.field("winner_id", &self.winner_id());
+      ds.finish()
+  }
+}
+pub enum EntityUpdateOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct EntityUpdate<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for EntityUpdate<'a> {
+  type Inner = EntityUpdate<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> EntityUpdate<'a> {
+  pub const VT_ID: flatbuffers::VOffsetT = 4;
+  pub const VT_X: flatbuffers::VOffsetT = 6;
+  pub const VT_Y: flatbuffers::VOffsetT = 8;
+  pub const VT_ROTATION: flatbuffers::VOffsetT = 10;
+  pub const VT_BLOCK_UPDATE: flatbuffers::VOffsetT = 12;
+  pub const VT_SHIELD_UPDATES: flatbuffers::VOffsetT = 14;
+  pub const VT_MISSILE_SLOT_UPDATES: flatbuffers::VOffsetT = 16;
+  pub const VT_TURRET_UPDATES: flatbuffers::VOffsetT = 18;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    EntityUpdate { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+    args: &'args EntityUpdateArgs<'args>
+  ) -> flatbuffers::WIPOffset<EntityUpdate<'bldr>> {
+    let mut builder = EntityUpdateBuilder::new(_fbb);
+    builder.add_id(args.id);
+    if let Some(x) = args.turret_updates { builder.add_turret_updates(x); }
+    if let Some(x) = args.missile_slot_updates { builder.add_missile_slot_updates(x); }
+    if let Some(x) = args.shield_updates { builder.add_shield_updates(x); }
+    if let Some(x) = args.block_update { builder.add_block_update(x); }
+    builder.add_rotation(args.rotation);
+    builder.add_y(args.y);
+    builder.add_x(args.x);
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn id(&self) -> u64 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u64>(EntityUpdate::VT_ID, Some(0)).unwrap()}
+  }
+  #[inline]
+  pub fn x(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(EntityUpdate::VT_X, Some(0.0)).unwrap()}
+  }
+  #[inline]
+  pub fn y(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(EntityUpdate::VT_Y, Some(0.0)).unwrap()}
+  }
+  #[inline]
+  pub fn rotation(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(EntityUpdate::VT_ROTATION, Some(0.0)).unwrap()}
+  }
+  #[inline]
+  pub fn block_update(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<BlockUpdate<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<BlockUpdate>>>>(EntityUpdate::VT_BLOCK_UPDATE, None)}
+  }
+  #[inline]
+  pub fn shield_updates(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ShieldUpdate<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ShieldUpdate>>>>(EntityUpdate::VT_SHIELD_UPDATES, None)}
+  }
+  #[inline]
+  pub fn missile_slot_updates(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<MissileSlotUpdate<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<MissileSlotUpdate>>>>(EntityUpdate::VT_MISSILE_SLOT_UPDATES, None)}
+  }
+  #[inline]
+  pub fn turret_updates(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<TurretUpdate<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<TurretUpdate>>>>(EntityUpdate::VT_TURRET_UPDATES, None)}
+  }
+}
+
+impl flatbuffers::Verifiable for EntityUpdate<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<u64>("id", Self::VT_ID, false)?
+     .visit_field::<f32>("x", Self::VT_X, false)?
+     .visit_field::<f32>("y", Self::VT_Y, false)?
+     .visit_field::<f32>("rotation", Self::VT_ROTATION, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<BlockUpdate>>>>("block_update", Self::VT_BLOCK_UPDATE, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<ShieldUpdate>>>>("shield_updates", Self::VT_SHIELD_UPDATES, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<MissileSlotUpdate>>>>("missile_slot_updates", Self::VT_MISSILE_SLOT_UPDATES, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<TurretUpdate>>>>("turret_updates", Self::VT_TURRET_UPDATES, false)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct EntityUpdateArgs<'a> {
+    pub id: u64,
+    pub x: f32,
+    pub y: f32,
+    pub rotation: f32,
+    pub block_update: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<BlockUpdate<'a>>>>>,
+    pub shield_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ShieldUpdate<'a>>>>>,
+    pub missile_slot_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<MissileSlotUpdate<'a>>>>>,
+    pub turret_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<TurretUpdate<'a>>>>>,
+}
+impl<'a> Default for EntityUpdateArgs<'a> {
+  #[inline]
+  fn default() -> Self {
+    EntityUpdateArgs {
+      id: 0,
+      x: 0.0,
+      y: 0.0,
+      rotation: 0.0,
+      block_update: None,
+      shield_updates: None,
+      missile_slot_updates: None,
+      turret_updates: None,
+    }
+  }
+}
+
+pub struct EntityUpdateBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> EntityUpdateBuilder<'a, 'b, A> {
+  #[inline]
+  pub fn add_id(&mut self, id: u64) {
+    self.fbb_.push_slot::<u64>(EntityUpdate::VT_ID, id, 0);
+  }
+  #[inline]
+  pub fn add_x(&mut self, x: f32) {
+    self.fbb_.push_slot::<f32>(EntityUpdate::VT_X, x, 0.0);
+  }
+  #[inline]
+  pub fn add_y(&mut self, y: f32) {
+    self.fbb_.push_slot::<f32>(EntityUpdate::VT_Y, y, 0.0);
+  }
+  #[inline]
+  pub fn add_rotation(&mut self, rotation: f32) {
+    self.fbb_.push_slot::<f32>(EntityUpdate::VT_ROTATION, rotation, 0.0);
+  }
+  #[inline]
+  pub fn add_block_update(&mut self, block_update: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<BlockUpdate<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(EntityUpdate::VT_BLOCK_UPDATE, block_update);
+  }
+  #[inline]
+  pub fn add_shield_updates(&mut self, shield_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<ShieldUpdate<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(EntityUpdate::VT_SHIELD_UPDATES, shield_updates);
+  }
+  #[inline]
+  pub fn add_missile_slot_updates(&mut self, missile_slot_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<MissileSlotUpdate<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(EntityUpdate::VT_MISSILE_SLOT_UPDATES, missile_slot_updates);
+  }
+  #[inline]
+  pub fn add_turret_updates(&mut self, turret_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<TurretUpdate<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(EntityUpdate::VT_TURRET_UPDATES, turret_updates);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> EntityUpdateBuilder<'a, 'b, A> {
+    let start = _fbb.start_table();
+    EntityUpdateBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<EntityUpdate<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for EntityUpdate<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("EntityUpdate");
+      ds.field("id", &self.id());
+      ds.field("x", &self.x());
+      ds.field("y", &self.y());
+      ds.field("rotation", &self.rotation());
+      ds.field("block_update", &self.block_update());
+      ds.field("shield_updates", &self.shield_updates());
+      ds.field("missile_slot_updates", &self.missile_slot_updates());
+      ds.field("turret_updates", &self.turret_updates());
+      ds.finish()
+  }
+}
+pub enum BlockUpdateOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct BlockUpdate<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for BlockUpdate<'a> {
+  type Inner = BlockUpdate<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> BlockUpdate<'a> {
+  pub const VT_BLOCK_INDEX: flatbuffers::VOffsetT = 4;
+  pub const VT_HITPOINTS: flatbuffers::VOffsetT = 6;
+  pub const VT_APPLIED_THRUST: flatbuffers::VOffsetT = 8;
+  pub const VT_IS_DESTROYED: flatbuffers::VOffsetT = 10;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    BlockUpdate { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+    args: &'args BlockUpdateArgs
+  ) -> flatbuffers::WIPOffset<BlockUpdate<'bldr>> {
+    let mut builder = BlockUpdateBuilder::new(_fbb);
+    builder.add_applied_thrust(args.applied_thrust);
+    builder.add_hitpoints(args.hitpoints);
+    builder.add_block_index(args.block_index);
+    builder.add_is_destroyed(args.is_destroyed);
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn block_index(&self) -> u16 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u16>(BlockUpdate::VT_BLOCK_INDEX, Some(0)).unwrap()}
+  }
+  #[inline]
+  pub fn hitpoints(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(BlockUpdate::VT_HITPOINTS, Some(0.0)).unwrap()}
+  }
+  #[inline]
+  pub fn applied_thrust(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(BlockUpdate::VT_APPLIED_THRUST, Some(0.0)).unwrap()}
+  }
+  #[inline]
+  pub fn is_destroyed(&self) -> bool {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<bool>(BlockUpdate::VT_IS_DESTROYED, Some(false)).unwrap()}
+  }
+}
+
+impl flatbuffers::Verifiable for BlockUpdate<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<u16>("block_index", Self::VT_BLOCK_INDEX, false)?
+     .visit_field::<f32>("hitpoints", Self::VT_HITPOINTS, false)?
+     .visit_field::<f32>("applied_thrust", Self::VT_APPLIED_THRUST, false)?
+     .visit_field::<bool>("is_destroyed", Self::VT_IS_DESTROYED, false)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct BlockUpdateArgs {
+    pub block_index: u16,
+    pub hitpoints: f32,
+    pub applied_thrust: f32,
+    pub is_destroyed: bool,
+}
+impl<'a> Default for BlockUpdateArgs {
+  #[inline]
+  fn default() -> Self {
+    BlockUpdateArgs {
+      block_index: 0,
+      hitpoints: 0.0,
+      applied_thrust: 0.0,
+      is_destroyed: false,
+    }
+  }
+}
+
+pub struct BlockUpdateBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> BlockUpdateBuilder<'a, 'b, A> {
+  #[inline]
+  pub fn add_block_index(&mut self, block_index: u16) {
+    self.fbb_.push_slot::<u16>(BlockUpdate::VT_BLOCK_INDEX, block_index, 0);
+  }
+  #[inline]
+  pub fn add_hitpoints(&mut self, hitpoints: f32) {
+    self.fbb_.push_slot::<f32>(BlockUpdate::VT_HITPOINTS, hitpoints, 0.0);
+  }
+  #[inline]
+  pub fn add_applied_thrust(&mut self, applied_thrust: f32) {
+    self.fbb_.push_slot::<f32>(BlockUpdate::VT_APPLIED_THRUST, applied_thrust, 0.0);
+  }
+  #[inline]
+  pub fn add_is_destroyed(&mut self, is_destroyed: bool) {
+    self.fbb_.push_slot::<bool>(BlockUpdate::VT_IS_DESTROYED, is_destroyed, false);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> BlockUpdateBuilder<'a, 'b, A> {
+    let start = _fbb.start_table();
+    BlockUpdateBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<BlockUpdate<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for BlockUpdate<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("BlockUpdate");
+      ds.field("block_index", &self.block_index());
+      ds.field("hitpoints", &self.hitpoints());
+      ds.field("applied_thrust", &self.applied_thrust());
+      ds.field("is_destroyed", &self.is_destroyed());
+      ds.finish()
+  }
+}
+pub enum ShieldUpdateOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct ShieldUpdate<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for ShieldUpdate<'a> {
+  type Inner = ShieldUpdate<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> ShieldUpdate<'a> {
+  pub const VT_BLOCK_INDEX: flatbuffers::VOffsetT = 4;
+  pub const VT_HITPOINTS: flatbuffers::VOffsetT = 6;
+  pub const VT_ROTATION: flatbuffers::VOffsetT = 8;
+  pub const VT_IS_DESTROYED: flatbuffers::VOffsetT = 10;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    ShieldUpdate { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+    args: &'args ShieldUpdateArgs
+  ) -> flatbuffers::WIPOffset<ShieldUpdate<'bldr>> {
+    let mut builder = ShieldUpdateBuilder::new(_fbb);
+    builder.add_rotation(args.rotation);
+    builder.add_hitpoints(args.hitpoints);
+    builder.add_block_index(args.block_index);
+    builder.add_is_destroyed(args.is_destroyed);
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn block_index(&self) -> u16 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u16>(ShieldUpdate::VT_BLOCK_INDEX, Some(0)).unwrap()}
+  }
+  #[inline]
+  pub fn hitpoints(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(ShieldUpdate::VT_HITPOINTS, Some(0.0)).unwrap()}
+  }
+  #[inline]
+  pub fn rotation(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(ShieldUpdate::VT_ROTATION, Some(0.0)).unwrap()}
+  }
+  #[inline]
+  pub fn is_destroyed(&self) -> bool {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<bool>(ShieldUpdate::VT_IS_DESTROYED, Some(false)).unwrap()}
+  }
+}
+
+impl flatbuffers::Verifiable for ShieldUpdate<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<u16>("block_index", Self::VT_BLOCK_INDEX, false)?
+     .visit_field::<f32>("hitpoints", Self::VT_HITPOINTS, false)?
+     .visit_field::<f32>("rotation", Self::VT_ROTATION, false)?
+     .visit_field::<bool>("is_destroyed", Self::VT_IS_DESTROYED, false)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct ShieldUpdateArgs {
+    pub block_index: u16,
+    pub hitpoints: f32,
+    pub rotation: f32,
+    pub is_destroyed: bool,
+}
+impl<'a> Default for ShieldUpdateArgs {
+  #[inline]
+  fn default() -> Self {
+    ShieldUpdateArgs {
+      block_index: 0,
+      hitpoints: 0.0,
+      rotation: 0.0,
+      is_destroyed: false,
+    }
+  }
+}
+
+pub struct ShieldUpdateBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ShieldUpdateBuilder<'a, 'b, A> {
+  #[inline]
+  pub fn add_block_index(&mut self, block_index: u16) {
+    self.fbb_.push_slot::<u16>(ShieldUpdate::VT_BLOCK_INDEX, block_index, 0);
+  }
+  #[inline]
+  pub fn add_hitpoints(&mut self, hitpoints: f32) {
+    self.fbb_.push_slot::<f32>(ShieldUpdate::VT_HITPOINTS, hitpoints, 0.0);
+  }
+  #[inline]
+  pub fn add_rotation(&mut self, rotation: f32) {
+    self.fbb_.push_slot::<f32>(ShieldUpdate::VT_ROTATION, rotation, 0.0);
+  }
+  #[inline]
+  pub fn add_is_destroyed(&mut self, is_destroyed: bool) {
+    self.fbb_.push_slot::<bool>(ShieldUpdate::VT_IS_DESTROYED, is_destroyed, false);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ShieldUpdateBuilder<'a, 'b, A> {
+    let start = _fbb.start_table();
+    ShieldUpdateBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<ShieldUpdate<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for ShieldUpdate<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("ShieldUpdate");
+      ds.field("block_index", &self.block_index());
+      ds.field("hitpoints", &self.hitpoints());
+      ds.field("rotation", &self.rotation());
+      ds.field("is_destroyed", &self.is_destroyed());
+      ds.finish()
+  }
+}
+pub enum MissileSlotUpdateOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct MissileSlotUpdate<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for MissileSlotUpdate<'a> {
+  type Inner = MissileSlotUpdate<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> MissileSlotUpdate<'a> {
+  pub const VT_BLOCK_INDEX: flatbuffers::VOffsetT = 4;
+  pub const VT_SLOT_INDEX: flatbuffers::VOffsetT = 6;
+  pub const VT_IS_LOADED: flatbuffers::VOffsetT = 8;
+  pub const VT_LOCAL_ROTATION: flatbuffers::VOffsetT = 10;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    MissileSlotUpdate { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+    args: &'args MissileSlotUpdateArgs
+  ) -> flatbuffers::WIPOffset<MissileSlotUpdate<'bldr>> {
+    let mut builder = MissileSlotUpdateBuilder::new(_fbb);
+    builder.add_local_rotation(args.local_rotation);
+    builder.add_block_index(args.block_index);
+    builder.add_is_loaded(args.is_loaded);
+    builder.add_slot_index(args.slot_index);
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn block_index(&self) -> u16 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u16>(MissileSlotUpdate::VT_BLOCK_INDEX, Some(0)).unwrap()}
+  }
+  #[inline]
+  pub fn slot_index(&self) -> u8 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u8>(MissileSlotUpdate::VT_SLOT_INDEX, Some(0)).unwrap()}
+  }
+  #[inline]
+  pub fn is_loaded(&self) -> bool {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<bool>(MissileSlotUpdate::VT_IS_LOADED, Some(false)).unwrap()}
+  }
+  #[inline]
+  pub fn local_rotation(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(MissileSlotUpdate::VT_LOCAL_ROTATION, Some(0.0)).unwrap()}
+  }
+}
+
+impl flatbuffers::Verifiable for MissileSlotUpdate<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<u16>("block_index", Self::VT_BLOCK_INDEX, false)?
+     .visit_field::<u8>("slot_index", Self::VT_SLOT_INDEX, false)?
+     .visit_field::<bool>("is_loaded", Self::VT_IS_LOADED, false)?
+     .visit_field::<f32>("local_rotation", Self::VT_LOCAL_ROTATION, false)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct MissileSlotUpdateArgs {
+    pub block_index: u16,
+    pub slot_index: u8,
+    pub is_loaded: bool,
+    pub local_rotation: f32,
+}
+impl<'a> Default for MissileSlotUpdateArgs {
+  #[inline]
+  fn default() -> Self {
+    MissileSlotUpdateArgs {
+      block_index: 0,
+      slot_index: 0,
+      is_loaded: false,
+      local_rotation: 0.0,
+    }
+  }
+}
+
+pub struct MissileSlotUpdateBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> MissileSlotUpdateBuilder<'a, 'b, A> {
+  #[inline]
+  pub fn add_block_index(&mut self, block_index: u16) {
+    self.fbb_.push_slot::<u16>(MissileSlotUpdate::VT_BLOCK_INDEX, block_index, 0);
+  }
+  #[inline]
+  pub fn add_slot_index(&mut self, slot_index: u8) {
+    self.fbb_.push_slot::<u8>(MissileSlotUpdate::VT_SLOT_INDEX, slot_index, 0);
+  }
+  #[inline]
+  pub fn add_is_loaded(&mut self, is_loaded: bool) {
+    self.fbb_.push_slot::<bool>(MissileSlotUpdate::VT_IS_LOADED, is_loaded, false);
+  }
+  #[inline]
+  pub fn add_local_rotation(&mut self, local_rotation: f32) {
+    self.fbb_.push_slot::<f32>(MissileSlotUpdate::VT_LOCAL_ROTATION, local_rotation, 0.0);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> MissileSlotUpdateBuilder<'a, 'b, A> {
+    let start = _fbb.start_table();
+    MissileSlotUpdateBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<MissileSlotUpdate<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for MissileSlotUpdate<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("MissileSlotUpdate");
+      ds.field("block_index", &self.block_index());
+      ds.field("slot_index", &self.slot_index());
+      ds.field("is_loaded", &self.is_loaded());
+      ds.field("local_rotation", &self.local_rotation());
+      ds.finish()
+  }
+}
+pub enum TurretUpdateOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct TurretUpdate<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for TurretUpdate<'a> {
+  type Inner = TurretUpdate<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> TurretUpdate<'a> {
+  pub const VT_BLOCK_INDEX: flatbuffers::VOffsetT = 4;
+  pub const VT_LOCAL_ROTATION: flatbuffers::VOffsetT = 6;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    TurretUpdate { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+    args: &'args TurretUpdateArgs
+  ) -> flatbuffers::WIPOffset<TurretUpdate<'bldr>> {
+    let mut builder = TurretUpdateBuilder::new(_fbb);
+    builder.add_local_rotation(args.local_rotation);
+    builder.add_block_index(args.block_index);
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn block_index(&self) -> u16 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u16>(TurretUpdate::VT_BLOCK_INDEX, Some(0)).unwrap()}
+  }
+  #[inline]
+  pub fn local_rotation(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(TurretUpdate::VT_LOCAL_ROTATION, Some(0.0)).unwrap()}
+  }
+}
+
+impl flatbuffers::Verifiable for TurretUpdate<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<u16>("block_index", Self::VT_BLOCK_INDEX, false)?
+     .visit_field::<f32>("local_rotation", Self::VT_LOCAL_ROTATION, false)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct TurretUpdateArgs {
+    pub block_index: u16,
+    pub local_rotation: f32,
+}
+impl<'a> Default for TurretUpdateArgs {
+  #[inline]
+  fn default() -> Self {
+    TurretUpdateArgs {
+      block_index: 0,
+      local_rotation: 0.0,
+    }
+  }
+}
+
+pub struct TurretUpdateBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> TurretUpdateBuilder<'a, 'b, A> {
+  #[inline]
+  pub fn add_block_index(&mut self, block_index: u16) {
+    self.fbb_.push_slot::<u16>(TurretUpdate::VT_BLOCK_INDEX, block_index, 0);
+  }
+  #[inline]
+  pub fn add_local_rotation(&mut self, local_rotation: f32) {
+    self.fbb_.push_slot::<f32>(TurretUpdate::VT_LOCAL_ROTATION, local_rotation, 0.0);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> TurretUpdateBuilder<'a, 'b, A> {
+    let start = _fbb.start_table();
+    TurretUpdateBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<TurretUpdate<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for TurretUpdate<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("TurretUpdate");
+      ds.field("block_index", &self.block_index());
+      ds.field("local_rotation", &self.local_rotation());
+      ds.finish()
+  }
+}
+pub enum DeadProjectileOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct DeadProjectile<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for DeadProjectile<'a> {
+  type Inner = DeadProjectile<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> DeadProjectile<'a> {
+  pub const VT_ID: flatbuffers::VOffsetT = 4;
+  pub const VT_POSITION: flatbuffers::VOffsetT = 6;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    DeadProjectile { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+    args: &'args DeadProjectileArgs<'args>
+  ) -> flatbuffers::WIPOffset<DeadProjectile<'bldr>> {
+    let mut builder = DeadProjectileBuilder::new(_fbb);
+    builder.add_id(args.id);
+    if let Some(x) = args.position { builder.add_position(x); }
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn id(&self) -> u64 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u64>(DeadProjectile::VT_ID, Some(0)).unwrap()}
+  }
+  #[inline]
+  pub fn position(&self) -> Option<Vec2<'a>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<Vec2>>(DeadProjectile::VT_POSITION, None)}
+  }
+}
+
+impl flatbuffers::Verifiable for DeadProjectile<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<u64>("id", Self::VT_ID, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<Vec2>>("position", Self::VT_POSITION, false)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct DeadProjectileArgs<'a> {
+    pub id: u64,
+    pub position: Option<flatbuffers::WIPOffset<Vec2<'a>>>,
+}
+impl<'a> Default for DeadProjectileArgs<'a> {
+  #[inline]
+  fn default() -> Self {
+    DeadProjectileArgs {
+      id: 0,
+      position: None,
+    }
+  }
+}
+
+pub struct DeadProjectileBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> DeadProjectileBuilder<'a, 'b, A> {
+  #[inline]
+  pub fn add_id(&mut self, id: u64) {
+    self.fbb_.push_slot::<u64>(DeadProjectile::VT_ID, id, 0);
+  }
+  #[inline]
+  pub fn add_position(&mut self, position: flatbuffers::WIPOffset<Vec2<'b >>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<Vec2>>(DeadProjectile::VT_POSITION, position);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> DeadProjectileBuilder<'a, 'b, A> {
+    let start = _fbb.start_table();
+    DeadProjectileBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<DeadProjectile<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for DeadProjectile<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("DeadProjectile");
+      ds.field("id", &self.id());
+      ds.field("position", &self.position());
+      ds.finish()
+  }
+}
+pub enum GameStateDeltaOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct GameStateDelta<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for GameStateDelta<'a> {
+  type Inner = GameStateDelta<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> GameStateDelta<'a> {
+  pub const VT_FLAG_UPDATES: flatbuffers::VOffsetT = 4;
+  pub const VT_NEW_ENTITIES: flatbuffers::VOffsetT = 6;
+  pub const VT_DEAD_ENTITIES: flatbuffers::VOffsetT = 8;
+  pub const VT_ENTITY_POSITIONS: flatbuffers::VOffsetT = 10;
+  pub const VT_NEW_PROJECTILES: flatbuffers::VOffsetT = 12;
+  pub const VT_DEAD_PROJECTILES: flatbuffers::VOffsetT = 14;
+  pub const VT_EXPLOSIONS: flatbuffers::VOffsetT = 16;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    GameStateDelta { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+    args: &'args GameStateDeltaArgs<'args>
+  ) -> flatbuffers::WIPOffset<GameStateDelta<'bldr>> {
+    let mut builder = GameStateDeltaBuilder::new(_fbb);
+    if let Some(x) = args.explosions { builder.add_explosions(x); }
+    if let Some(x) = args.dead_projectiles { builder.add_dead_projectiles(x); }
+    if let Some(x) = args.new_projectiles { builder.add_new_projectiles(x); }
+    if let Some(x) = args.entity_positions { builder.add_entity_positions(x); }
+    if let Some(x) = args.dead_entities { builder.add_dead_entities(x); }
+    if let Some(x) = args.new_entities { builder.add_new_entities(x); }
+    if let Some(x) = args.flag_updates { builder.add_flag_updates(x); }
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn flag_updates(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag>>>>(GameStateDelta::VT_FLAG_UPDATES, None)}
+  }
+  #[inline]
+  pub fn new_entities(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Entity<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Entity>>>>(GameStateDelta::VT_NEW_ENTITIES, None)}
+  }
+  #[inline]
+  pub fn dead_entities(&self) -> Option<flatbuffers::Vector<'a, u64>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, u64>>>(GameStateDelta::VT_DEAD_ENTITIES, None)}
+  }
+  #[inline]
+  pub fn entity_positions(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<EntityUpdate<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<EntityUpdate>>>>(GameStateDelta::VT_ENTITY_POSITIONS, None)}
+  }
+  #[inline]
+  pub fn new_projectiles(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Projectile<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Projectile>>>>(GameStateDelta::VT_NEW_PROJECTILES, None)}
+  }
+  #[inline]
+  pub fn dead_projectiles(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<DeadProjectile<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<DeadProjectile>>>>(GameStateDelta::VT_DEAD_PROJECTILES, None)}
+  }
+  #[inline]
+  pub fn explosions(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Explosion<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Explosion>>>>(GameStateDelta::VT_EXPLOSIONS, None)}
+  }
+}
+
+impl flatbuffers::Verifiable for GameStateDelta<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Flag>>>>("flag_updates", Self::VT_FLAG_UPDATES, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Entity>>>>("new_entities", Self::VT_NEW_ENTITIES, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, u64>>>("dead_entities", Self::VT_DEAD_ENTITIES, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<EntityUpdate>>>>("entity_positions", Self::VT_ENTITY_POSITIONS, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Projectile>>>>("new_projectiles", Self::VT_NEW_PROJECTILES, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<DeadProjectile>>>>("dead_projectiles", Self::VT_DEAD_PROJECTILES, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Explosion>>>>("explosions", Self::VT_EXPLOSIONS, false)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct GameStateDeltaArgs<'a> {
+    pub flag_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag<'a>>>>>,
+    pub new_entities: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Entity<'a>>>>>,
+    pub dead_entities: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, u64>>>,
+    pub entity_positions: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<EntityUpdate<'a>>>>>,
+    pub new_projectiles: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Projectile<'a>>>>>,
+    pub dead_projectiles: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<DeadProjectile<'a>>>>>,
+    pub explosions: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Explosion<'a>>>>>,
+}
+impl<'a> Default for GameStateDeltaArgs<'a> {
+  #[inline]
+  fn default() -> Self {
+    GameStateDeltaArgs {
+      flag_updates: None,
+      new_entities: None,
+      dead_entities: None,
+      entity_positions: None,
+      new_projectiles: None,
+      dead_projectiles: None,
+      explosions: None,
+    }
+  }
+}
+
+pub struct GameStateDeltaBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GameStateDeltaBuilder<'a, 'b, A> {
+  #[inline]
+  pub fn add_flag_updates(&mut self, flag_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Flag<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStateDelta::VT_FLAG_UPDATES, flag_updates);
+  }
+  #[inline]
+  pub fn add_new_entities(&mut self, new_entities: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Entity<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStateDelta::VT_NEW_ENTITIES, new_entities);
+  }
+  #[inline]
+  pub fn add_dead_entities(&mut self, dead_entities: flatbuffers::WIPOffset<flatbuffers::Vector<'b , u64>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStateDelta::VT_DEAD_ENTITIES, dead_entities);
+  }
+  #[inline]
+  pub fn add_entity_positions(&mut self, entity_positions: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<EntityUpdate<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStateDelta::VT_ENTITY_POSITIONS, entity_positions);
+  }
+  #[inline]
+  pub fn add_new_projectiles(&mut self, new_projectiles: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Projectile<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStateDelta::VT_NEW_PROJECTILES, new_projectiles);
+  }
+  #[inline]
+  pub fn add_dead_projectiles(&mut self, dead_projectiles: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<DeadProjectile<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStateDelta::VT_DEAD_PROJECTILES, dead_projectiles);
+  }
+  #[inline]
+  pub fn add_explosions(&mut self, explosions: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Explosion<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStateDelta::VT_EXPLOSIONS, explosions);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> GameStateDeltaBuilder<'a, 'b, A> {
+    let start = _fbb.start_table();
+    GameStateDeltaBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<GameStateDelta<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for GameStateDelta<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("GameStateDelta");
+      ds.field("flag_updates", &self.flag_updates());
+      ds.field("new_entities", &self.new_entities());
+      ds.field("dead_entities", &self.dead_entities());
+      ds.field("entity_positions", &self.entity_positions());
+      ds.field("new_projectiles", &self.new_projectiles());
+      ds.field("dead_projectiles", &self.dead_projectiles());
+      ds.field("explosions", &self.explosions());
       ds.finish()
   }
 }

@@ -52,6 +52,7 @@ table Entity {
 }
 
 table Projectile {
+	id: uint64;
 	my: bool;
 	position: Vec2;
 	linear_velocity: Vec2;
@@ -75,5 +76,58 @@ table GameState {
 	my_id: uint8; // the id of the script reading this state
 	winner_id: uint8; // The id of the script that won the game. Do not consider this value until the very last snapshot of the gamestate.
 }
+
+table EntityUpdate {
+	id: uint64;
+	x: float32;
+	y: float32;
+	rotation: float32;
+	block_update: [BlockUpdate];
+	shield_updates: [ShieldUpdate];
+	missile_slot_updates: [MissileSlotUpdate];
+	turret_updates: [TurretUpdate];
+}
+
+table BlockUpdate {
+	block_index: uint16;
+	hitpoints: float32;
+	applied_thrust: float32;
+	is_destroyed: bool;
+}
+
+table ShieldUpdate {
+	block_index: uint16;
+	hitpoints: float32;
+	rotation: float32;
+	is_destroyed: bool;
+}
+
+table MissileSlotUpdate {
+	block_index: uint16;
+	slot_index: uint8;
+	is_loaded: bool;
+	local_rotation: float32; // relative to entity
+}
+
+table TurretUpdate {
+	block_index: uint16;	
+	local_rotation: float32; // relative to entity
+}
+
+table DeadProjectile {
+	id: uint64;
+	position: Vec2;
+}
+
+table GameStateDelta {
+	flag_updates: [Flag];
+	new_entities: [Entity];
+	dead_entities: [uint64]; //stores the ids of the entities that were destroyed
+	entity_positions: [EntityUpdate];
+	new_projectiles: [Projectile];
+	dead_projectiles: [DeadProjectile];
+	explosions: [Explosion];
+}
+
 
 root_type GameState;

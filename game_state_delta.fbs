@@ -14,13 +14,13 @@ table EntityUpdate {
 	x: float32;
 	y: float32;
 	rotation: float32;
-	damaged_blocks: [DamagedBlock];
+	block_update: [BlockUpdate];
 	shield_updates: [ShieldUpdate];
 	missile_slot_updates: [MissileSlotUpdate];
 	turret_updates: [TurretUpdate];
 }
 
-table DamagedBlock {
+table BlockUpdate {
 	block_index: uint16;
 	hitpoints: float32;
 	applied_thrust: float32;
@@ -38,18 +38,19 @@ table MissileSlotUpdate {
 	block_index: uint16;
 	slot_index: uint8;
 	is_loaded: bool;
-	rotation: float32;
+	local_rotation: float32; // relative to entity
 }
 
 table TurretUpdate {
 	block_index: uint16;	
-	rotation: float32;
+	local_rotation: float32; // relative to entity
 }
 
-table NewExplosion {
-    position: Vec2;
-    radius: float32;
-    damage: float32;
+table Explosion {
+	x: float32;
+	y: float32;
+	radius: float32;
+	damage: float32;
 }
 
 table NewProjectile {
@@ -66,10 +67,9 @@ table DeadProjectile {
 }
 
 table GameStateDelta {
-	tick: uint32;
 	flag_positions: [FlagUpdate];
 	entity_positions: [EntityUpdate];
 	new_projectiles: [NewProjectile];
 	dead_projectiles: [DeadProjectile];
-	new_explosions: [NewExplosion];
+	explosions: [Explosion];
 }

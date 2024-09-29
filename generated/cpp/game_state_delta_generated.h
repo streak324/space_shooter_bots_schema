@@ -22,8 +22,8 @@ struct FlagUpdateBuilder;
 struct EntityUpdate;
 struct EntityUpdateBuilder;
 
-struct DamagedBlock;
-struct DamagedBlockBuilder;
+struct BlockUpdate;
+struct BlockUpdateBuilder;
 
 struct ShieldUpdate;
 struct ShieldUpdateBuilder;
@@ -34,8 +34,8 @@ struct MissileSlotUpdateBuilder;
 struct TurretUpdate;
 struct TurretUpdateBuilder;
 
-struct NewExplosion;
-struct NewExplosionBuilder;
+struct Explosion;
+struct ExplosionBuilder;
 
 struct NewProjectile;
 struct NewProjectileBuilder;
@@ -165,7 +165,7 @@ struct EntityUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_X = 6,
     VT_Y = 8,
     VT_ROTATION = 10,
-    VT_DAMAGED_BLOCKS = 12,
+    VT_BLOCK_UPDATE = 12,
     VT_SHIELD_UPDATES = 14,
     VT_MISSILE_SLOT_UPDATES = 16,
     VT_TURRET_UPDATES = 18
@@ -182,8 +182,8 @@ struct EntityUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   float rotation() const {
     return GetField<float>(VT_ROTATION, 0.0f);
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<DamagedBlock>> *damaged_blocks() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<DamagedBlock>> *>(VT_DAMAGED_BLOCKS);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<BlockUpdate>> *block_update() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<BlockUpdate>> *>(VT_BLOCK_UPDATE);
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<ShieldUpdate>> *shield_updates() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ShieldUpdate>> *>(VT_SHIELD_UPDATES);
@@ -200,9 +200,9 @@ struct EntityUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyField<float>(verifier, VT_X, 4) &&
            VerifyField<float>(verifier, VT_Y, 4) &&
            VerifyField<float>(verifier, VT_ROTATION, 4) &&
-           VerifyOffset(verifier, VT_DAMAGED_BLOCKS) &&
-           verifier.VerifyVector(damaged_blocks()) &&
-           verifier.VerifyVectorOfTables(damaged_blocks()) &&
+           VerifyOffset(verifier, VT_BLOCK_UPDATE) &&
+           verifier.VerifyVector(block_update()) &&
+           verifier.VerifyVectorOfTables(block_update()) &&
            VerifyOffset(verifier, VT_SHIELD_UPDATES) &&
            verifier.VerifyVector(shield_updates()) &&
            verifier.VerifyVectorOfTables(shield_updates()) &&
@@ -232,8 +232,8 @@ struct EntityUpdateBuilder {
   void add_rotation(float rotation) {
     fbb_.AddElement<float>(EntityUpdate::VT_ROTATION, rotation, 0.0f);
   }
-  void add_damaged_blocks(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DamagedBlock>>> damaged_blocks) {
-    fbb_.AddOffset(EntityUpdate::VT_DAMAGED_BLOCKS, damaged_blocks);
+  void add_block_update(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<BlockUpdate>>> block_update) {
+    fbb_.AddOffset(EntityUpdate::VT_BLOCK_UPDATE, block_update);
   }
   void add_shield_updates(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ShieldUpdate>>> shield_updates) {
     fbb_.AddOffset(EntityUpdate::VT_SHIELD_UPDATES, shield_updates);
@@ -261,7 +261,7 @@ inline ::flatbuffers::Offset<EntityUpdate> CreateEntityUpdate(
     float x = 0.0f,
     float y = 0.0f,
     float rotation = 0.0f,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DamagedBlock>>> damaged_blocks = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<BlockUpdate>>> block_update = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ShieldUpdate>>> shield_updates = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<MissileSlotUpdate>>> missile_slot_updates = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TurretUpdate>>> turret_updates = 0) {
@@ -270,7 +270,7 @@ inline ::flatbuffers::Offset<EntityUpdate> CreateEntityUpdate(
   builder_.add_turret_updates(turret_updates);
   builder_.add_missile_slot_updates(missile_slot_updates);
   builder_.add_shield_updates(shield_updates);
-  builder_.add_damaged_blocks(damaged_blocks);
+  builder_.add_block_update(block_update);
   builder_.add_rotation(rotation);
   builder_.add_y(y);
   builder_.add_x(x);
@@ -283,11 +283,11 @@ inline ::flatbuffers::Offset<EntityUpdate> CreateEntityUpdateDirect(
     float x = 0.0f,
     float y = 0.0f,
     float rotation = 0.0f,
-    const std::vector<::flatbuffers::Offset<DamagedBlock>> *damaged_blocks = nullptr,
+    const std::vector<::flatbuffers::Offset<BlockUpdate>> *block_update = nullptr,
     const std::vector<::flatbuffers::Offset<ShieldUpdate>> *shield_updates = nullptr,
     const std::vector<::flatbuffers::Offset<MissileSlotUpdate>> *missile_slot_updates = nullptr,
     const std::vector<::flatbuffers::Offset<TurretUpdate>> *turret_updates = nullptr) {
-  auto damaged_blocks__ = damaged_blocks ? _fbb.CreateVector<::flatbuffers::Offset<DamagedBlock>>(*damaged_blocks) : 0;
+  auto block_update__ = block_update ? _fbb.CreateVector<::flatbuffers::Offset<BlockUpdate>>(*block_update) : 0;
   auto shield_updates__ = shield_updates ? _fbb.CreateVector<::flatbuffers::Offset<ShieldUpdate>>(*shield_updates) : 0;
   auto missile_slot_updates__ = missile_slot_updates ? _fbb.CreateVector<::flatbuffers::Offset<MissileSlotUpdate>>(*missile_slot_updates) : 0;
   auto turret_updates__ = turret_updates ? _fbb.CreateVector<::flatbuffers::Offset<TurretUpdate>>(*turret_updates) : 0;
@@ -297,14 +297,14 @@ inline ::flatbuffers::Offset<EntityUpdate> CreateEntityUpdateDirect(
       x,
       y,
       rotation,
-      damaged_blocks__,
+      block_update__,
       shield_updates__,
       missile_slot_updates__,
       turret_updates__);
 }
 
-struct DamagedBlock FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef DamagedBlockBuilder Builder;
+struct BlockUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef BlockUpdateBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_BLOCK_INDEX = 4,
     VT_HITPOINTS = 6,
@@ -333,40 +333,40 @@ struct DamagedBlock FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
 };
 
-struct DamagedBlockBuilder {
-  typedef DamagedBlock Table;
+struct BlockUpdateBuilder {
+  typedef BlockUpdate Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
   void add_block_index(uint16_t block_index) {
-    fbb_.AddElement<uint16_t>(DamagedBlock::VT_BLOCK_INDEX, block_index, 0);
+    fbb_.AddElement<uint16_t>(BlockUpdate::VT_BLOCK_INDEX, block_index, 0);
   }
   void add_hitpoints(float hitpoints) {
-    fbb_.AddElement<float>(DamagedBlock::VT_HITPOINTS, hitpoints, 0.0f);
+    fbb_.AddElement<float>(BlockUpdate::VT_HITPOINTS, hitpoints, 0.0f);
   }
   void add_applied_thrust(float applied_thrust) {
-    fbb_.AddElement<float>(DamagedBlock::VT_APPLIED_THRUST, applied_thrust, 0.0f);
+    fbb_.AddElement<float>(BlockUpdate::VT_APPLIED_THRUST, applied_thrust, 0.0f);
   }
   void add_is_destroyed(bool is_destroyed) {
-    fbb_.AddElement<uint8_t>(DamagedBlock::VT_IS_DESTROYED, static_cast<uint8_t>(is_destroyed), 0);
+    fbb_.AddElement<uint8_t>(BlockUpdate::VT_IS_DESTROYED, static_cast<uint8_t>(is_destroyed), 0);
   }
-  explicit DamagedBlockBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit BlockUpdateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<DamagedBlock> Finish() {
+  ::flatbuffers::Offset<BlockUpdate> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<DamagedBlock>(end);
+    auto o = ::flatbuffers::Offset<BlockUpdate>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<DamagedBlock> CreateDamagedBlock(
+inline ::flatbuffers::Offset<BlockUpdate> CreateBlockUpdate(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint16_t block_index = 0,
     float hitpoints = 0.0f,
     float applied_thrust = 0.0f,
     bool is_destroyed = false) {
-  DamagedBlockBuilder builder_(_fbb);
+  BlockUpdateBuilder builder_(_fbb);
   builder_.add_applied_thrust(applied_thrust);
   builder_.add_hitpoints(hitpoints);
   builder_.add_block_index(block_index);
@@ -451,7 +451,7 @@ struct MissileSlotUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
     VT_BLOCK_INDEX = 4,
     VT_SLOT_INDEX = 6,
     VT_IS_LOADED = 8,
-    VT_ROTATION = 10
+    VT_LOCAL_ROTATION = 10
   };
   uint16_t block_index() const {
     return GetField<uint16_t>(VT_BLOCK_INDEX, 0);
@@ -462,15 +462,15 @@ struct MissileSlotUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table 
   bool is_loaded() const {
     return GetField<uint8_t>(VT_IS_LOADED, 0) != 0;
   }
-  float rotation() const {
-    return GetField<float>(VT_ROTATION, 0.0f);
+  float local_rotation() const {
+    return GetField<float>(VT_LOCAL_ROTATION, 0.0f);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint16_t>(verifier, VT_BLOCK_INDEX, 2) &&
            VerifyField<uint8_t>(verifier, VT_SLOT_INDEX, 1) &&
            VerifyField<uint8_t>(verifier, VT_IS_LOADED, 1) &&
-           VerifyField<float>(verifier, VT_ROTATION, 4) &&
+           VerifyField<float>(verifier, VT_LOCAL_ROTATION, 4) &&
            verifier.EndTable();
   }
 };
@@ -488,8 +488,8 @@ struct MissileSlotUpdateBuilder {
   void add_is_loaded(bool is_loaded) {
     fbb_.AddElement<uint8_t>(MissileSlotUpdate::VT_IS_LOADED, static_cast<uint8_t>(is_loaded), 0);
   }
-  void add_rotation(float rotation) {
-    fbb_.AddElement<float>(MissileSlotUpdate::VT_ROTATION, rotation, 0.0f);
+  void add_local_rotation(float local_rotation) {
+    fbb_.AddElement<float>(MissileSlotUpdate::VT_LOCAL_ROTATION, local_rotation, 0.0f);
   }
   explicit MissileSlotUpdateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -507,9 +507,9 @@ inline ::flatbuffers::Offset<MissileSlotUpdate> CreateMissileSlotUpdate(
     uint16_t block_index = 0,
     uint8_t slot_index = 0,
     bool is_loaded = false,
-    float rotation = 0.0f) {
+    float local_rotation = 0.0f) {
   MissileSlotUpdateBuilder builder_(_fbb);
-  builder_.add_rotation(rotation);
+  builder_.add_local_rotation(local_rotation);
   builder_.add_block_index(block_index);
   builder_.add_is_loaded(is_loaded);
   builder_.add_slot_index(slot_index);
@@ -520,18 +520,18 @@ struct TurretUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef TurretUpdateBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_BLOCK_INDEX = 4,
-    VT_ROTATION = 6
+    VT_LOCAL_ROTATION = 6
   };
   uint16_t block_index() const {
     return GetField<uint16_t>(VT_BLOCK_INDEX, 0);
   }
-  float rotation() const {
-    return GetField<float>(VT_ROTATION, 0.0f);
+  float local_rotation() const {
+    return GetField<float>(VT_LOCAL_ROTATION, 0.0f);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint16_t>(verifier, VT_BLOCK_INDEX, 2) &&
-           VerifyField<float>(verifier, VT_ROTATION, 4) &&
+           VerifyField<float>(verifier, VT_LOCAL_ROTATION, 4) &&
            verifier.EndTable();
   }
 };
@@ -543,8 +543,8 @@ struct TurretUpdateBuilder {
   void add_block_index(uint16_t block_index) {
     fbb_.AddElement<uint16_t>(TurretUpdate::VT_BLOCK_INDEX, block_index, 0);
   }
-  void add_rotation(float rotation) {
-    fbb_.AddElement<float>(TurretUpdate::VT_ROTATION, rotation, 0.0f);
+  void add_local_rotation(float local_rotation) {
+    fbb_.AddElement<float>(TurretUpdate::VT_LOCAL_ROTATION, local_rotation, 0.0f);
   }
   explicit TurretUpdateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -560,22 +560,26 @@ struct TurretUpdateBuilder {
 inline ::flatbuffers::Offset<TurretUpdate> CreateTurretUpdate(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint16_t block_index = 0,
-    float rotation = 0.0f) {
+    float local_rotation = 0.0f) {
   TurretUpdateBuilder builder_(_fbb);
-  builder_.add_rotation(rotation);
+  builder_.add_local_rotation(local_rotation);
   builder_.add_block_index(block_index);
   return builder_.Finish();
 }
 
-struct NewExplosion FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef NewExplosionBuilder Builder;
+struct Explosion FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ExplosionBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_POSITION = 4,
-    VT_RADIUS = 6,
-    VT_DAMAGE = 8
+    VT_X = 4,
+    VT_Y = 6,
+    VT_RADIUS = 8,
+    VT_DAMAGE = 10
   };
-  const Vec2 *position() const {
-    return GetPointer<const Vec2 *>(VT_POSITION);
+  float x() const {
+    return GetField<float>(VT_X, 0.0f);
+  }
+  float y() const {
+    return GetField<float>(VT_Y, 0.0f);
   }
   float radius() const {
     return GetField<float>(VT_RADIUS, 0.0f);
@@ -585,47 +589,52 @@ struct NewExplosion FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_POSITION) &&
-           verifier.VerifyTable(position()) &&
+           VerifyField<float>(verifier, VT_X, 4) &&
+           VerifyField<float>(verifier, VT_Y, 4) &&
            VerifyField<float>(verifier, VT_RADIUS, 4) &&
            VerifyField<float>(verifier, VT_DAMAGE, 4) &&
            verifier.EndTable();
   }
 };
 
-struct NewExplosionBuilder {
-  typedef NewExplosion Table;
+struct ExplosionBuilder {
+  typedef Explosion Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_position(::flatbuffers::Offset<Vec2> position) {
-    fbb_.AddOffset(NewExplosion::VT_POSITION, position);
+  void add_x(float x) {
+    fbb_.AddElement<float>(Explosion::VT_X, x, 0.0f);
+  }
+  void add_y(float y) {
+    fbb_.AddElement<float>(Explosion::VT_Y, y, 0.0f);
   }
   void add_radius(float radius) {
-    fbb_.AddElement<float>(NewExplosion::VT_RADIUS, radius, 0.0f);
+    fbb_.AddElement<float>(Explosion::VT_RADIUS, radius, 0.0f);
   }
   void add_damage(float damage) {
-    fbb_.AddElement<float>(NewExplosion::VT_DAMAGE, damage, 0.0f);
+    fbb_.AddElement<float>(Explosion::VT_DAMAGE, damage, 0.0f);
   }
-  explicit NewExplosionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit ExplosionBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<NewExplosion> Finish() {
+  ::flatbuffers::Offset<Explosion> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<NewExplosion>(end);
+    auto o = ::flatbuffers::Offset<Explosion>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<NewExplosion> CreateNewExplosion(
+inline ::flatbuffers::Offset<Explosion> CreateExplosion(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<Vec2> position = 0,
+    float x = 0.0f,
+    float y = 0.0f,
     float radius = 0.0f,
     float damage = 0.0f) {
-  NewExplosionBuilder builder_(_fbb);
+  ExplosionBuilder builder_(_fbb);
   builder_.add_damage(damage);
   builder_.add_radius(radius);
-  builder_.add_position(position);
+  builder_.add_y(y);
+  builder_.add_x(x);
   return builder_.Finish();
 }
 
@@ -767,16 +776,12 @@ inline ::flatbuffers::Offset<DeadProjectile> CreateDeadProjectile(
 struct GameStateDelta FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef GameStateDeltaBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_TICK = 4,
-    VT_FLAG_POSITIONS = 6,
-    VT_ENTITY_POSITIONS = 8,
-    VT_NEW_PROJECTILES = 10,
-    VT_DEAD_PROJECTILES = 12,
-    VT_NEW_EXPLOSIONS = 14
+    VT_FLAG_POSITIONS = 4,
+    VT_ENTITY_POSITIONS = 6,
+    VT_NEW_PROJECTILES = 8,
+    VT_DEAD_PROJECTILES = 10,
+    VT_EXPLOSIONS = 12
   };
-  uint32_t tick() const {
-    return GetField<uint32_t>(VT_TICK, 0);
-  }
   const ::flatbuffers::Vector<::flatbuffers::Offset<FlagUpdate>> *flag_positions() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<FlagUpdate>> *>(VT_FLAG_POSITIONS);
   }
@@ -789,12 +794,11 @@ struct GameStateDelta FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   const ::flatbuffers::Vector<::flatbuffers::Offset<DeadProjectile>> *dead_projectiles() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<DeadProjectile>> *>(VT_DEAD_PROJECTILES);
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<NewExplosion>> *new_explosions() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<NewExplosion>> *>(VT_NEW_EXPLOSIONS);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Explosion>> *explosions() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Explosion>> *>(VT_EXPLOSIONS);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<uint32_t>(verifier, VT_TICK, 4) &&
            VerifyOffset(verifier, VT_FLAG_POSITIONS) &&
            verifier.VerifyVector(flag_positions()) &&
            verifier.VerifyVectorOfTables(flag_positions()) &&
@@ -807,9 +811,9 @@ struct GameStateDelta FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_DEAD_PROJECTILES) &&
            verifier.VerifyVector(dead_projectiles()) &&
            verifier.VerifyVectorOfTables(dead_projectiles()) &&
-           VerifyOffset(verifier, VT_NEW_EXPLOSIONS) &&
-           verifier.VerifyVector(new_explosions()) &&
-           verifier.VerifyVectorOfTables(new_explosions()) &&
+           VerifyOffset(verifier, VT_EXPLOSIONS) &&
+           verifier.VerifyVector(explosions()) &&
+           verifier.VerifyVectorOfTables(explosions()) &&
            verifier.EndTable();
   }
 };
@@ -818,9 +822,6 @@ struct GameStateDeltaBuilder {
   typedef GameStateDelta Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_tick(uint32_t tick) {
-    fbb_.AddElement<uint32_t>(GameStateDelta::VT_TICK, tick, 0);
-  }
   void add_flag_positions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<FlagUpdate>>> flag_positions) {
     fbb_.AddOffset(GameStateDelta::VT_FLAG_POSITIONS, flag_positions);
   }
@@ -833,8 +834,8 @@ struct GameStateDeltaBuilder {
   void add_dead_projectiles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DeadProjectile>>> dead_projectiles) {
     fbb_.AddOffset(GameStateDelta::VT_DEAD_PROJECTILES, dead_projectiles);
   }
-  void add_new_explosions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<NewExplosion>>> new_explosions) {
-    fbb_.AddOffset(GameStateDelta::VT_NEW_EXPLOSIONS, new_explosions);
+  void add_explosions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Explosion>>> explosions) {
+    fbb_.AddOffset(GameStateDelta::VT_EXPLOSIONS, explosions);
   }
   explicit GameStateDeltaBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -849,43 +850,39 @@ struct GameStateDeltaBuilder {
 
 inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDelta(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t tick = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<FlagUpdate>>> flag_positions = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<EntityUpdate>>> entity_positions = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<NewProjectile>>> new_projectiles = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DeadProjectile>>> dead_projectiles = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<NewExplosion>>> new_explosions = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Explosion>>> explosions = 0) {
   GameStateDeltaBuilder builder_(_fbb);
-  builder_.add_new_explosions(new_explosions);
+  builder_.add_explosions(explosions);
   builder_.add_dead_projectiles(dead_projectiles);
   builder_.add_new_projectiles(new_projectiles);
   builder_.add_entity_positions(entity_positions);
   builder_.add_flag_positions(flag_positions);
-  builder_.add_tick(tick);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDeltaDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    uint32_t tick = 0,
     const std::vector<::flatbuffers::Offset<FlagUpdate>> *flag_positions = nullptr,
     const std::vector<::flatbuffers::Offset<EntityUpdate>> *entity_positions = nullptr,
     const std::vector<::flatbuffers::Offset<NewProjectile>> *new_projectiles = nullptr,
     const std::vector<::flatbuffers::Offset<DeadProjectile>> *dead_projectiles = nullptr,
-    const std::vector<::flatbuffers::Offset<NewExplosion>> *new_explosions = nullptr) {
+    const std::vector<::flatbuffers::Offset<Explosion>> *explosions = nullptr) {
   auto flag_positions__ = flag_positions ? _fbb.CreateVector<::flatbuffers::Offset<FlagUpdate>>(*flag_positions) : 0;
   auto entity_positions__ = entity_positions ? _fbb.CreateVector<::flatbuffers::Offset<EntityUpdate>>(*entity_positions) : 0;
   auto new_projectiles__ = new_projectiles ? _fbb.CreateVector<::flatbuffers::Offset<NewProjectile>>(*new_projectiles) : 0;
   auto dead_projectiles__ = dead_projectiles ? _fbb.CreateVector<::flatbuffers::Offset<DeadProjectile>>(*dead_projectiles) : 0;
-  auto new_explosions__ = new_explosions ? _fbb.CreateVector<::flatbuffers::Offset<NewExplosion>>(*new_explosions) : 0;
+  auto explosions__ = explosions ? _fbb.CreateVector<::flatbuffers::Offset<Explosion>>(*explosions) : 0;
   return CreateGameStateDelta(
       _fbb,
-      tick,
       flag_positions__,
       entity_positions__,
       new_projectiles__,
       dead_projectiles__,
-      new_explosions__);
+      explosions__);
 }
 
 #endif  // FLATBUFFERS_GENERATED_GAMESTATEDELTA_H_
