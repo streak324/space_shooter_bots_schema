@@ -82,7 +82,8 @@ table EntityUpdate {
 	x: float32;
 	y: float32;
 	rotation: float32;
-	block_update: [BlockUpdate];
+	is_commandable: bool;
+	block_updates: [BlockUpdate];
 	shield_updates: [ShieldUpdate];
 	missile_slot_updates: [MissileSlotUpdate];
 	turret_updates: [TurretUpdate];
@@ -98,7 +99,6 @@ table BlockUpdate {
 table ShieldUpdate {
 	block_index: uint16;
 	hitpoints: float32;
-	rotation: float32;
 	is_destroyed: bool;
 }
 
