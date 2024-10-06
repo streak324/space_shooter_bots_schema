@@ -54,80 +54,33 @@ table Entity {
 table Projectile {
 	id: uint64;
 	my: bool;
+    position: Vec2;
+    linear_velocity: Vec2;
+    damage: float32;
+    size: float32;
+	range: float32;
+}
+
+table DeadProjectile {
+	id: uint64;	
 	position: Vec2;
-	linear_velocity: Vec2;
-	size: float32;
-	damage: float32;
 }
 
 table Flag {
-	owner_id: uint8;
+	owner_id: uint8; // if it is not GameState.my_id, it is the enemy flag
 	x: float32; //note, their initial x and y positions are also the base position where the enemy's flag needs to be taken to win
 	y: float32;
 	carrier_id: uint64; // the entity id that is carrying this flag
 }
 
-// Define the GameState table for the overall game state
 table GameState {
 	flags: [Flag];
-	entities: [Entity]; // Array of entities in the game state. ships, debris, missiles, and obstacles
-	projectiles: [Projectile];
-	explosions: [Explosion];
-	my_id: uint8; // the id of the script reading this state
-	winner_id: uint8; // The id of the script that won the game. Do not consider this value until the very last snapshot of the gamestate.
-}
-
-table EntityUpdate {
-	id: uint64;
-	x: float32;
-	y: float32;
-	rotation: float32;
-	is_commandable: bool;
-	block_updates: [BlockUpdate];
-	shield_updates: [ShieldUpdate];
-	missile_slot_updates: [MissileSlotUpdate];
-	turret_updates: [TurretUpdate];
-}
-
-table BlockUpdate {
-	block_index: uint16;
-	hitpoints: float32;
-	applied_thrust: float32;
-	is_destroyed: bool;
-}
-
-table ShieldUpdate {
-	block_index: uint16;
-	hitpoints: float32;
-	is_destroyed: bool;
-}
-
-table MissileSlotUpdate {
-	block_index: uint16;
-	slot_index: uint8;
-	is_loaded: bool;
-	local_rotation: float32; // relative to entity
-}
-
-table TurretUpdate {
-	block_index: uint16;	
-	local_rotation: float32; // relative to entity
-}
-
-table DeadProjectile {
-	id: uint64;
-	position: Vec2;
-}
-
-table GameStateDelta {
-	flag_updates: [Flag];
-	new_entities: [Entity];
-	dead_entities: [uint64]; //stores the ids of the entities that were destroyed
-	entity_positions: [EntityUpdate];
-	new_projectiles: [Projectile];
+	entities: [Entity]; // ships, debris, missiles.
+	new_projectiles: [Projectile]; // new projectiles generated at this tick.
 	dead_projectiles: [DeadProjectile];
 	explosions: [Explosion];
+	my_id: uint8; // the owner id of the script reading this state
+	winner_id: uint8; // The owner id of the script that won the game. Do not consider this value until the very last snapshot of the gamestate.
 }
-
 
 root_type GameState;
