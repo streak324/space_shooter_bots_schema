@@ -43,6 +43,27 @@ struct FlagBuilder;
 struct GameState;
 struct GameStateBuilder;
 
+struct BlockHitUpdate;
+struct BlockHitUpdateBuilder;
+
+struct ThrusterUpdate;
+struct ThrusterUpdateBuilder;
+
+struct ShieldUpdate;
+struct ShieldUpdateBuilder;
+
+struct MissileSlotUpdate;
+struct MissileSlotUpdateBuilder;
+
+struct TurretUpdate;
+struct TurretUpdateBuilder;
+
+struct EntityUpdate;
+struct EntityUpdateBuilder;
+
+struct GameStateDelta;
+struct GameStateDeltaBuilder;
+
 struct Vec2 FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef Vec2Builder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -985,6 +1006,648 @@ inline ::flatbuffers::Offset<GameState> CreateGameStateDirect(
       _fbb,
       flags__,
       entities__,
+      new_projectiles__,
+      dead_projectiles__,
+      explosions__,
+      my_id,
+      winner_id);
+}
+
+struct BlockHitUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef BlockHitUpdateBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BLOCK_INDEX = 4,
+    VT_HITPOINTS = 6,
+    VT_IS_DESTROYED = 8
+  };
+  uint16_t block_index() const {
+    return GetField<uint16_t>(VT_BLOCK_INDEX, 0);
+  }
+  float hitpoints() const {
+    return GetField<float>(VT_HITPOINTS, 0.0f);
+  }
+  bool is_destroyed() const {
+    return GetField<uint8_t>(VT_IS_DESTROYED, 0) != 0;
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_BLOCK_INDEX, 2) &&
+           VerifyField<float>(verifier, VT_HITPOINTS, 4) &&
+           VerifyField<uint8_t>(verifier, VT_IS_DESTROYED, 1) &&
+           verifier.EndTable();
+  }
+};
+
+struct BlockHitUpdateBuilder {
+  typedef BlockHitUpdate Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_block_index(uint16_t block_index) {
+    fbb_.AddElement<uint16_t>(BlockHitUpdate::VT_BLOCK_INDEX, block_index, 0);
+  }
+  void add_hitpoints(float hitpoints) {
+    fbb_.AddElement<float>(BlockHitUpdate::VT_HITPOINTS, hitpoints, 0.0f);
+  }
+  void add_is_destroyed(bool is_destroyed) {
+    fbb_.AddElement<uint8_t>(BlockHitUpdate::VT_IS_DESTROYED, static_cast<uint8_t>(is_destroyed), 0);
+  }
+  explicit BlockHitUpdateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<BlockHitUpdate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<BlockHitUpdate>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<BlockHitUpdate> CreateBlockHitUpdate(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t block_index = 0,
+    float hitpoints = 0.0f,
+    bool is_destroyed = false) {
+  BlockHitUpdateBuilder builder_(_fbb);
+  builder_.add_hitpoints(hitpoints);
+  builder_.add_block_index(block_index);
+  builder_.add_is_destroyed(is_destroyed);
+  return builder_.Finish();
+}
+
+struct ThrusterUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ThrusterUpdateBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BLOCK_INDEX = 4,
+    VT_APPLIED_THRUST = 6,
+    VT_APPLIED_TORQUE = 8
+  };
+  uint16_t block_index() const {
+    return GetField<uint16_t>(VT_BLOCK_INDEX, 0);
+  }
+  float applied_thrust() const {
+    return GetField<float>(VT_APPLIED_THRUST, 0.0f);
+  }
+  float applied_torque() const {
+    return GetField<float>(VT_APPLIED_TORQUE, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_BLOCK_INDEX, 2) &&
+           VerifyField<float>(verifier, VT_APPLIED_THRUST, 4) &&
+           VerifyField<float>(verifier, VT_APPLIED_TORQUE, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct ThrusterUpdateBuilder {
+  typedef ThrusterUpdate Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_block_index(uint16_t block_index) {
+    fbb_.AddElement<uint16_t>(ThrusterUpdate::VT_BLOCK_INDEX, block_index, 0);
+  }
+  void add_applied_thrust(float applied_thrust) {
+    fbb_.AddElement<float>(ThrusterUpdate::VT_APPLIED_THRUST, applied_thrust, 0.0f);
+  }
+  void add_applied_torque(float applied_torque) {
+    fbb_.AddElement<float>(ThrusterUpdate::VT_APPLIED_TORQUE, applied_torque, 0.0f);
+  }
+  explicit ThrusterUpdateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<ThrusterUpdate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<ThrusterUpdate>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<ThrusterUpdate> CreateThrusterUpdate(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t block_index = 0,
+    float applied_thrust = 0.0f,
+    float applied_torque = 0.0f) {
+  ThrusterUpdateBuilder builder_(_fbb);
+  builder_.add_applied_torque(applied_torque);
+  builder_.add_applied_thrust(applied_thrust);
+  builder_.add_block_index(block_index);
+  return builder_.Finish();
+}
+
+struct ShieldUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef ShieldUpdateBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BLOCK_INDEX = 4,
+    VT_HITPOINTS = 6,
+    VT_IS_DESTROYED = 8
+  };
+  uint16_t block_index() const {
+    return GetField<uint16_t>(VT_BLOCK_INDEX, 0);
+  }
+  float hitpoints() const {
+    return GetField<float>(VT_HITPOINTS, 0.0f);
+  }
+  bool is_destroyed() const {
+    return GetField<uint8_t>(VT_IS_DESTROYED, 0) != 0;
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_BLOCK_INDEX, 2) &&
+           VerifyField<float>(verifier, VT_HITPOINTS, 4) &&
+           VerifyField<uint8_t>(verifier, VT_IS_DESTROYED, 1) &&
+           verifier.EndTable();
+  }
+};
+
+struct ShieldUpdateBuilder {
+  typedef ShieldUpdate Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_block_index(uint16_t block_index) {
+    fbb_.AddElement<uint16_t>(ShieldUpdate::VT_BLOCK_INDEX, block_index, 0);
+  }
+  void add_hitpoints(float hitpoints) {
+    fbb_.AddElement<float>(ShieldUpdate::VT_HITPOINTS, hitpoints, 0.0f);
+  }
+  void add_is_destroyed(bool is_destroyed) {
+    fbb_.AddElement<uint8_t>(ShieldUpdate::VT_IS_DESTROYED, static_cast<uint8_t>(is_destroyed), 0);
+  }
+  explicit ShieldUpdateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<ShieldUpdate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<ShieldUpdate>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<ShieldUpdate> CreateShieldUpdate(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t block_index = 0,
+    float hitpoints = 0.0f,
+    bool is_destroyed = false) {
+  ShieldUpdateBuilder builder_(_fbb);
+  builder_.add_hitpoints(hitpoints);
+  builder_.add_block_index(block_index);
+  builder_.add_is_destroyed(is_destroyed);
+  return builder_.Finish();
+}
+
+struct MissileSlotUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef MissileSlotUpdateBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BLOCK_INDEX = 4,
+    VT_SLOT_INDEX = 6,
+    VT_IS_LOADED = 8,
+    VT_LOCAL_ROTATION = 10
+  };
+  uint16_t block_index() const {
+    return GetField<uint16_t>(VT_BLOCK_INDEX, 0);
+  }
+  uint8_t slot_index() const {
+    return GetField<uint8_t>(VT_SLOT_INDEX, 0);
+  }
+  bool is_loaded() const {
+    return GetField<uint8_t>(VT_IS_LOADED, 0) != 0;
+  }
+  float local_rotation() const {
+    return GetField<float>(VT_LOCAL_ROTATION, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_BLOCK_INDEX, 2) &&
+           VerifyField<uint8_t>(verifier, VT_SLOT_INDEX, 1) &&
+           VerifyField<uint8_t>(verifier, VT_IS_LOADED, 1) &&
+           VerifyField<float>(verifier, VT_LOCAL_ROTATION, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct MissileSlotUpdateBuilder {
+  typedef MissileSlotUpdate Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_block_index(uint16_t block_index) {
+    fbb_.AddElement<uint16_t>(MissileSlotUpdate::VT_BLOCK_INDEX, block_index, 0);
+  }
+  void add_slot_index(uint8_t slot_index) {
+    fbb_.AddElement<uint8_t>(MissileSlotUpdate::VT_SLOT_INDEX, slot_index, 0);
+  }
+  void add_is_loaded(bool is_loaded) {
+    fbb_.AddElement<uint8_t>(MissileSlotUpdate::VT_IS_LOADED, static_cast<uint8_t>(is_loaded), 0);
+  }
+  void add_local_rotation(float local_rotation) {
+    fbb_.AddElement<float>(MissileSlotUpdate::VT_LOCAL_ROTATION, local_rotation, 0.0f);
+  }
+  explicit MissileSlotUpdateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<MissileSlotUpdate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<MissileSlotUpdate>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<MissileSlotUpdate> CreateMissileSlotUpdate(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t block_index = 0,
+    uint8_t slot_index = 0,
+    bool is_loaded = false,
+    float local_rotation = 0.0f) {
+  MissileSlotUpdateBuilder builder_(_fbb);
+  builder_.add_local_rotation(local_rotation);
+  builder_.add_block_index(block_index);
+  builder_.add_is_loaded(is_loaded);
+  builder_.add_slot_index(slot_index);
+  return builder_.Finish();
+}
+
+struct TurretUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef TurretUpdateBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BLOCK_INDEX = 4,
+    VT_LOCAL_ROTATION = 6
+  };
+  uint16_t block_index() const {
+    return GetField<uint16_t>(VT_BLOCK_INDEX, 0);
+  }
+  float local_rotation() const {
+    return GetField<float>(VT_LOCAL_ROTATION, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint16_t>(verifier, VT_BLOCK_INDEX, 2) &&
+           VerifyField<float>(verifier, VT_LOCAL_ROTATION, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct TurretUpdateBuilder {
+  typedef TurretUpdate Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_block_index(uint16_t block_index) {
+    fbb_.AddElement<uint16_t>(TurretUpdate::VT_BLOCK_INDEX, block_index, 0);
+  }
+  void add_local_rotation(float local_rotation) {
+    fbb_.AddElement<float>(TurretUpdate::VT_LOCAL_ROTATION, local_rotation, 0.0f);
+  }
+  explicit TurretUpdateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<TurretUpdate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<TurretUpdate>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<TurretUpdate> CreateTurretUpdate(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint16_t block_index = 0,
+    float local_rotation = 0.0f) {
+  TurretUpdateBuilder builder_(_fbb);
+  builder_.add_local_rotation(local_rotation);
+  builder_.add_block_index(block_index);
+  return builder_.Finish();
+}
+
+struct EntityUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef EntityUpdateBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ID = 4,
+    VT_X = 6,
+    VT_Y = 8,
+    VT_ROTATION = 10,
+    VT_IS_COMMANDABLE = 12,
+    VT_BLOCK_HIT_UPDATES = 14,
+    VT_THRUSTER_UPDATES = 16,
+    VT_SHIELD_UPDATES = 18,
+    VT_MISSILE_SLOT_UPDATES = 20,
+    VT_TURRET_UPDATES = 22
+  };
+  uint64_t id() const {
+    return GetField<uint64_t>(VT_ID, 0);
+  }
+  float x() const {
+    return GetField<float>(VT_X, 0.0f);
+  }
+  float y() const {
+    return GetField<float>(VT_Y, 0.0f);
+  }
+  float rotation() const {
+    return GetField<float>(VT_ROTATION, 0.0f);
+  }
+  bool is_commandable() const {
+    return GetField<uint8_t>(VT_IS_COMMANDABLE, 0) != 0;
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<BlockHitUpdate>> *block_hit_updates() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<BlockHitUpdate>> *>(VT_BLOCK_HIT_UPDATES);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<ThrusterUpdate>> *thruster_updates() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ThrusterUpdate>> *>(VT_THRUSTER_UPDATES);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<ShieldUpdate>> *shield_updates() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<ShieldUpdate>> *>(VT_SHIELD_UPDATES);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<MissileSlotUpdate>> *missile_slot_updates() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<MissileSlotUpdate>> *>(VT_MISSILE_SLOT_UPDATES);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<TurretUpdate>> *turret_updates() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<TurretUpdate>> *>(VT_TURRET_UPDATES);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint64_t>(verifier, VT_ID, 8) &&
+           VerifyField<float>(verifier, VT_X, 4) &&
+           VerifyField<float>(verifier, VT_Y, 4) &&
+           VerifyField<float>(verifier, VT_ROTATION, 4) &&
+           VerifyField<uint8_t>(verifier, VT_IS_COMMANDABLE, 1) &&
+           VerifyOffset(verifier, VT_BLOCK_HIT_UPDATES) &&
+           verifier.VerifyVector(block_hit_updates()) &&
+           verifier.VerifyVectorOfTables(block_hit_updates()) &&
+           VerifyOffset(verifier, VT_THRUSTER_UPDATES) &&
+           verifier.VerifyVector(thruster_updates()) &&
+           verifier.VerifyVectorOfTables(thruster_updates()) &&
+           VerifyOffset(verifier, VT_SHIELD_UPDATES) &&
+           verifier.VerifyVector(shield_updates()) &&
+           verifier.VerifyVectorOfTables(shield_updates()) &&
+           VerifyOffset(verifier, VT_MISSILE_SLOT_UPDATES) &&
+           verifier.VerifyVector(missile_slot_updates()) &&
+           verifier.VerifyVectorOfTables(missile_slot_updates()) &&
+           VerifyOffset(verifier, VT_TURRET_UPDATES) &&
+           verifier.VerifyVector(turret_updates()) &&
+           verifier.VerifyVectorOfTables(turret_updates()) &&
+           verifier.EndTable();
+  }
+};
+
+struct EntityUpdateBuilder {
+  typedef EntityUpdate Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_id(uint64_t id) {
+    fbb_.AddElement<uint64_t>(EntityUpdate::VT_ID, id, 0);
+  }
+  void add_x(float x) {
+    fbb_.AddElement<float>(EntityUpdate::VT_X, x, 0.0f);
+  }
+  void add_y(float y) {
+    fbb_.AddElement<float>(EntityUpdate::VT_Y, y, 0.0f);
+  }
+  void add_rotation(float rotation) {
+    fbb_.AddElement<float>(EntityUpdate::VT_ROTATION, rotation, 0.0f);
+  }
+  void add_is_commandable(bool is_commandable) {
+    fbb_.AddElement<uint8_t>(EntityUpdate::VT_IS_COMMANDABLE, static_cast<uint8_t>(is_commandable), 0);
+  }
+  void add_block_hit_updates(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<BlockHitUpdate>>> block_hit_updates) {
+    fbb_.AddOffset(EntityUpdate::VT_BLOCK_HIT_UPDATES, block_hit_updates);
+  }
+  void add_thruster_updates(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ThrusterUpdate>>> thruster_updates) {
+    fbb_.AddOffset(EntityUpdate::VT_THRUSTER_UPDATES, thruster_updates);
+  }
+  void add_shield_updates(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ShieldUpdate>>> shield_updates) {
+    fbb_.AddOffset(EntityUpdate::VT_SHIELD_UPDATES, shield_updates);
+  }
+  void add_missile_slot_updates(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<MissileSlotUpdate>>> missile_slot_updates) {
+    fbb_.AddOffset(EntityUpdate::VT_MISSILE_SLOT_UPDATES, missile_slot_updates);
+  }
+  void add_turret_updates(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TurretUpdate>>> turret_updates) {
+    fbb_.AddOffset(EntityUpdate::VT_TURRET_UPDATES, turret_updates);
+  }
+  explicit EntityUpdateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<EntityUpdate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<EntityUpdate>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<EntityUpdate> CreateEntityUpdate(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint64_t id = 0,
+    float x = 0.0f,
+    float y = 0.0f,
+    float rotation = 0.0f,
+    bool is_commandable = false,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<BlockHitUpdate>>> block_hit_updates = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ThrusterUpdate>>> thruster_updates = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<ShieldUpdate>>> shield_updates = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<MissileSlotUpdate>>> missile_slot_updates = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<TurretUpdate>>> turret_updates = 0) {
+  EntityUpdateBuilder builder_(_fbb);
+  builder_.add_id(id);
+  builder_.add_turret_updates(turret_updates);
+  builder_.add_missile_slot_updates(missile_slot_updates);
+  builder_.add_shield_updates(shield_updates);
+  builder_.add_thruster_updates(thruster_updates);
+  builder_.add_block_hit_updates(block_hit_updates);
+  builder_.add_rotation(rotation);
+  builder_.add_y(y);
+  builder_.add_x(x);
+  builder_.add_is_commandable(is_commandable);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<EntityUpdate> CreateEntityUpdateDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint64_t id = 0,
+    float x = 0.0f,
+    float y = 0.0f,
+    float rotation = 0.0f,
+    bool is_commandable = false,
+    const std::vector<::flatbuffers::Offset<BlockHitUpdate>> *block_hit_updates = nullptr,
+    const std::vector<::flatbuffers::Offset<ThrusterUpdate>> *thruster_updates = nullptr,
+    const std::vector<::flatbuffers::Offset<ShieldUpdate>> *shield_updates = nullptr,
+    const std::vector<::flatbuffers::Offset<MissileSlotUpdate>> *missile_slot_updates = nullptr,
+    const std::vector<::flatbuffers::Offset<TurretUpdate>> *turret_updates = nullptr) {
+  auto block_hit_updates__ = block_hit_updates ? _fbb.CreateVector<::flatbuffers::Offset<BlockHitUpdate>>(*block_hit_updates) : 0;
+  auto thruster_updates__ = thruster_updates ? _fbb.CreateVector<::flatbuffers::Offset<ThrusterUpdate>>(*thruster_updates) : 0;
+  auto shield_updates__ = shield_updates ? _fbb.CreateVector<::flatbuffers::Offset<ShieldUpdate>>(*shield_updates) : 0;
+  auto missile_slot_updates__ = missile_slot_updates ? _fbb.CreateVector<::flatbuffers::Offset<MissileSlotUpdate>>(*missile_slot_updates) : 0;
+  auto turret_updates__ = turret_updates ? _fbb.CreateVector<::flatbuffers::Offset<TurretUpdate>>(*turret_updates) : 0;
+  return CreateEntityUpdate(
+      _fbb,
+      id,
+      x,
+      y,
+      rotation,
+      is_commandable,
+      block_hit_updates__,
+      thruster_updates__,
+      shield_updates__,
+      missile_slot_updates__,
+      turret_updates__);
+}
+
+struct GameStateDelta FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef GameStateDeltaBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_FLAG_UPDATES = 4,
+    VT_NEW_ENTITIES = 6,
+    VT_ENTITY_UPDATES = 8,
+    VT_DEAD_ENTITIES = 10,
+    VT_NEW_PROJECTILES = 12,
+    VT_DEAD_PROJECTILES = 14,
+    VT_EXPLOSIONS = 16,
+    VT_MY_ID = 18,
+    VT_WINNER_ID = 20
+  };
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *flag_updates() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *>(VT_FLAG_UPDATES);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Entity>> *new_entities() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Entity>> *>(VT_NEW_ENTITIES);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<EntityUpdate>> *entity_updates() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<EntityUpdate>> *>(VT_ENTITY_UPDATES);
+  }
+  const ::flatbuffers::Vector<uint64_t> *dead_entities() const {
+    return GetPointer<const ::flatbuffers::Vector<uint64_t> *>(VT_DEAD_ENTITIES);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Projectile>> *new_projectiles() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Projectile>> *>(VT_NEW_PROJECTILES);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<DeadProjectile>> *dead_projectiles() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<DeadProjectile>> *>(VT_DEAD_PROJECTILES);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Explosion>> *explosions() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Explosion>> *>(VT_EXPLOSIONS);
+  }
+  uint8_t my_id() const {
+    return GetField<uint8_t>(VT_MY_ID, 0);
+  }
+  uint8_t winner_id() const {
+    return GetField<uint8_t>(VT_WINNER_ID, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_FLAG_UPDATES) &&
+           verifier.VerifyVector(flag_updates()) &&
+           verifier.VerifyVectorOfTables(flag_updates()) &&
+           VerifyOffset(verifier, VT_NEW_ENTITIES) &&
+           verifier.VerifyVector(new_entities()) &&
+           verifier.VerifyVectorOfTables(new_entities()) &&
+           VerifyOffset(verifier, VT_ENTITY_UPDATES) &&
+           verifier.VerifyVector(entity_updates()) &&
+           verifier.VerifyVectorOfTables(entity_updates()) &&
+           VerifyOffset(verifier, VT_DEAD_ENTITIES) &&
+           verifier.VerifyVector(dead_entities()) &&
+           VerifyOffset(verifier, VT_NEW_PROJECTILES) &&
+           verifier.VerifyVector(new_projectiles()) &&
+           verifier.VerifyVectorOfTables(new_projectiles()) &&
+           VerifyOffset(verifier, VT_DEAD_PROJECTILES) &&
+           verifier.VerifyVector(dead_projectiles()) &&
+           verifier.VerifyVectorOfTables(dead_projectiles()) &&
+           VerifyOffset(verifier, VT_EXPLOSIONS) &&
+           verifier.VerifyVector(explosions()) &&
+           verifier.VerifyVectorOfTables(explosions()) &&
+           VerifyField<uint8_t>(verifier, VT_MY_ID, 1) &&
+           VerifyField<uint8_t>(verifier, VT_WINNER_ID, 1) &&
+           verifier.EndTable();
+  }
+};
+
+struct GameStateDeltaBuilder {
+  typedef GameStateDelta Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_flag_updates(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Flag>>> flag_updates) {
+    fbb_.AddOffset(GameStateDelta::VT_FLAG_UPDATES, flag_updates);
+  }
+  void add_new_entities(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Entity>>> new_entities) {
+    fbb_.AddOffset(GameStateDelta::VT_NEW_ENTITIES, new_entities);
+  }
+  void add_entity_updates(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<EntityUpdate>>> entity_updates) {
+    fbb_.AddOffset(GameStateDelta::VT_ENTITY_UPDATES, entity_updates);
+  }
+  void add_dead_entities(::flatbuffers::Offset<::flatbuffers::Vector<uint64_t>> dead_entities) {
+    fbb_.AddOffset(GameStateDelta::VT_DEAD_ENTITIES, dead_entities);
+  }
+  void add_new_projectiles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Projectile>>> new_projectiles) {
+    fbb_.AddOffset(GameStateDelta::VT_NEW_PROJECTILES, new_projectiles);
+  }
+  void add_dead_projectiles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DeadProjectile>>> dead_projectiles) {
+    fbb_.AddOffset(GameStateDelta::VT_DEAD_PROJECTILES, dead_projectiles);
+  }
+  void add_explosions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Explosion>>> explosions) {
+    fbb_.AddOffset(GameStateDelta::VT_EXPLOSIONS, explosions);
+  }
+  void add_my_id(uint8_t my_id) {
+    fbb_.AddElement<uint8_t>(GameStateDelta::VT_MY_ID, my_id, 0);
+  }
+  void add_winner_id(uint8_t winner_id) {
+    fbb_.AddElement<uint8_t>(GameStateDelta::VT_WINNER_ID, winner_id, 0);
+  }
+  explicit GameStateDeltaBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<GameStateDelta> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<GameStateDelta>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDelta(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Flag>>> flag_updates = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Entity>>> new_entities = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<EntityUpdate>>> entity_updates = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<uint64_t>> dead_entities = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Projectile>>> new_projectiles = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DeadProjectile>>> dead_projectiles = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Explosion>>> explosions = 0,
+    uint8_t my_id = 0,
+    uint8_t winner_id = 0) {
+  GameStateDeltaBuilder builder_(_fbb);
+  builder_.add_explosions(explosions);
+  builder_.add_dead_projectiles(dead_projectiles);
+  builder_.add_new_projectiles(new_projectiles);
+  builder_.add_dead_entities(dead_entities);
+  builder_.add_entity_updates(entity_updates);
+  builder_.add_new_entities(new_entities);
+  builder_.add_flag_updates(flag_updates);
+  builder_.add_winner_id(winner_id);
+  builder_.add_my_id(my_id);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDeltaDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<::flatbuffers::Offset<Flag>> *flag_updates = nullptr,
+    const std::vector<::flatbuffers::Offset<Entity>> *new_entities = nullptr,
+    const std::vector<::flatbuffers::Offset<EntityUpdate>> *entity_updates = nullptr,
+    const std::vector<uint64_t> *dead_entities = nullptr,
+    const std::vector<::flatbuffers::Offset<Projectile>> *new_projectiles = nullptr,
+    const std::vector<::flatbuffers::Offset<DeadProjectile>> *dead_projectiles = nullptr,
+    const std::vector<::flatbuffers::Offset<Explosion>> *explosions = nullptr,
+    uint8_t my_id = 0,
+    uint8_t winner_id = 0) {
+  auto flag_updates__ = flag_updates ? _fbb.CreateVector<::flatbuffers::Offset<Flag>>(*flag_updates) : 0;
+  auto new_entities__ = new_entities ? _fbb.CreateVector<::flatbuffers::Offset<Entity>>(*new_entities) : 0;
+  auto entity_updates__ = entity_updates ? _fbb.CreateVector<::flatbuffers::Offset<EntityUpdate>>(*entity_updates) : 0;
+  auto dead_entities__ = dead_entities ? _fbb.CreateVector<uint64_t>(*dead_entities) : 0;
+  auto new_projectiles__ = new_projectiles ? _fbb.CreateVector<::flatbuffers::Offset<Projectile>>(*new_projectiles) : 0;
+  auto dead_projectiles__ = dead_projectiles ? _fbb.CreateVector<::flatbuffers::Offset<DeadProjectile>>(*dead_projectiles) : 0;
+  auto explosions__ = explosions ? _fbb.CreateVector<::flatbuffers::Offset<Explosion>>(*explosions) : 0;
+  return CreateGameStateDelta(
+      _fbb,
+      flag_updates__,
+      new_entities__,
+      entity_updates__,
+      dead_entities__,
       new_projectiles__,
       dead_projectiles__,
       explosions__,

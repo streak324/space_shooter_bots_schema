@@ -83,4 +83,60 @@ table GameState {
 	winner_id: uint8; // The owner id of the script that won the game. Do not consider this value until the very last snapshot of the gamestate.
 }
 
+table BlockHitUpdate {
+	block_index: uint16;
+	hitpoints: float32;
+	is_destroyed: bool;
+}
+
+table ThrusterUpdate {
+	block_index: uint16;
+	applied_thrust: float32;
+	applied_torque: float32;
+}
+
+table ShieldUpdate {
+	block_index: uint16;
+	hitpoints: float32;
+	is_destroyed: bool;
+}
+
+table MissileSlotUpdate {
+	block_index: uint16;
+	slot_index: uint8;
+	is_loaded: bool;
+	local_rotation: float32; // relative to entity
+}
+
+table TurretUpdate {
+	block_index: uint16;	
+	local_rotation: float32; // relative to entity
+}
+
+table EntityUpdate {
+	id: uint64;
+	x: float32;
+	y: float32;
+	rotation: float32;
+	is_commandable: bool;
+	block_hit_updates: [BlockHitUpdate];
+	thruster_updates: [ThrusterUpdate];
+	shield_updates: [ShieldUpdate];
+	missile_slot_updates: [MissileSlotUpdate];
+	turret_updates: [TurretUpdate];
+}
+
+
+table GameStateDelta {
+	flag_updates: [Flag];
+	new_entities: [Entity];
+	entity_updates: [EntityUpdate];
+	dead_entities: [uint64]; //stores the ids of the entities that were destroyed
+	new_projectiles: [Projectile];
+	dead_projectiles: [DeadProjectile];
+	explosions: [Explosion];
+	my_id: uint8;
+	winner_id: uint8;
+}
+
 root_type GameState;
