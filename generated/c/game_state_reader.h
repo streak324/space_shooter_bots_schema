@@ -18,11 +18,12 @@
 #define flatbuffers_extension "bin"
 #endif
 
+typedef struct Vec2 Vec2_t;
+typedef const Vec2_t *Vec2_struct_t;
+typedef Vec2_t *Vec2_mutable_struct_t;
+typedef const Vec2_t *Vec2_vec_t;
+typedef Vec2_t *Vec2_mutable_vec_t;
 
-typedef const struct Vec2_table *Vec2_table_t;
-typedef struct Vec2_table *Vec2_mutable_table_t;
-typedef const flatbuffers_uoffset_t *Vec2_vec_t;
-typedef flatbuffers_uoffset_t *Vec2_mutable_vec_t;
 typedef const struct MissileSlot_table *MissileSlot_table_t;
 typedef struct MissileSlot_table *MissileSlot_mutable_table_t;
 typedef const flatbuffers_uoffset_t *MissileSlot_vec_t;
@@ -293,17 +294,24 @@ typedef flatbuffers_uoffset_t *GameStateDelta_mutable_vec_t;
 #endif
 
 
+struct Vec2 {
+    alignas(4) float x;
+    alignas(4) float y;
+};
+static_assert(sizeof(Vec2_t) == 8, "struct size mismatch");
 
-struct Vec2_table { uint8_t unused__; };
-
+static inline const Vec2_t *Vec2__const_ptr_add(const Vec2_t *p, size_t i) { return p + i; }
+static inline Vec2_t *Vec2__ptr_add(Vec2_t *p, size_t i) { return p + i; }
+static inline Vec2_struct_t Vec2_vec_at(Vec2_vec_t vec, size_t i)
+__flatbuffers_struct_vec_at(vec, i)
+static inline size_t Vec2__size(void) { return 8; }
 static inline size_t Vec2_vec_len(Vec2_vec_t vec)
 __flatbuffers_vec_len(vec)
-static inline Vec2_table_t Vec2_vec_at(Vec2_vec_t vec, size_t i)
-__flatbuffers_offset_vec_at(Vec2_table_t, vec, i, 0)
-__flatbuffers_table_as_root(Vec2)
+__flatbuffers_struct_as_root(Vec2)
 
-__flatbuffers_define_scalar_field(0, Vec2, x, flatbuffers_float, float, 0.00000000f)
-__flatbuffers_define_scalar_field(1, Vec2, y, flatbuffers_float, float, 0.00000000f)
+__flatbuffers_define_struct_scalar_field(Vec2, x, flatbuffers_float, float)
+__flatbuffers_define_struct_scalar_field(Vec2, y, flatbuffers_float, float)
+
 
 struct MissileSlot_table { uint8_t unused__; };
 
@@ -375,8 +383,8 @@ __flatbuffers_table_as_root(Entity)
 __flatbuffers_define_scalar_field(0, Entity, id, flatbuffers_uint64, uint64_t, UINT64_C(0))
 __flatbuffers_define_scalar_field(1, Entity, my, flatbuffers_bool, flatbuffers_bool_t, UINT8_C(0))
 __flatbuffers_define_scalar_field(2, Entity, is_commandable, flatbuffers_bool, flatbuffers_bool_t, UINT8_C(0))
-__flatbuffers_define_table_field(3, Entity, position, Vec2_table_t, 0)
-__flatbuffers_define_table_field(4, Entity, linear_velocity, Vec2_table_t, 0)
+__flatbuffers_define_struct_field(3, Entity, position, Vec2_struct_t, 0)
+__flatbuffers_define_struct_field(4, Entity, linear_velocity, Vec2_struct_t, 0)
 __flatbuffers_define_scalar_field(5, Entity, owner, flatbuffers_uint8, uint8_t, UINT8_C(0))
 __flatbuffers_define_scalar_field(6, Entity, rotation, flatbuffers_float, float, 0.00000000f)
 __flatbuffers_define_scalar_field(7, Entity, angular_velocity, flatbuffers_float, float, 0.00000000f)
@@ -392,8 +400,8 @@ __flatbuffers_table_as_root(Projectile)
 
 __flatbuffers_define_scalar_field(0, Projectile, id, flatbuffers_uint64, uint64_t, UINT64_C(0))
 __flatbuffers_define_scalar_field(1, Projectile, my, flatbuffers_bool, flatbuffers_bool_t, UINT8_C(0))
-__flatbuffers_define_table_field(2, Projectile, position, Vec2_table_t, 0)
-__flatbuffers_define_table_field(3, Projectile, linear_velocity, Vec2_table_t, 0)
+__flatbuffers_define_struct_field(2, Projectile, position, Vec2_struct_t, 0)
+__flatbuffers_define_struct_field(3, Projectile, linear_velocity, Vec2_struct_t, 0)
 __flatbuffers_define_scalar_field(4, Projectile, damage, flatbuffers_float, float, 0.00000000f)
 __flatbuffers_define_scalar_field(5, Projectile, size, flatbuffers_float, float, 0.00000000f)
 __flatbuffers_define_scalar_field(6, Projectile, range, flatbuffers_float, float, 0.00000000f)
@@ -407,7 +415,7 @@ __flatbuffers_offset_vec_at(DeadProjectile_table_t, vec, i, 0)
 __flatbuffers_table_as_root(DeadProjectile)
 
 __flatbuffers_define_scalar_field(0, DeadProjectile, id, flatbuffers_uint64, uint64_t, UINT64_C(0))
-__flatbuffers_define_table_field(1, DeadProjectile, position, Vec2_table_t, 0)
+__flatbuffers_define_struct_field(1, DeadProjectile, position, Vec2_struct_t, 0)
 
 struct Flag_table { uint8_t unused__; };
 
@@ -420,7 +428,8 @@ __flatbuffers_table_as_root(Flag)
 __flatbuffers_define_scalar_field(0, Flag, owner_id, flatbuffers_uint8, uint8_t, UINT8_C(0))
 __flatbuffers_define_scalar_field(1, Flag, x, flatbuffers_float, float, 0.00000000f)
 __flatbuffers_define_scalar_field(2, Flag, y, flatbuffers_float, float, 0.00000000f)
-__flatbuffers_define_scalar_field(3, Flag, carrier_id, flatbuffers_uint64, uint64_t, UINT64_C(0))
+__flatbuffers_define_scalar_field(3, Flag, is_carried, flatbuffers_bool, flatbuffers_bool_t, UINT8_C(0))
+__flatbuffers_define_scalar_field(4, Flag, carrier_id, flatbuffers_uint64, uint64_t, UINT64_C(0))
 
 struct GameState_table { uint8_t unused__; };
 
@@ -460,7 +469,6 @@ __flatbuffers_table_as_root(ThrusterUpdate)
 
 __flatbuffers_define_scalar_field(0, ThrusterUpdate, block_index, flatbuffers_uint16, uint16_t, UINT16_C(0))
 __flatbuffers_define_scalar_field(1, ThrusterUpdate, applied_thrust, flatbuffers_float, float, 0.00000000f)
-__flatbuffers_define_scalar_field(2, ThrusterUpdate, applied_torque, flatbuffers_float, float, 0.00000000f)
 
 struct ShieldUpdate_table { uint8_t unused__; };
 
@@ -507,8 +515,8 @@ __flatbuffers_offset_vec_at(EntityUpdate_table_t, vec, i, 0)
 __flatbuffers_table_as_root(EntityUpdate)
 
 __flatbuffers_define_scalar_field(0, EntityUpdate, id, flatbuffers_uint64, uint64_t, UINT64_C(0))
-__flatbuffers_define_scalar_field(1, EntityUpdate, x, flatbuffers_float, float, 0.00000000f)
-__flatbuffers_define_scalar_field(2, EntityUpdate, y, flatbuffers_float, float, 0.00000000f)
+__flatbuffers_define_struct_field(1, EntityUpdate, position, Vec2_struct_t, 0)
+__flatbuffers_define_struct_field(2, EntityUpdate, linear_velocity, Vec2_struct_t, 0)
 __flatbuffers_define_scalar_field(3, EntityUpdate, rotation, flatbuffers_float, float, 0.00000000f)
 __flatbuffers_define_scalar_field(4, EntityUpdate, is_commandable, flatbuffers_bool, flatbuffers_bool_t, UINT8_C(0))
 __flatbuffers_define_vector_field(5, EntityUpdate, block_hit_updates, BlockHitUpdate_vec_t, 0)

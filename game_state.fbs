@@ -1,4 +1,4 @@
-table Vec2 {
+struct Vec2 {
 	x: float32;
 	y: float32;
 }
@@ -70,7 +70,8 @@ table Flag {
 	owner_id: uint8; // if it is not GameState.my_id, it is the enemy flag
 	x: float32; //note, their initial x and y positions are also the base position where the enemy's flag needs to be taken to win
 	y: float32;
-	carrier_id: uint64; // the entity id that is carrying this flag
+	is_carried: bool; // whether some entity is carrying this flag.
+	carrier_id: uint64; // the entity id that is carrying this flag. ignore if is_carried is false
 }
 
 table GameState {
@@ -80,7 +81,7 @@ table GameState {
 	dead_projectiles: [DeadProjectile];
 	explosions: [Explosion];
 	my_id: uint8; // the owner id of the script reading this state
-	winner_id: uint8; // The owner id of the script that won the game. Do not consider this value until the very last snapshot of the gamestate.
+	winner_id: uint8; // The owner id of the script that won the game. Do not consider this value until the very last snapshot of the gamestate. 0 means game tied
 }
 
 table BlockHitUpdate {
@@ -92,7 +93,6 @@ table BlockHitUpdate {
 table ThrusterUpdate {
 	block_index: uint16;
 	applied_thrust: float32;
-	applied_torque: float32;
 }
 
 table ShieldUpdate {
@@ -115,8 +115,8 @@ table TurretUpdate {
 
 table EntityUpdate {
 	id: uint64;
-	x: float32;
-	y: float32;
+	position: Vec2;
+	linear_velocity: Vec2;
 	rotation: float32;
 	is_commandable: bool;
 	block_hit_updates: [BlockHitUpdate];
@@ -136,7 +136,7 @@ table GameStateDelta {
 	dead_projectiles: [DeadProjectile];
 	explosions: [Explosion];
 	my_id: uint8;
-	winner_id: uint8;
+	winner_id: uint8; // The owner id of the script that won the game. Do not consider this value until the very last snapshot of the gamestate. 0 means game tied
 }
 
 root_type GameState;

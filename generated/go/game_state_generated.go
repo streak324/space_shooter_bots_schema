@@ -7,29 +7,7 @@ import (
 )
 
 type Vec2 struct {
-	_tab flatbuffers.Table
-}
-
-func GetRootAsVec2(buf []byte, offset flatbuffers.UOffsetT) *Vec2 {
-	n := flatbuffers.GetUOffsetT(buf[offset:])
-	x := &Vec2{}
-	x.Init(buf, n+offset)
-	return x
-}
-
-func FinishVec2Buffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
-	builder.Finish(offset)
-}
-
-func GetSizePrefixedRootAsVec2(buf []byte, offset flatbuffers.UOffsetT) *Vec2 {
-	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
-	x := &Vec2{}
-	x.Init(buf, n+offset+flatbuffers.SizeUint32)
-	return x
-}
-
-func FinishSizePrefixedVec2Buffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
-	builder.FinishSizePrefixed(offset)
+	_tab flatbuffers.Struct
 }
 
 func (rcv *Vec2) Init(buf []byte, i flatbuffers.UOffsetT) {
@@ -38,44 +16,28 @@ func (rcv *Vec2) Init(buf []byte, i flatbuffers.UOffsetT) {
 }
 
 func (rcv *Vec2) Table() flatbuffers.Table {
-	return rcv._tab
+	return rcv._tab.Table
 }
 
 func (rcv *Vec2) X() float32 {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
-	if o != 0 {
-		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
-	}
-	return 0.0
+	return rcv._tab.GetFloat32(rcv._tab.Pos + flatbuffers.UOffsetT(0))
 }
-
 func (rcv *Vec2) MutateX(n float32) bool {
-	return rcv._tab.MutateFloat32Slot(4, n)
+	return rcv._tab.MutateFloat32(rcv._tab.Pos+flatbuffers.UOffsetT(0), n)
 }
 
 func (rcv *Vec2) Y() float32 {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
-	if o != 0 {
-		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
-	}
-	return 0.0
+	return rcv._tab.GetFloat32(rcv._tab.Pos + flatbuffers.UOffsetT(4))
 }
-
 func (rcv *Vec2) MutateY(n float32) bool {
-	return rcv._tab.MutateFloat32Slot(6, n)
+	return rcv._tab.MutateFloat32(rcv._tab.Pos+flatbuffers.UOffsetT(4), n)
 }
 
-func Vec2Start(builder *flatbuffers.Builder) {
-	builder.StartObject(2)
-}
-func Vec2AddX(builder *flatbuffers.Builder, x float32) {
-	builder.PrependFloat32Slot(0, x, 0.0)
-}
-func Vec2AddY(builder *flatbuffers.Builder, y float32) {
-	builder.PrependFloat32Slot(1, y, 0.0)
-}
-func Vec2End(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
-	return builder.EndObject()
+func CreateVec2(builder *flatbuffers.Builder, x float32, y float32) flatbuffers.UOffsetT {
+	builder.Prep(4, 8)
+	builder.PrependFloat32(y)
+	builder.PrependFloat32(x)
+	return builder.Offset()
 }
 type MissileSlot struct {
 	_tab flatbuffers.Table
@@ -672,7 +634,7 @@ func (rcv *Entity) MutateIsCommandable(n bool) bool {
 func (rcv *Entity) Position(obj *Vec2) *Vec2 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
 	if o != 0 {
-		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		x := o + rcv._tab.Pos
 		if obj == nil {
 			obj = new(Vec2)
 		}
@@ -685,7 +647,7 @@ func (rcv *Entity) Position(obj *Vec2) *Vec2 {
 func (rcv *Entity) LinearVelocity(obj *Vec2) *Vec2 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
 	if o != 0 {
-		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		x := o + rcv._tab.Pos
 		if obj == nil {
 			obj = new(Vec2)
 		}
@@ -764,10 +726,10 @@ func EntityAddIsCommandable(builder *flatbuffers.Builder, isCommandable bool) {
 	builder.PrependBoolSlot(2, isCommandable, false)
 }
 func EntityAddPosition(builder *flatbuffers.Builder, position flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(3, flatbuffers.UOffsetT(position), 0)
+	builder.PrependStructSlot(3, flatbuffers.UOffsetT(position), 0)
 }
 func EntityAddLinearVelocity(builder *flatbuffers.Builder, linearVelocity flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(4, flatbuffers.UOffsetT(linearVelocity), 0)
+	builder.PrependStructSlot(4, flatbuffers.UOffsetT(linearVelocity), 0)
 }
 func EntityAddOwner(builder *flatbuffers.Builder, owner byte) {
 	builder.PrependByteSlot(5, owner, 0)
@@ -849,7 +811,7 @@ func (rcv *Projectile) MutateMy(n bool) bool {
 func (rcv *Projectile) Position(obj *Vec2) *Vec2 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
 	if o != 0 {
-		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		x := o + rcv._tab.Pos
 		if obj == nil {
 			obj = new(Vec2)
 		}
@@ -862,7 +824,7 @@ func (rcv *Projectile) Position(obj *Vec2) *Vec2 {
 func (rcv *Projectile) LinearVelocity(obj *Vec2) *Vec2 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
 	if o != 0 {
-		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		x := o + rcv._tab.Pos
 		if obj == nil {
 			obj = new(Vec2)
 		}
@@ -918,10 +880,10 @@ func ProjectileAddMy(builder *flatbuffers.Builder, my bool) {
 	builder.PrependBoolSlot(1, my, false)
 }
 func ProjectileAddPosition(builder *flatbuffers.Builder, position flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(2, flatbuffers.UOffsetT(position), 0)
+	builder.PrependStructSlot(2, flatbuffers.UOffsetT(position), 0)
 }
 func ProjectileAddLinearVelocity(builder *flatbuffers.Builder, linearVelocity flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(3, flatbuffers.UOffsetT(linearVelocity), 0)
+	builder.PrependStructSlot(3, flatbuffers.UOffsetT(linearVelocity), 0)
 }
 func ProjectileAddDamage(builder *flatbuffers.Builder, damage float32) {
 	builder.PrependFloat32Slot(4, damage, 0.0)
@@ -985,7 +947,7 @@ func (rcv *DeadProjectile) MutateId(n uint64) bool {
 func (rcv *DeadProjectile) Position(obj *Vec2) *Vec2 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
 	if o != 0 {
-		x := rcv._tab.Indirect(o + rcv._tab.Pos)
+		x := o + rcv._tab.Pos
 		if obj == nil {
 			obj = new(Vec2)
 		}
@@ -1002,7 +964,7 @@ func DeadProjectileAddId(builder *flatbuffers.Builder, id uint64) {
 	builder.PrependUint64Slot(0, id, 0)
 }
 func DeadProjectileAddPosition(builder *flatbuffers.Builder, position flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(1, flatbuffers.UOffsetT(position), 0)
+	builder.PrependStructSlot(1, flatbuffers.UOffsetT(position), 0)
 }
 func DeadProjectileEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
@@ -1078,8 +1040,20 @@ func (rcv *Flag) MutateY(n float32) bool {
 	return rcv._tab.MutateFloat32Slot(8, n)
 }
 
-func (rcv *Flag) CarrierId() uint64 {
+func (rcv *Flag) IsCarried() bool {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
+	if o != 0 {
+		return rcv._tab.GetBool(o + rcv._tab.Pos)
+	}
+	return false
+}
+
+func (rcv *Flag) MutateIsCarried(n bool) bool {
+	return rcv._tab.MutateBoolSlot(10, n)
+}
+
+func (rcv *Flag) CarrierId() uint64 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
 	if o != 0 {
 		return rcv._tab.GetUint64(o + rcv._tab.Pos)
 	}
@@ -1087,11 +1061,11 @@ func (rcv *Flag) CarrierId() uint64 {
 }
 
 func (rcv *Flag) MutateCarrierId(n uint64) bool {
-	return rcv._tab.MutateUint64Slot(10, n)
+	return rcv._tab.MutateUint64Slot(12, n)
 }
 
 func FlagStart(builder *flatbuffers.Builder) {
-	builder.StartObject(4)
+	builder.StartObject(5)
 }
 func FlagAddOwnerId(builder *flatbuffers.Builder, ownerId byte) {
 	builder.PrependByteSlot(0, ownerId, 0)
@@ -1102,8 +1076,11 @@ func FlagAddX(builder *flatbuffers.Builder, x float32) {
 func FlagAddY(builder *flatbuffers.Builder, y float32) {
 	builder.PrependFloat32Slot(2, y, 0.0)
 }
+func FlagAddIsCarried(builder *flatbuffers.Builder, isCarried bool) {
+	builder.PrependBoolSlot(3, isCarried, false)
+}
 func FlagAddCarrierId(builder *flatbuffers.Builder, carrierId uint64) {
-	builder.PrependUint64Slot(3, carrierId, 0)
+	builder.PrependUint64Slot(4, carrierId, 0)
 }
 func FlagEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
@@ -1454,29 +1431,14 @@ func (rcv *ThrusterUpdate) MutateAppliedThrust(n float32) bool {
 	return rcv._tab.MutateFloat32Slot(6, n)
 }
 
-func (rcv *ThrusterUpdate) AppliedTorque() float32 {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
-	if o != 0 {
-		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
-	}
-	return 0.0
-}
-
-func (rcv *ThrusterUpdate) MutateAppliedTorque(n float32) bool {
-	return rcv._tab.MutateFloat32Slot(8, n)
-}
-
 func ThrusterUpdateStart(builder *flatbuffers.Builder) {
-	builder.StartObject(3)
+	builder.StartObject(2)
 }
 func ThrusterUpdateAddBlockIndex(builder *flatbuffers.Builder, blockIndex uint16) {
 	builder.PrependUint16Slot(0, blockIndex, 0)
 }
 func ThrusterUpdateAddAppliedThrust(builder *flatbuffers.Builder, appliedThrust float32) {
 	builder.PrependFloat32Slot(1, appliedThrust, 0.0)
-}
-func ThrusterUpdateAddAppliedTorque(builder *flatbuffers.Builder, appliedTorque float32) {
-	builder.PrependFloat32Slot(2, appliedTorque, 0.0)
 }
 func ThrusterUpdateEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
@@ -1786,28 +1748,30 @@ func (rcv *EntityUpdate) MutateId(n uint64) bool {
 	return rcv._tab.MutateUint64Slot(4, n)
 }
 
-func (rcv *EntityUpdate) X() float32 {
+func (rcv *EntityUpdate) Position(obj *Vec2) *Vec2 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
 	if o != 0 {
-		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
+		x := o + rcv._tab.Pos
+		if obj == nil {
+			obj = new(Vec2)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
 	}
-	return 0.0
+	return nil
 }
 
-func (rcv *EntityUpdate) MutateX(n float32) bool {
-	return rcv._tab.MutateFloat32Slot(6, n)
-}
-
-func (rcv *EntityUpdate) Y() float32 {
+func (rcv *EntityUpdate) LinearVelocity(obj *Vec2) *Vec2 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
 	if o != 0 {
-		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
+		x := o + rcv._tab.Pos
+		if obj == nil {
+			obj = new(Vec2)
+		}
+		obj.Init(rcv._tab.Bytes, x)
+		return obj
 	}
-	return 0.0
-}
-
-func (rcv *EntityUpdate) MutateY(n float32) bool {
-	return rcv._tab.MutateFloat32Slot(8, n)
+	return nil
 }
 
 func (rcv *EntityUpdate) Rotation() float32 {
@@ -1940,11 +1904,11 @@ func EntityUpdateStart(builder *flatbuffers.Builder) {
 func EntityUpdateAddId(builder *flatbuffers.Builder, id uint64) {
 	builder.PrependUint64Slot(0, id, 0)
 }
-func EntityUpdateAddX(builder *flatbuffers.Builder, x float32) {
-	builder.PrependFloat32Slot(1, x, 0.0)
+func EntityUpdateAddPosition(builder *flatbuffers.Builder, position flatbuffers.UOffsetT) {
+	builder.PrependStructSlot(1, flatbuffers.UOffsetT(position), 0)
 }
-func EntityUpdateAddY(builder *flatbuffers.Builder, y float32) {
-	builder.PrependFloat32Slot(2, y, 0.0)
+func EntityUpdateAddLinearVelocity(builder *flatbuffers.Builder, linearVelocity flatbuffers.UOffsetT) {
+	builder.PrependStructSlot(2, flatbuffers.UOffsetT(linearVelocity), 0)
 }
 func EntityUpdateAddRotation(builder *flatbuffers.Builder, rotation float32) {
 	builder.PrependFloat32Slot(3, rotation, 0.0)

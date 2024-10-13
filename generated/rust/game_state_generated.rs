@@ -9,120 +9,130 @@ use core::cmp::Ordering;
 extern crate flatbuffers;
 use self::flatbuffers::{EndianScalar, Follow};
 
-pub enum Vec2Offset {}
-#[derive(Copy, Clone, PartialEq)]
-
-pub struct Vec2<'a> {
-  pub _tab: flatbuffers::Table<'a>,
+// struct Vec2, aligned to 4
+#[repr(transparent)]
+#[derive(Clone, Copy, PartialEq)]
+pub struct Vec2(pub [u8; 8]);
+impl Default for Vec2 { 
+  fn default() -> Self { 
+    Self([0; 8])
+  }
+}
+impl core::fmt::Debug for Vec2 {
+  fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    f.debug_struct("Vec2")
+      .field("x", &self.x())
+      .field("y", &self.y())
+      .finish()
+  }
 }
 
-impl<'a> flatbuffers::Follow<'a> for Vec2<'a> {
-  type Inner = Vec2<'a>;
+impl flatbuffers::SimpleToVerifyInSlice for Vec2 {}
+impl<'a> flatbuffers::Follow<'a> for Vec2 {
+  type Inner = &'a Vec2;
   #[inline]
   unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
-    Self { _tab: flatbuffers::Table::new(buf, loc) }
+    <&'a Vec2>::follow(buf, loc)
   }
 }
-
-impl<'a> Vec2<'a> {
-  pub const VT_X: flatbuffers::VOffsetT = 4;
-  pub const VT_Y: flatbuffers::VOffsetT = 6;
-
+impl<'a> flatbuffers::Follow<'a> for &'a Vec2 {
+  type Inner = &'a Vec2;
   #[inline]
-  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
-    Vec2 { _tab: table }
-  }
-  #[allow(unused_mut)]
-  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
-    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
-    args: &'args Vec2Args
-  ) -> flatbuffers::WIPOffset<Vec2<'bldr>> {
-    let mut builder = Vec2Builder::new(_fbb);
-    builder.add_y(args.y);
-    builder.add_x(args.x);
-    builder.finish()
-  }
-
-
-  #[inline]
-  pub fn x(&self) -> f32 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<f32>(Vec2::VT_X, Some(0.0)).unwrap()}
-  }
-  #[inline]
-  pub fn y(&self) -> f32 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<f32>(Vec2::VT_Y, Some(0.0)).unwrap()}
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    flatbuffers::follow_cast_ref::<Vec2>(buf, loc)
   }
 }
+impl<'b> flatbuffers::Push for Vec2 {
+    type Output = Vec2;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        let src = ::core::slice::from_raw_parts(self as *const Vec2 as *const u8, Self::size());
+        dst.copy_from_slice(src);
+    }
+}
 
-impl flatbuffers::Verifiable for Vec2<'_> {
+impl<'a> flatbuffers::Verifiable for Vec2 {
   #[inline]
   fn run_verifier(
     v: &mut flatbuffers::Verifier, pos: usize
   ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
     use self::flatbuffers::Verifiable;
-    v.visit_table(pos)?
-     .visit_field::<f32>("x", Self::VT_X, false)?
-     .visit_field::<f32>("y", Self::VT_Y, false)?
-     .finish();
-    Ok(())
-  }
-}
-pub struct Vec2Args {
-    pub x: f32,
-    pub y: f32,
-}
-impl<'a> Default for Vec2Args {
-  #[inline]
-  fn default() -> Self {
-    Vec2Args {
-      x: 0.0,
-      y: 0.0,
-    }
+    v.in_buffer::<Self>(pos)
   }
 }
 
-pub struct Vec2Builder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
-  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
-  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
-}
-impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> Vec2Builder<'a, 'b, A> {
-  #[inline]
-  pub fn add_x(&mut self, x: f32) {
-    self.fbb_.push_slot::<f32>(Vec2::VT_X, x, 0.0);
+impl<'a> Vec2 {
+  #[allow(clippy::too_many_arguments)]
+  pub fn new(
+    x: f32,
+    y: f32,
+  ) -> Self {
+    let mut s = Self([0; 8]);
+    s.set_x(x);
+    s.set_y(y);
+    s
   }
-  #[inline]
-  pub fn add_y(&mut self, y: f32) {
-    self.fbb_.push_slot::<f32>(Vec2::VT_Y, y, 0.0);
+
+  pub fn x(&self) -> f32 {
+    let mut mem = core::mem::MaybeUninit::<<f32 as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[0..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<f32 as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
   }
-  #[inline]
-  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> Vec2Builder<'a, 'b, A> {
-    let start = _fbb.start_table();
-    Vec2Builder {
-      fbb_: _fbb,
-      start_: start,
+
+  pub fn set_x(&mut self, x: f32) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[0..].as_mut_ptr(),
+        core::mem::size_of::<<f32 as EndianScalar>::Scalar>(),
+      );
     }
   }
-  #[inline]
-  pub fn finish(self) -> flatbuffers::WIPOffset<Vec2<'a>> {
-    let o = self.fbb_.end_table(self.start_);
-    flatbuffers::WIPOffset::new(o.value())
+
+  pub fn y(&self) -> f32 {
+    let mut mem = core::mem::MaybeUninit::<<f32 as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[4..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<f32 as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
   }
+
+  pub fn set_y(&mut self, x: f32) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[4..].as_mut_ptr(),
+        core::mem::size_of::<<f32 as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
 }
 
-impl core::fmt::Debug for Vec2<'_> {
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    let mut ds = f.debug_struct("Vec2");
-      ds.field("x", &self.x());
-      ds.field("y", &self.y());
-      ds.finish()
-  }
-}
 pub enum MissileSlotOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -905,18 +915,18 @@ impl<'a> Entity<'a> {
     unsafe { self._tab.get::<bool>(Entity::VT_IS_COMMANDABLE, Some(false)).unwrap()}
   }
   #[inline]
-  pub fn position(&self) -> Option<Vec2<'a>> {
+  pub fn position(&self) -> Option<&'a Vec2> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<Vec2>>(Entity::VT_POSITION, None)}
+    unsafe { self._tab.get::<Vec2>(Entity::VT_POSITION, None)}
   }
   #[inline]
-  pub fn linear_velocity(&self) -> Option<Vec2<'a>> {
+  pub fn linear_velocity(&self) -> Option<&'a Vec2> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<Vec2>>(Entity::VT_LINEAR_VELOCITY, None)}
+    unsafe { self._tab.get::<Vec2>(Entity::VT_LINEAR_VELOCITY, None)}
   }
   #[inline]
   pub fn owner(&self) -> u8 {
@@ -958,8 +968,8 @@ impl flatbuffers::Verifiable for Entity<'_> {
      .visit_field::<u64>("id", Self::VT_ID, false)?
      .visit_field::<bool>("my", Self::VT_MY, false)?
      .visit_field::<bool>("is_commandable", Self::VT_IS_COMMANDABLE, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<Vec2>>("position", Self::VT_POSITION, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<Vec2>>("linear_velocity", Self::VT_LINEAR_VELOCITY, false)?
+     .visit_field::<Vec2>("position", Self::VT_POSITION, false)?
+     .visit_field::<Vec2>("linear_velocity", Self::VT_LINEAR_VELOCITY, false)?
      .visit_field::<u8>("owner", Self::VT_OWNER, false)?
      .visit_field::<f32>("rotation", Self::VT_ROTATION, false)?
      .visit_field::<f32>("angular_velocity", Self::VT_ANGULAR_VELOCITY, false)?
@@ -972,8 +982,8 @@ pub struct EntityArgs<'a> {
     pub id: u64,
     pub my: bool,
     pub is_commandable: bool,
-    pub position: Option<flatbuffers::WIPOffset<Vec2<'a>>>,
-    pub linear_velocity: Option<flatbuffers::WIPOffset<Vec2<'a>>>,
+    pub position: Option<&'a Vec2>,
+    pub linear_velocity: Option<&'a Vec2>,
     pub owner: u8,
     pub rotation: f32,
     pub angular_velocity: f32,
@@ -1014,12 +1024,12 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> EntityBuilder<'a, 'b, A> {
     self.fbb_.push_slot::<bool>(Entity::VT_IS_COMMANDABLE, is_commandable, false);
   }
   #[inline]
-  pub fn add_position(&mut self, position: flatbuffers::WIPOffset<Vec2<'b >>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<Vec2>>(Entity::VT_POSITION, position);
+  pub fn add_position(&mut self, position: &Vec2) {
+    self.fbb_.push_slot_always::<&Vec2>(Entity::VT_POSITION, position);
   }
   #[inline]
-  pub fn add_linear_velocity(&mut self, linear_velocity: flatbuffers::WIPOffset<Vec2<'b >>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<Vec2>>(Entity::VT_LINEAR_VELOCITY, linear_velocity);
+  pub fn add_linear_velocity(&mut self, linear_velocity: &Vec2) {
+    self.fbb_.push_slot_always::<&Vec2>(Entity::VT_LINEAR_VELOCITY, linear_velocity);
   }
   #[inline]
   pub fn add_owner(&mut self, owner: u8) {
@@ -1127,18 +1137,18 @@ impl<'a> Projectile<'a> {
     unsafe { self._tab.get::<bool>(Projectile::VT_MY, Some(false)).unwrap()}
   }
   #[inline]
-  pub fn position(&self) -> Option<Vec2<'a>> {
+  pub fn position(&self) -> Option<&'a Vec2> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<Vec2>>(Projectile::VT_POSITION, None)}
+    unsafe { self._tab.get::<Vec2>(Projectile::VT_POSITION, None)}
   }
   #[inline]
-  pub fn linear_velocity(&self) -> Option<Vec2<'a>> {
+  pub fn linear_velocity(&self) -> Option<&'a Vec2> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<Vec2>>(Projectile::VT_LINEAR_VELOCITY, None)}
+    unsafe { self._tab.get::<Vec2>(Projectile::VT_LINEAR_VELOCITY, None)}
   }
   #[inline]
   pub fn damage(&self) -> f32 {
@@ -1172,8 +1182,8 @@ impl flatbuffers::Verifiable for Projectile<'_> {
     v.visit_table(pos)?
      .visit_field::<u64>("id", Self::VT_ID, false)?
      .visit_field::<bool>("my", Self::VT_MY, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<Vec2>>("position", Self::VT_POSITION, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<Vec2>>("linear_velocity", Self::VT_LINEAR_VELOCITY, false)?
+     .visit_field::<Vec2>("position", Self::VT_POSITION, false)?
+     .visit_field::<Vec2>("linear_velocity", Self::VT_LINEAR_VELOCITY, false)?
      .visit_field::<f32>("damage", Self::VT_DAMAGE, false)?
      .visit_field::<f32>("size_", Self::VT_SIZE_, false)?
      .visit_field::<f32>("range", Self::VT_RANGE, false)?
@@ -1184,8 +1194,8 @@ impl flatbuffers::Verifiable for Projectile<'_> {
 pub struct ProjectileArgs<'a> {
     pub id: u64,
     pub my: bool,
-    pub position: Option<flatbuffers::WIPOffset<Vec2<'a>>>,
-    pub linear_velocity: Option<flatbuffers::WIPOffset<Vec2<'a>>>,
+    pub position: Option<&'a Vec2>,
+    pub linear_velocity: Option<&'a Vec2>,
     pub damage: f32,
     pub size_: f32,
     pub range: f32,
@@ -1219,12 +1229,12 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ProjectileBuilder<'a, 'b, A> {
     self.fbb_.push_slot::<bool>(Projectile::VT_MY, my, false);
   }
   #[inline]
-  pub fn add_position(&mut self, position: flatbuffers::WIPOffset<Vec2<'b >>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<Vec2>>(Projectile::VT_POSITION, position);
+  pub fn add_position(&mut self, position: &Vec2) {
+    self.fbb_.push_slot_always::<&Vec2>(Projectile::VT_POSITION, position);
   }
   #[inline]
-  pub fn add_linear_velocity(&mut self, linear_velocity: flatbuffers::WIPOffset<Vec2<'b >>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<Vec2>>(Projectile::VT_LINEAR_VELOCITY, linear_velocity);
+  pub fn add_linear_velocity(&mut self, linear_velocity: &Vec2) {
+    self.fbb_.push_slot_always::<&Vec2>(Projectile::VT_LINEAR_VELOCITY, linear_velocity);
   }
   #[inline]
   pub fn add_damage(&mut self, damage: f32) {
@@ -1309,11 +1319,11 @@ impl<'a> DeadProjectile<'a> {
     unsafe { self._tab.get::<u64>(DeadProjectile::VT_ID, Some(0)).unwrap()}
   }
   #[inline]
-  pub fn position(&self) -> Option<Vec2<'a>> {
+  pub fn position(&self) -> Option<&'a Vec2> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<Vec2>>(DeadProjectile::VT_POSITION, None)}
+    unsafe { self._tab.get::<Vec2>(DeadProjectile::VT_POSITION, None)}
   }
 }
 
@@ -1325,14 +1335,14 @@ impl flatbuffers::Verifiable for DeadProjectile<'_> {
     use self::flatbuffers::Verifiable;
     v.visit_table(pos)?
      .visit_field::<u64>("id", Self::VT_ID, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<Vec2>>("position", Self::VT_POSITION, false)?
+     .visit_field::<Vec2>("position", Self::VT_POSITION, false)?
      .finish();
     Ok(())
   }
 }
 pub struct DeadProjectileArgs<'a> {
     pub id: u64,
-    pub position: Option<flatbuffers::WIPOffset<Vec2<'a>>>,
+    pub position: Option<&'a Vec2>,
 }
 impl<'a> Default for DeadProjectileArgs<'a> {
   #[inline]
@@ -1354,8 +1364,8 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> DeadProjectileBuilder<'a, 'b, A
     self.fbb_.push_slot::<u64>(DeadProjectile::VT_ID, id, 0);
   }
   #[inline]
-  pub fn add_position(&mut self, position: flatbuffers::WIPOffset<Vec2<'b >>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<Vec2>>(DeadProjectile::VT_POSITION, position);
+  pub fn add_position(&mut self, position: &Vec2) {
+    self.fbb_.push_slot_always::<&Vec2>(DeadProjectile::VT_POSITION, position);
   }
   #[inline]
   pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> DeadProjectileBuilder<'a, 'b, A> {
@@ -1399,7 +1409,8 @@ impl<'a> Flag<'a> {
   pub const VT_OWNER_ID: flatbuffers::VOffsetT = 4;
   pub const VT_X: flatbuffers::VOffsetT = 6;
   pub const VT_Y: flatbuffers::VOffsetT = 8;
-  pub const VT_CARRIER_ID: flatbuffers::VOffsetT = 10;
+  pub const VT_IS_CARRIED: flatbuffers::VOffsetT = 10;
+  pub const VT_CARRIER_ID: flatbuffers::VOffsetT = 12;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -1414,6 +1425,7 @@ impl<'a> Flag<'a> {
     builder.add_carrier_id(args.carrier_id);
     builder.add_y(args.y);
     builder.add_x(args.x);
+    builder.add_is_carried(args.is_carried);
     builder.add_owner_id(args.owner_id);
     builder.finish()
   }
@@ -1441,6 +1453,13 @@ impl<'a> Flag<'a> {
     unsafe { self._tab.get::<f32>(Flag::VT_Y, Some(0.0)).unwrap()}
   }
   #[inline]
+  pub fn is_carried(&self) -> bool {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<bool>(Flag::VT_IS_CARRIED, Some(false)).unwrap()}
+  }
+  #[inline]
   pub fn carrier_id(&self) -> u64 {
     // Safety:
     // Created from valid Table for this object
@@ -1459,6 +1478,7 @@ impl flatbuffers::Verifiable for Flag<'_> {
      .visit_field::<u8>("owner_id", Self::VT_OWNER_ID, false)?
      .visit_field::<f32>("x", Self::VT_X, false)?
      .visit_field::<f32>("y", Self::VT_Y, false)?
+     .visit_field::<bool>("is_carried", Self::VT_IS_CARRIED, false)?
      .visit_field::<u64>("carrier_id", Self::VT_CARRIER_ID, false)?
      .finish();
     Ok(())
@@ -1468,6 +1488,7 @@ pub struct FlagArgs {
     pub owner_id: u8,
     pub x: f32,
     pub y: f32,
+    pub is_carried: bool,
     pub carrier_id: u64,
 }
 impl<'a> Default for FlagArgs {
@@ -1477,6 +1498,7 @@ impl<'a> Default for FlagArgs {
       owner_id: 0,
       x: 0.0,
       y: 0.0,
+      is_carried: false,
       carrier_id: 0,
     }
   }
@@ -1498,6 +1520,10 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> FlagBuilder<'a, 'b, A> {
   #[inline]
   pub fn add_y(&mut self, y: f32) {
     self.fbb_.push_slot::<f32>(Flag::VT_Y, y, 0.0);
+  }
+  #[inline]
+  pub fn add_is_carried(&mut self, is_carried: bool) {
+    self.fbb_.push_slot::<bool>(Flag::VT_IS_CARRIED, is_carried, false);
   }
   #[inline]
   pub fn add_carrier_id(&mut self, carrier_id: u64) {
@@ -1524,6 +1550,7 @@ impl core::fmt::Debug for Flag<'_> {
       ds.field("owner_id", &self.owner_id());
       ds.field("x", &self.x());
       ds.field("y", &self.y());
+      ds.field("is_carried", &self.is_carried());
       ds.field("carrier_id", &self.carrier_id());
       ds.finish()
   }
@@ -1876,7 +1903,6 @@ impl<'a> flatbuffers::Follow<'a> for ThrusterUpdate<'a> {
 impl<'a> ThrusterUpdate<'a> {
   pub const VT_BLOCK_INDEX: flatbuffers::VOffsetT = 4;
   pub const VT_APPLIED_THRUST: flatbuffers::VOffsetT = 6;
-  pub const VT_APPLIED_TORQUE: flatbuffers::VOffsetT = 8;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -1888,7 +1914,6 @@ impl<'a> ThrusterUpdate<'a> {
     args: &'args ThrusterUpdateArgs
   ) -> flatbuffers::WIPOffset<ThrusterUpdate<'bldr>> {
     let mut builder = ThrusterUpdateBuilder::new(_fbb);
-    builder.add_applied_torque(args.applied_torque);
     builder.add_applied_thrust(args.applied_thrust);
     builder.add_block_index(args.block_index);
     builder.finish()
@@ -1909,13 +1934,6 @@ impl<'a> ThrusterUpdate<'a> {
     // which contains a valid value in this slot
     unsafe { self._tab.get::<f32>(ThrusterUpdate::VT_APPLIED_THRUST, Some(0.0)).unwrap()}
   }
-  #[inline]
-  pub fn applied_torque(&self) -> f32 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<f32>(ThrusterUpdate::VT_APPLIED_TORQUE, Some(0.0)).unwrap()}
-  }
 }
 
 impl flatbuffers::Verifiable for ThrusterUpdate<'_> {
@@ -1927,7 +1945,6 @@ impl flatbuffers::Verifiable for ThrusterUpdate<'_> {
     v.visit_table(pos)?
      .visit_field::<u16>("block_index", Self::VT_BLOCK_INDEX, false)?
      .visit_field::<f32>("applied_thrust", Self::VT_APPLIED_THRUST, false)?
-     .visit_field::<f32>("applied_torque", Self::VT_APPLIED_TORQUE, false)?
      .finish();
     Ok(())
   }
@@ -1935,7 +1952,6 @@ impl flatbuffers::Verifiable for ThrusterUpdate<'_> {
 pub struct ThrusterUpdateArgs {
     pub block_index: u16,
     pub applied_thrust: f32,
-    pub applied_torque: f32,
 }
 impl<'a> Default for ThrusterUpdateArgs {
   #[inline]
@@ -1943,7 +1959,6 @@ impl<'a> Default for ThrusterUpdateArgs {
     ThrusterUpdateArgs {
       block_index: 0,
       applied_thrust: 0.0,
-      applied_torque: 0.0,
     }
   }
 }
@@ -1960,10 +1975,6 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ThrusterUpdateBuilder<'a, 'b, A
   #[inline]
   pub fn add_applied_thrust(&mut self, applied_thrust: f32) {
     self.fbb_.push_slot::<f32>(ThrusterUpdate::VT_APPLIED_THRUST, applied_thrust, 0.0);
-  }
-  #[inline]
-  pub fn add_applied_torque(&mut self, applied_torque: f32) {
-    self.fbb_.push_slot::<f32>(ThrusterUpdate::VT_APPLIED_TORQUE, applied_torque, 0.0);
   }
   #[inline]
   pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ThrusterUpdateBuilder<'a, 'b, A> {
@@ -1985,7 +1996,6 @@ impl core::fmt::Debug for ThrusterUpdate<'_> {
     let mut ds = f.debug_struct("ThrusterUpdate");
       ds.field("block_index", &self.block_index());
       ds.field("applied_thrust", &self.applied_thrust());
-      ds.field("applied_torque", &self.applied_torque());
       ds.finish()
   }
 }
@@ -2399,8 +2409,8 @@ impl<'a> flatbuffers::Follow<'a> for EntityUpdate<'a> {
 
 impl<'a> EntityUpdate<'a> {
   pub const VT_ID: flatbuffers::VOffsetT = 4;
-  pub const VT_X: flatbuffers::VOffsetT = 6;
-  pub const VT_Y: flatbuffers::VOffsetT = 8;
+  pub const VT_POSITION: flatbuffers::VOffsetT = 6;
+  pub const VT_LINEAR_VELOCITY: flatbuffers::VOffsetT = 8;
   pub const VT_ROTATION: flatbuffers::VOffsetT = 10;
   pub const VT_IS_COMMANDABLE: flatbuffers::VOffsetT = 12;
   pub const VT_BLOCK_HIT_UPDATES: flatbuffers::VOffsetT = 14;
@@ -2426,8 +2436,8 @@ impl<'a> EntityUpdate<'a> {
     if let Some(x) = args.thruster_updates { builder.add_thruster_updates(x); }
     if let Some(x) = args.block_hit_updates { builder.add_block_hit_updates(x); }
     builder.add_rotation(args.rotation);
-    builder.add_y(args.y);
-    builder.add_x(args.x);
+    if let Some(x) = args.linear_velocity { builder.add_linear_velocity(x); }
+    if let Some(x) = args.position { builder.add_position(x); }
     builder.add_is_commandable(args.is_commandable);
     builder.finish()
   }
@@ -2441,18 +2451,18 @@ impl<'a> EntityUpdate<'a> {
     unsafe { self._tab.get::<u64>(EntityUpdate::VT_ID, Some(0)).unwrap()}
   }
   #[inline]
-  pub fn x(&self) -> f32 {
+  pub fn position(&self) -> Option<&'a Vec2> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<f32>(EntityUpdate::VT_X, Some(0.0)).unwrap()}
+    unsafe { self._tab.get::<Vec2>(EntityUpdate::VT_POSITION, None)}
   }
   #[inline]
-  pub fn y(&self) -> f32 {
+  pub fn linear_velocity(&self) -> Option<&'a Vec2> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<f32>(EntityUpdate::VT_Y, Some(0.0)).unwrap()}
+    unsafe { self._tab.get::<Vec2>(EntityUpdate::VT_LINEAR_VELOCITY, None)}
   }
   #[inline]
   pub fn rotation(&self) -> f32 {
@@ -2513,8 +2523,8 @@ impl flatbuffers::Verifiable for EntityUpdate<'_> {
     use self::flatbuffers::Verifiable;
     v.visit_table(pos)?
      .visit_field::<u64>("id", Self::VT_ID, false)?
-     .visit_field::<f32>("x", Self::VT_X, false)?
-     .visit_field::<f32>("y", Self::VT_Y, false)?
+     .visit_field::<Vec2>("position", Self::VT_POSITION, false)?
+     .visit_field::<Vec2>("linear_velocity", Self::VT_LINEAR_VELOCITY, false)?
      .visit_field::<f32>("rotation", Self::VT_ROTATION, false)?
      .visit_field::<bool>("is_commandable", Self::VT_IS_COMMANDABLE, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<BlockHitUpdate>>>>("block_hit_updates", Self::VT_BLOCK_HIT_UPDATES, false)?
@@ -2528,8 +2538,8 @@ impl flatbuffers::Verifiable for EntityUpdate<'_> {
 }
 pub struct EntityUpdateArgs<'a> {
     pub id: u64,
-    pub x: f32,
-    pub y: f32,
+    pub position: Option<&'a Vec2>,
+    pub linear_velocity: Option<&'a Vec2>,
     pub rotation: f32,
     pub is_commandable: bool,
     pub block_hit_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<BlockHitUpdate<'a>>>>>,
@@ -2543,8 +2553,8 @@ impl<'a> Default for EntityUpdateArgs<'a> {
   fn default() -> Self {
     EntityUpdateArgs {
       id: 0,
-      x: 0.0,
-      y: 0.0,
+      position: None,
+      linear_velocity: None,
       rotation: 0.0,
       is_commandable: false,
       block_hit_updates: None,
@@ -2566,12 +2576,12 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> EntityUpdateBuilder<'a, 'b, A> 
     self.fbb_.push_slot::<u64>(EntityUpdate::VT_ID, id, 0);
   }
   #[inline]
-  pub fn add_x(&mut self, x: f32) {
-    self.fbb_.push_slot::<f32>(EntityUpdate::VT_X, x, 0.0);
+  pub fn add_position(&mut self, position: &Vec2) {
+    self.fbb_.push_slot_always::<&Vec2>(EntityUpdate::VT_POSITION, position);
   }
   #[inline]
-  pub fn add_y(&mut self, y: f32) {
-    self.fbb_.push_slot::<f32>(EntityUpdate::VT_Y, y, 0.0);
+  pub fn add_linear_velocity(&mut self, linear_velocity: &Vec2) {
+    self.fbb_.push_slot_always::<&Vec2>(EntityUpdate::VT_LINEAR_VELOCITY, linear_velocity);
   }
   #[inline]
   pub fn add_rotation(&mut self, rotation: f32) {
@@ -2620,8 +2630,8 @@ impl core::fmt::Debug for EntityUpdate<'_> {
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ds = f.debug_struct("EntityUpdate");
       ds.field("id", &self.id());
-      ds.field("x", &self.x());
-      ds.field("y", &self.y());
+      ds.field("position", &self.position());
+      ds.field("linear_velocity", &self.linear_velocity());
       ds.field("rotation", &self.rotation());
       ds.field("is_commandable", &self.is_commandable());
       ds.field("block_hit_updates", &self.block_hit_updates());
