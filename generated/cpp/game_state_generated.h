@@ -1339,7 +1339,8 @@ struct SingleBlockEntityUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::
     VT_LINEAR_VELOCITY = 8,
     VT_ROTATION = 10,
     VT_HITPOINTS = 12,
-    VT_TURRET_ROTATION = 14
+    VT_TURRET_ROTATION = 14,
+    VT_APPLIED_THRUST = 16
   };
   uint64_t id() const {
     return GetField<uint64_t>(VT_ID, 0);
@@ -1359,6 +1360,9 @@ struct SingleBlockEntityUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::
   float turret_rotation() const {
     return GetField<float>(VT_TURRET_ROTATION, 0.0f);
   }
+  float applied_thrust() const {
+    return GetField<float>(VT_APPLIED_THRUST, 0.0f);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_ID, 8) &&
@@ -1367,6 +1371,7 @@ struct SingleBlockEntityUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::
            VerifyField<float>(verifier, VT_ROTATION, 4) &&
            VerifyField<float>(verifier, VT_HITPOINTS, 4) &&
            VerifyField<float>(verifier, VT_TURRET_ROTATION, 4) &&
+           VerifyField<float>(verifier, VT_APPLIED_THRUST, 4) &&
            verifier.EndTable();
   }
 };
@@ -1393,6 +1398,9 @@ struct SingleBlockEntityUpdateBuilder {
   void add_turret_rotation(float turret_rotation) {
     fbb_.AddElement<float>(SingleBlockEntityUpdate::VT_TURRET_ROTATION, turret_rotation, 0.0f);
   }
+  void add_applied_thrust(float applied_thrust) {
+    fbb_.AddElement<float>(SingleBlockEntityUpdate::VT_APPLIED_THRUST, applied_thrust, 0.0f);
+  }
   explicit SingleBlockEntityUpdateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1411,9 +1419,11 @@ inline ::flatbuffers::Offset<SingleBlockEntityUpdate> CreateSingleBlockEntityUpd
     const Vec2 *linear_velocity = nullptr,
     float rotation = 0.0f,
     float hitpoints = 0.0f,
-    float turret_rotation = 0.0f) {
+    float turret_rotation = 0.0f,
+    float applied_thrust = 0.0f) {
   SingleBlockEntityUpdateBuilder builder_(_fbb);
   builder_.add_id(id);
+  builder_.add_applied_thrust(applied_thrust);
   builder_.add_turret_rotation(turret_rotation);
   builder_.add_hitpoints(hitpoints);
   builder_.add_rotation(rotation);

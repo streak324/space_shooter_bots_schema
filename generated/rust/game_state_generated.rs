@@ -2774,6 +2774,7 @@ impl<'a> SingleBlockEntityUpdate<'a> {
   pub const VT_ROTATION: flatbuffers::VOffsetT = 10;
   pub const VT_HITPOINTS: flatbuffers::VOffsetT = 12;
   pub const VT_TURRET_ROTATION: flatbuffers::VOffsetT = 14;
+  pub const VT_APPLIED_THRUST: flatbuffers::VOffsetT = 16;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -2786,6 +2787,7 @@ impl<'a> SingleBlockEntityUpdate<'a> {
   ) -> flatbuffers::WIPOffset<SingleBlockEntityUpdate<'bldr>> {
     let mut builder = SingleBlockEntityUpdateBuilder::new(_fbb);
     builder.add_id(args.id);
+    builder.add_applied_thrust(args.applied_thrust);
     builder.add_turret_rotation(args.turret_rotation);
     builder.add_hitpoints(args.hitpoints);
     builder.add_rotation(args.rotation);
@@ -2837,6 +2839,13 @@ impl<'a> SingleBlockEntityUpdate<'a> {
     // which contains a valid value in this slot
     unsafe { self._tab.get::<f32>(SingleBlockEntityUpdate::VT_TURRET_ROTATION, Some(0.0)).unwrap()}
   }
+  #[inline]
+  pub fn applied_thrust(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(SingleBlockEntityUpdate::VT_APPLIED_THRUST, Some(0.0)).unwrap()}
+  }
 }
 
 impl flatbuffers::Verifiable for SingleBlockEntityUpdate<'_> {
@@ -2852,6 +2861,7 @@ impl flatbuffers::Verifiable for SingleBlockEntityUpdate<'_> {
      .visit_field::<f32>("rotation", Self::VT_ROTATION, false)?
      .visit_field::<f32>("hitpoints", Self::VT_HITPOINTS, false)?
      .visit_field::<f32>("turret_rotation", Self::VT_TURRET_ROTATION, false)?
+     .visit_field::<f32>("applied_thrust", Self::VT_APPLIED_THRUST, false)?
      .finish();
     Ok(())
   }
@@ -2863,6 +2873,7 @@ pub struct SingleBlockEntityUpdateArgs<'a> {
     pub rotation: f32,
     pub hitpoints: f32,
     pub turret_rotation: f32,
+    pub applied_thrust: f32,
 }
 impl<'a> Default for SingleBlockEntityUpdateArgs<'a> {
   #[inline]
@@ -2874,6 +2885,7 @@ impl<'a> Default for SingleBlockEntityUpdateArgs<'a> {
       rotation: 0.0,
       hitpoints: 0.0,
       turret_rotation: 0.0,
+      applied_thrust: 0.0,
     }
   }
 }
@@ -2908,6 +2920,10 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> SingleBlockEntityUpdateBuilder<
     self.fbb_.push_slot::<f32>(SingleBlockEntityUpdate::VT_TURRET_ROTATION, turret_rotation, 0.0);
   }
   #[inline]
+  pub fn add_applied_thrust(&mut self, applied_thrust: f32) {
+    self.fbb_.push_slot::<f32>(SingleBlockEntityUpdate::VT_APPLIED_THRUST, applied_thrust, 0.0);
+  }
+  #[inline]
   pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> SingleBlockEntityUpdateBuilder<'a, 'b, A> {
     let start = _fbb.start_table();
     SingleBlockEntityUpdateBuilder {
@@ -2931,6 +2947,7 @@ impl core::fmt::Debug for SingleBlockEntityUpdate<'_> {
       ds.field("rotation", &self.rotation());
       ds.field("hitpoints", &self.hitpoints());
       ds.field("turret_rotation", &self.turret_rotation());
+      ds.field("applied_thrust", &self.applied_thrust());
       ds.finish()
   }
 }

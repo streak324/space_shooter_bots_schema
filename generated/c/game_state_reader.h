@@ -599,6 +599,7 @@ __flatbuffers_define_struct_field(2, SingleBlockEntityUpdate, linear_velocity, V
 __flatbuffers_define_scalar_field(3, SingleBlockEntityUpdate, rotation, flatbuffers_float, float, 0.00000000f)
 __flatbuffers_define_scalar_field(4, SingleBlockEntityUpdate, hitpoints, flatbuffers_float, float, 0.00000000f)
 __flatbuffers_define_scalar_field(5, SingleBlockEntityUpdate, turret_rotation, flatbuffers_float, float, 0.00000000f)
+__flatbuffers_define_scalar_field(6, SingleBlockEntityUpdate, applied_thrust, flatbuffers_float, float, 0.00000000f)
 
 struct GameStateDelta_table { uint8_t unused__; };
 

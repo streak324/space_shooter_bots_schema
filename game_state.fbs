@@ -134,6 +134,7 @@ table SingleBlockEntityUpdate {
 	rotation: float32;
 	hitpoints: float32;
 	turret_rotation: float32; // relative to entity
+	applied_thrust: float32;
 }
 
 

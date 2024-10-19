@@ -1841,8 +1841,20 @@ func (rcv *SingleBlockEntityUpdate) MutateTurretRotation(n float32) bool {
 	return rcv._tab.MutateFloat32Slot(14, n)
 }
 
+func (rcv *SingleBlockEntityUpdate) AppliedThrust() float32 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(16))
+	if o != 0 {
+		return rcv._tab.GetFloat32(o + rcv._tab.Pos)
+	}
+	return 0.0
+}
+
+func (rcv *SingleBlockEntityUpdate) MutateAppliedThrust(n float32) bool {
+	return rcv._tab.MutateFloat32Slot(16, n)
+}
+
 func SingleBlockEntityUpdateStart(builder *flatbuffers.Builder) {
-	builder.StartObject(6)
+	builder.StartObject(7)
 }
 func SingleBlockEntityUpdateAddId(builder *flatbuffers.Builder, id uint64) {
 	builder.PrependUint64Slot(0, id, 0)
@@ -1861,6 +1873,9 @@ func SingleBlockEntityUpdateAddHitpoints(builder *flatbuffers.Builder, hitpoints
 }
 func SingleBlockEntityUpdateAddTurretRotation(builder *flatbuffers.Builder, turretRotation float32) {
 	builder.PrependFloat32Slot(5, turretRotation, 0.0)
+}
+func SingleBlockEntityUpdateAddAppliedThrust(builder *flatbuffers.Builder, appliedThrust float32) {
+	builder.PrependFloat32Slot(6, appliedThrust, 0.0)
 }
 func SingleBlockEntityUpdateEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
