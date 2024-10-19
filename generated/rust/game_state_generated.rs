@@ -2752,6 +2752,188 @@ impl core::fmt::Debug for EntityUpdate<'_> {
       ds.finish()
   }
 }
+pub enum SingleBlockEntityUpdateOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct SingleBlockEntityUpdate<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for SingleBlockEntityUpdate<'a> {
+  type Inner = SingleBlockEntityUpdate<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> SingleBlockEntityUpdate<'a> {
+  pub const VT_ID: flatbuffers::VOffsetT = 4;
+  pub const VT_POSITION: flatbuffers::VOffsetT = 6;
+  pub const VT_LINEAR_VELOCITY: flatbuffers::VOffsetT = 8;
+  pub const VT_ROTATION: flatbuffers::VOffsetT = 10;
+  pub const VT_HITPOINTS: flatbuffers::VOffsetT = 12;
+  pub const VT_TURRET_ROTATION: flatbuffers::VOffsetT = 14;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    SingleBlockEntityUpdate { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+    args: &'args SingleBlockEntityUpdateArgs<'args>
+  ) -> flatbuffers::WIPOffset<SingleBlockEntityUpdate<'bldr>> {
+    let mut builder = SingleBlockEntityUpdateBuilder::new(_fbb);
+    builder.add_id(args.id);
+    builder.add_turret_rotation(args.turret_rotation);
+    builder.add_hitpoints(args.hitpoints);
+    builder.add_rotation(args.rotation);
+    if let Some(x) = args.linear_velocity { builder.add_linear_velocity(x); }
+    if let Some(x) = args.position { builder.add_position(x); }
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn id(&self) -> u64 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u64>(SingleBlockEntityUpdate::VT_ID, Some(0)).unwrap()}
+  }
+  #[inline]
+  pub fn position(&self) -> Option<&'a Vec2> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<Vec2>(SingleBlockEntityUpdate::VT_POSITION, None)}
+  }
+  #[inline]
+  pub fn linear_velocity(&self) -> Option<&'a Vec2> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<Vec2>(SingleBlockEntityUpdate::VT_LINEAR_VELOCITY, None)}
+  }
+  #[inline]
+  pub fn rotation(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(SingleBlockEntityUpdate::VT_ROTATION, Some(0.0)).unwrap()}
+  }
+  #[inline]
+  pub fn hitpoints(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(SingleBlockEntityUpdate::VT_HITPOINTS, Some(0.0)).unwrap()}
+  }
+  #[inline]
+  pub fn turret_rotation(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(SingleBlockEntityUpdate::VT_TURRET_ROTATION, Some(0.0)).unwrap()}
+  }
+}
+
+impl flatbuffers::Verifiable for SingleBlockEntityUpdate<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<u64>("id", Self::VT_ID, false)?
+     .visit_field::<Vec2>("position", Self::VT_POSITION, false)?
+     .visit_field::<Vec2>("linear_velocity", Self::VT_LINEAR_VELOCITY, false)?
+     .visit_field::<f32>("rotation", Self::VT_ROTATION, false)?
+     .visit_field::<f32>("hitpoints", Self::VT_HITPOINTS, false)?
+     .visit_field::<f32>("turret_rotation", Self::VT_TURRET_ROTATION, false)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct SingleBlockEntityUpdateArgs<'a> {
+    pub id: u64,
+    pub position: Option<&'a Vec2>,
+    pub linear_velocity: Option<&'a Vec2>,
+    pub rotation: f32,
+    pub hitpoints: f32,
+    pub turret_rotation: f32,
+}
+impl<'a> Default for SingleBlockEntityUpdateArgs<'a> {
+  #[inline]
+  fn default() -> Self {
+    SingleBlockEntityUpdateArgs {
+      id: 0,
+      position: None,
+      linear_velocity: None,
+      rotation: 0.0,
+      hitpoints: 0.0,
+      turret_rotation: 0.0,
+    }
+  }
+}
+
+pub struct SingleBlockEntityUpdateBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> SingleBlockEntityUpdateBuilder<'a, 'b, A> {
+  #[inline]
+  pub fn add_id(&mut self, id: u64) {
+    self.fbb_.push_slot::<u64>(SingleBlockEntityUpdate::VT_ID, id, 0);
+  }
+  #[inline]
+  pub fn add_position(&mut self, position: &Vec2) {
+    self.fbb_.push_slot_always::<&Vec2>(SingleBlockEntityUpdate::VT_POSITION, position);
+  }
+  #[inline]
+  pub fn add_linear_velocity(&mut self, linear_velocity: &Vec2) {
+    self.fbb_.push_slot_always::<&Vec2>(SingleBlockEntityUpdate::VT_LINEAR_VELOCITY, linear_velocity);
+  }
+  #[inline]
+  pub fn add_rotation(&mut self, rotation: f32) {
+    self.fbb_.push_slot::<f32>(SingleBlockEntityUpdate::VT_ROTATION, rotation, 0.0);
+  }
+  #[inline]
+  pub fn add_hitpoints(&mut self, hitpoints: f32) {
+    self.fbb_.push_slot::<f32>(SingleBlockEntityUpdate::VT_HITPOINTS, hitpoints, 0.0);
+  }
+  #[inline]
+  pub fn add_turret_rotation(&mut self, turret_rotation: f32) {
+    self.fbb_.push_slot::<f32>(SingleBlockEntityUpdate::VT_TURRET_ROTATION, turret_rotation, 0.0);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> SingleBlockEntityUpdateBuilder<'a, 'b, A> {
+    let start = _fbb.start_table();
+    SingleBlockEntityUpdateBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<SingleBlockEntityUpdate<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for SingleBlockEntityUpdate<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("SingleBlockEntityUpdate");
+      ds.field("id", &self.id());
+      ds.field("position", &self.position());
+      ds.field("linear_velocity", &self.linear_velocity());
+      ds.field("rotation", &self.rotation());
+      ds.field("hitpoints", &self.hitpoints());
+      ds.field("turret_rotation", &self.turret_rotation());
+      ds.finish()
+  }
+}
 pub enum GameStateDeltaOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -2771,12 +2953,13 @@ impl<'a> GameStateDelta<'a> {
   pub const VT_FLAG_UPDATES: flatbuffers::VOffsetT = 4;
   pub const VT_NEW_ENTITIES: flatbuffers::VOffsetT = 6;
   pub const VT_ENTITY_UPDATES: flatbuffers::VOffsetT = 8;
-  pub const VT_DEAD_ENTITIES: flatbuffers::VOffsetT = 10;
-  pub const VT_NEW_PROJECTILES: flatbuffers::VOffsetT = 12;
-  pub const VT_DEAD_PROJECTILES: flatbuffers::VOffsetT = 14;
-  pub const VT_EXPLOSIONS: flatbuffers::VOffsetT = 16;
-  pub const VT_MY_ID: flatbuffers::VOffsetT = 18;
-  pub const VT_WINNER_ID: flatbuffers::VOffsetT = 20;
+  pub const VT_SINGLE_BLOCK_ENTITY_UPDATES: flatbuffers::VOffsetT = 10;
+  pub const VT_DEAD_ENTITIES: flatbuffers::VOffsetT = 12;
+  pub const VT_NEW_PROJECTILES: flatbuffers::VOffsetT = 14;
+  pub const VT_DEAD_PROJECTILES: flatbuffers::VOffsetT = 16;
+  pub const VT_EXPLOSIONS: flatbuffers::VOffsetT = 18;
+  pub const VT_MY_ID: flatbuffers::VOffsetT = 20;
+  pub const VT_WINNER_ID: flatbuffers::VOffsetT = 22;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -2792,6 +2975,7 @@ impl<'a> GameStateDelta<'a> {
     if let Some(x) = args.dead_projectiles { builder.add_dead_projectiles(x); }
     if let Some(x) = args.new_projectiles { builder.add_new_projectiles(x); }
     if let Some(x) = args.dead_entities { builder.add_dead_entities(x); }
+    if let Some(x) = args.single_block_entity_updates { builder.add_single_block_entity_updates(x); }
     if let Some(x) = args.entity_updates { builder.add_entity_updates(x); }
     if let Some(x) = args.new_entities { builder.add_new_entities(x); }
     if let Some(x) = args.flag_updates { builder.add_flag_updates(x); }
@@ -2821,6 +3005,13 @@ impl<'a> GameStateDelta<'a> {
     // Created from valid Table for this object
     // which contains a valid value in this slot
     unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<EntityUpdate>>>>(GameStateDelta::VT_ENTITY_UPDATES, None)}
+  }
+  #[inline]
+  pub fn single_block_entity_updates(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<SingleBlockEntityUpdate<'a>>>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<SingleBlockEntityUpdate>>>>(GameStateDelta::VT_SINGLE_BLOCK_ENTITY_UPDATES, None)}
   }
   #[inline]
   pub fn dead_entities(&self) -> Option<flatbuffers::Vector<'a, u64>> {
@@ -2876,6 +3067,7 @@ impl flatbuffers::Verifiable for GameStateDelta<'_> {
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Flag>>>>("flag_updates", Self::VT_FLAG_UPDATES, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Entity>>>>("new_entities", Self::VT_NEW_ENTITIES, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<EntityUpdate>>>>("entity_updates", Self::VT_ENTITY_UPDATES, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<SingleBlockEntityUpdate>>>>("single_block_entity_updates", Self::VT_SINGLE_BLOCK_ENTITY_UPDATES, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, u64>>>("dead_entities", Self::VT_DEAD_ENTITIES, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Projectile>>>>("new_projectiles", Self::VT_NEW_PROJECTILES, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<DeadProjectile>>>>("dead_projectiles", Self::VT_DEAD_PROJECTILES, false)?
@@ -2890,6 +3082,7 @@ pub struct GameStateDeltaArgs<'a> {
     pub flag_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag<'a>>>>>,
     pub new_entities: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Entity<'a>>>>>,
     pub entity_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<EntityUpdate<'a>>>>>,
+    pub single_block_entity_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<SingleBlockEntityUpdate<'a>>>>>,
     pub dead_entities: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, u64>>>,
     pub new_projectiles: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Projectile<'a>>>>>,
     pub dead_projectiles: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<DeadProjectile<'a>>>>>,
@@ -2904,6 +3097,7 @@ impl<'a> Default for GameStateDeltaArgs<'a> {
       flag_updates: None,
       new_entities: None,
       entity_updates: None,
+      single_block_entity_updates: None,
       dead_entities: None,
       new_projectiles: None,
       dead_projectiles: None,
@@ -2930,6 +3124,10 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GameStateDeltaBuilder<'a, 'b, A
   #[inline]
   pub fn add_entity_updates(&mut self, entity_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<EntityUpdate<'b >>>>) {
     self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStateDelta::VT_ENTITY_UPDATES, entity_updates);
+  }
+  #[inline]
+  pub fn add_single_block_entity_updates(&mut self, single_block_entity_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<SingleBlockEntityUpdate<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStateDelta::VT_SINGLE_BLOCK_ENTITY_UPDATES, single_block_entity_updates);
   }
   #[inline]
   pub fn add_dead_entities(&mut self, dead_entities: flatbuffers::WIPOffset<flatbuffers::Vector<'b , u64>>) {
@@ -2976,6 +3174,7 @@ impl core::fmt::Debug for GameStateDelta<'_> {
       ds.field("flag_updates", &self.flag_updates());
       ds.field("new_entities", &self.new_entities());
       ds.field("entity_updates", &self.entity_updates());
+      ds.field("single_block_entity_updates", &self.single_block_entity_updates());
       ds.field("dead_entities", &self.dead_entities());
       ds.field("new_projectiles", &self.new_projectiles());
       ds.field("dead_projectiles", &self.dead_projectiles());

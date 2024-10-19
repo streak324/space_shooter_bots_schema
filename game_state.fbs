@@ -126,11 +126,22 @@ table EntityUpdate {
 	turret_updates: [TurretUpdate];
 }
 
+// updates to entities that are only a single block. intention is to reduce data transfer.
+table SingleBlockEntityUpdate {
+	id: uint64;	
+	position: Vec2;
+	linear_velocity: Vec2;
+	rotation: float32;
+	hitpoints: float32;
+	turret_rotation: float32; // relative to entity
+}
+
 
 table GameStateDelta {
 	flag_updates: [Flag];
 	new_entities: [Entity];
 	entity_updates: [EntityUpdate];
+	single_block_entity_updates: [SingleBlockEntityUpdate];
 	dead_entities: [uint64]; //stores the ids of the entities that were destroyed
 	new_projectiles: [Projectile];
 	dead_projectiles: [DeadProjectile];

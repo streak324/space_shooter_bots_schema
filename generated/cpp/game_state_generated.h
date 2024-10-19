@@ -55,6 +55,9 @@ struct TurretUpdate;
 struct EntityUpdate;
 struct EntityUpdateBuilder;
 
+struct SingleBlockEntityUpdate;
+struct SingleBlockEntityUpdateBuilder;
+
 struct GameStateDelta;
 struct GameStateDeltaBuilder;
 
@@ -1328,18 +1331,110 @@ inline ::flatbuffers::Offset<EntityUpdate> CreateEntityUpdateDirect(
       turret_updates__);
 }
 
+struct SingleBlockEntityUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef SingleBlockEntityUpdateBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ID = 4,
+    VT_POSITION = 6,
+    VT_LINEAR_VELOCITY = 8,
+    VT_ROTATION = 10,
+    VT_HITPOINTS = 12,
+    VT_TURRET_ROTATION = 14
+  };
+  uint64_t id() const {
+    return GetField<uint64_t>(VT_ID, 0);
+  }
+  const Vec2 *position() const {
+    return GetStruct<const Vec2 *>(VT_POSITION);
+  }
+  const Vec2 *linear_velocity() const {
+    return GetStruct<const Vec2 *>(VT_LINEAR_VELOCITY);
+  }
+  float rotation() const {
+    return GetField<float>(VT_ROTATION, 0.0f);
+  }
+  float hitpoints() const {
+    return GetField<float>(VT_HITPOINTS, 0.0f);
+  }
+  float turret_rotation() const {
+    return GetField<float>(VT_TURRET_ROTATION, 0.0f);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint64_t>(verifier, VT_ID, 8) &&
+           VerifyField<Vec2>(verifier, VT_POSITION, 4) &&
+           VerifyField<Vec2>(verifier, VT_LINEAR_VELOCITY, 4) &&
+           VerifyField<float>(verifier, VT_ROTATION, 4) &&
+           VerifyField<float>(verifier, VT_HITPOINTS, 4) &&
+           VerifyField<float>(verifier, VT_TURRET_ROTATION, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct SingleBlockEntityUpdateBuilder {
+  typedef SingleBlockEntityUpdate Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_id(uint64_t id) {
+    fbb_.AddElement<uint64_t>(SingleBlockEntityUpdate::VT_ID, id, 0);
+  }
+  void add_position(const Vec2 *position) {
+    fbb_.AddStruct(SingleBlockEntityUpdate::VT_POSITION, position);
+  }
+  void add_linear_velocity(const Vec2 *linear_velocity) {
+    fbb_.AddStruct(SingleBlockEntityUpdate::VT_LINEAR_VELOCITY, linear_velocity);
+  }
+  void add_rotation(float rotation) {
+    fbb_.AddElement<float>(SingleBlockEntityUpdate::VT_ROTATION, rotation, 0.0f);
+  }
+  void add_hitpoints(float hitpoints) {
+    fbb_.AddElement<float>(SingleBlockEntityUpdate::VT_HITPOINTS, hitpoints, 0.0f);
+  }
+  void add_turret_rotation(float turret_rotation) {
+    fbb_.AddElement<float>(SingleBlockEntityUpdate::VT_TURRET_ROTATION, turret_rotation, 0.0f);
+  }
+  explicit SingleBlockEntityUpdateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<SingleBlockEntityUpdate> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<SingleBlockEntityUpdate>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<SingleBlockEntityUpdate> CreateSingleBlockEntityUpdate(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint64_t id = 0,
+    const Vec2 *position = nullptr,
+    const Vec2 *linear_velocity = nullptr,
+    float rotation = 0.0f,
+    float hitpoints = 0.0f,
+    float turret_rotation = 0.0f) {
+  SingleBlockEntityUpdateBuilder builder_(_fbb);
+  builder_.add_id(id);
+  builder_.add_turret_rotation(turret_rotation);
+  builder_.add_hitpoints(hitpoints);
+  builder_.add_rotation(rotation);
+  builder_.add_linear_velocity(linear_velocity);
+  builder_.add_position(position);
+  return builder_.Finish();
+}
+
 struct GameStateDelta FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef GameStateDeltaBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_FLAG_UPDATES = 4,
     VT_NEW_ENTITIES = 6,
     VT_ENTITY_UPDATES = 8,
-    VT_DEAD_ENTITIES = 10,
-    VT_NEW_PROJECTILES = 12,
-    VT_DEAD_PROJECTILES = 14,
-    VT_EXPLOSIONS = 16,
-    VT_MY_ID = 18,
-    VT_WINNER_ID = 20
+    VT_SINGLE_BLOCK_ENTITY_UPDATES = 10,
+    VT_DEAD_ENTITIES = 12,
+    VT_NEW_PROJECTILES = 14,
+    VT_DEAD_PROJECTILES = 16,
+    VT_EXPLOSIONS = 18,
+    VT_MY_ID = 20,
+    VT_WINNER_ID = 22
   };
   const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *flag_updates() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *>(VT_FLAG_UPDATES);
@@ -1349,6 +1444,9 @@ struct GameStateDelta FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<EntityUpdate>> *entity_updates() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<EntityUpdate>> *>(VT_ENTITY_UPDATES);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<SingleBlockEntityUpdate>> *single_block_entity_updates() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<SingleBlockEntityUpdate>> *>(VT_SINGLE_BLOCK_ENTITY_UPDATES);
   }
   const ::flatbuffers::Vector<uint64_t> *dead_entities() const {
     return GetPointer<const ::flatbuffers::Vector<uint64_t> *>(VT_DEAD_ENTITIES);
@@ -1379,6 +1477,9 @@ struct GameStateDelta FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_ENTITY_UPDATES) &&
            verifier.VerifyVector(entity_updates()) &&
            verifier.VerifyVectorOfTables(entity_updates()) &&
+           VerifyOffset(verifier, VT_SINGLE_BLOCK_ENTITY_UPDATES) &&
+           verifier.VerifyVector(single_block_entity_updates()) &&
+           verifier.VerifyVectorOfTables(single_block_entity_updates()) &&
            VerifyOffset(verifier, VT_DEAD_ENTITIES) &&
            verifier.VerifyVector(dead_entities()) &&
            VerifyOffset(verifier, VT_NEW_PROJECTILES) &&
@@ -1408,6 +1509,9 @@ struct GameStateDeltaBuilder {
   }
   void add_entity_updates(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<EntityUpdate>>> entity_updates) {
     fbb_.AddOffset(GameStateDelta::VT_ENTITY_UPDATES, entity_updates);
+  }
+  void add_single_block_entity_updates(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<SingleBlockEntityUpdate>>> single_block_entity_updates) {
+    fbb_.AddOffset(GameStateDelta::VT_SINGLE_BLOCK_ENTITY_UPDATES, single_block_entity_updates);
   }
   void add_dead_entities(::flatbuffers::Offset<::flatbuffers::Vector<uint64_t>> dead_entities) {
     fbb_.AddOffset(GameStateDelta::VT_DEAD_ENTITIES, dead_entities);
@@ -1443,6 +1547,7 @@ inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDelta(
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Flag>>> flag_updates = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Entity>>> new_entities = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<EntityUpdate>>> entity_updates = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<SingleBlockEntityUpdate>>> single_block_entity_updates = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<uint64_t>> dead_entities = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Projectile>>> new_projectiles = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DeadProjectile>>> dead_projectiles = 0,
@@ -1454,6 +1559,7 @@ inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDelta(
   builder_.add_dead_projectiles(dead_projectiles);
   builder_.add_new_projectiles(new_projectiles);
   builder_.add_dead_entities(dead_entities);
+  builder_.add_single_block_entity_updates(single_block_entity_updates);
   builder_.add_entity_updates(entity_updates);
   builder_.add_new_entities(new_entities);
   builder_.add_flag_updates(flag_updates);
@@ -1467,6 +1573,7 @@ inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDeltaDirect(
     const std::vector<::flatbuffers::Offset<Flag>> *flag_updates = nullptr,
     const std::vector<::flatbuffers::Offset<Entity>> *new_entities = nullptr,
     const std::vector<::flatbuffers::Offset<EntityUpdate>> *entity_updates = nullptr,
+    const std::vector<::flatbuffers::Offset<SingleBlockEntityUpdate>> *single_block_entity_updates = nullptr,
     const std::vector<uint64_t> *dead_entities = nullptr,
     const std::vector<::flatbuffers::Offset<Projectile>> *new_projectiles = nullptr,
     const std::vector<::flatbuffers::Offset<DeadProjectile>> *dead_projectiles = nullptr,
@@ -1476,6 +1583,7 @@ inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDeltaDirect(
   auto flag_updates__ = flag_updates ? _fbb.CreateVector<::flatbuffers::Offset<Flag>>(*flag_updates) : 0;
   auto new_entities__ = new_entities ? _fbb.CreateVector<::flatbuffers::Offset<Entity>>(*new_entities) : 0;
   auto entity_updates__ = entity_updates ? _fbb.CreateVector<::flatbuffers::Offset<EntityUpdate>>(*entity_updates) : 0;
+  auto single_block_entity_updates__ = single_block_entity_updates ? _fbb.CreateVector<::flatbuffers::Offset<SingleBlockEntityUpdate>>(*single_block_entity_updates) : 0;
   auto dead_entities__ = dead_entities ? _fbb.CreateVector<uint64_t>(*dead_entities) : 0;
   auto new_projectiles__ = new_projectiles ? _fbb.CreateVector<::flatbuffers::Offset<Projectile>>(*new_projectiles) : 0;
   auto dead_projectiles__ = dead_projectiles ? _fbb.CreateVector<::flatbuffers::Offset<DeadProjectile>>(*dead_projectiles) : 0;
@@ -1485,6 +1593,7 @@ inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDeltaDirect(
       flag_updates__,
       new_entities__,
       entity_updates__,
+      single_block_entity_updates__,
       dead_entities__,
       new_projectiles__,
       dead_projectiles__,

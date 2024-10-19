@@ -89,6 +89,10 @@ typedef const struct EntityUpdate_table *EntityUpdate_table_t;
 typedef struct EntityUpdate_table *EntityUpdate_mutable_table_t;
 typedef const flatbuffers_uoffset_t *EntityUpdate_vec_t;
 typedef flatbuffers_uoffset_t *EntityUpdate_mutable_vec_t;
+typedef const struct SingleBlockEntityUpdate_table *SingleBlockEntityUpdate_table_t;
+typedef struct SingleBlockEntityUpdate_table *SingleBlockEntityUpdate_mutable_table_t;
+typedef const flatbuffers_uoffset_t *SingleBlockEntityUpdate_vec_t;
+typedef flatbuffers_uoffset_t *SingleBlockEntityUpdate_mutable_vec_t;
 typedef const struct GameStateDelta_table *GameStateDelta_table_t;
 typedef struct GameStateDelta_table *GameStateDelta_mutable_table_t;
 typedef const flatbuffers_uoffset_t *GameStateDelta_vec_t;
@@ -284,6 +288,18 @@ typedef flatbuffers_uoffset_t *GameStateDelta_mutable_vec_t;
 #define EntityUpdate_type_identifier "\xb3\xea\xe4\xf2"
 #ifndef EntityUpdate_file_extension
 #define EntityUpdate_file_extension "bin"
+#endif
+#ifndef SingleBlockEntityUpdate_file_identifier
+#define SingleBlockEntityUpdate_file_identifier 0
+#endif
+/* deprecated, use SingleBlockEntityUpdate_file_identifier */
+#ifndef SingleBlockEntityUpdate_identifier
+#define SingleBlockEntityUpdate_identifier 0
+#endif
+#define SingleBlockEntityUpdate_type_hash ((flatbuffers_thash_t)0x87620b0c)
+#define SingleBlockEntityUpdate_type_identifier "\x0c\x0b\x62\x87"
+#ifndef SingleBlockEntityUpdate_file_extension
+#define SingleBlockEntityUpdate_file_extension "bin"
 #endif
 #ifndef GameStateDelta_file_identifier
 #define GameStateDelta_file_identifier 0
@@ -569,6 +585,21 @@ __flatbuffers_define_vector_field(7, EntityUpdate, shield_updates, ShieldUpdate_
 __flatbuffers_define_vector_field(8, EntityUpdate, missile_slot_updates, MissileSlotUpdate_vec_t, 0)
 __flatbuffers_define_vector_field(9, EntityUpdate, turret_updates, TurretUpdate_vec_t, 0)
 
+struct SingleBlockEntityUpdate_table { uint8_t unused__; };
+
+static inline size_t SingleBlockEntityUpdate_vec_len(SingleBlockEntityUpdate_vec_t vec)
+__flatbuffers_vec_len(vec)
+static inline SingleBlockEntityUpdate_table_t SingleBlockEntityUpdate_vec_at(SingleBlockEntityUpdate_vec_t vec, size_t i)
+__flatbuffers_offset_vec_at(SingleBlockEntityUpdate_table_t, vec, i, 0)
+__flatbuffers_table_as_root(SingleBlockEntityUpdate)
+
+__flatbuffers_define_scalar_field(0, SingleBlockEntityUpdate, id, flatbuffers_uint64, uint64_t, UINT64_C(0))
+__flatbuffers_define_struct_field(1, SingleBlockEntityUpdate, position, Vec2_struct_t, 0)
+__flatbuffers_define_struct_field(2, SingleBlockEntityUpdate, linear_velocity, Vec2_struct_t, 0)
+__flatbuffers_define_scalar_field(3, SingleBlockEntityUpdate, rotation, flatbuffers_float, float, 0.00000000f)
+__flatbuffers_define_scalar_field(4, SingleBlockEntityUpdate, hitpoints, flatbuffers_float, float, 0.00000000f)
+__flatbuffers_define_scalar_field(5, SingleBlockEntityUpdate, turret_rotation, flatbuffers_float, float, 0.00000000f)
+
 struct GameStateDelta_table { uint8_t unused__; };
 
 static inline size_t GameStateDelta_vec_len(GameStateDelta_vec_t vec)
@@ -580,12 +611,13 @@ __flatbuffers_table_as_root(GameStateDelta)
 __flatbuffers_define_vector_field(0, GameStateDelta, flag_updates, Flag_vec_t, 0)
 __flatbuffers_define_vector_field(1, GameStateDelta, new_entities, Entity_vec_t, 0)
 __flatbuffers_define_vector_field(2, GameStateDelta, entity_updates, EntityUpdate_vec_t, 0)
-__flatbuffers_define_vector_field(3, GameStateDelta, dead_entities, flatbuffers_uint64_vec_t, 0)
-__flatbuffers_define_vector_field(4, GameStateDelta, new_projectiles, Projectile_vec_t, 0)
-__flatbuffers_define_vector_field(5, GameStateDelta, dead_projectiles, DeadProjectile_vec_t, 0)
-__flatbuffers_define_vector_field(6, GameStateDelta, explosions, Explosion_vec_t, 0)
-__flatbuffers_define_scalar_field(7, GameStateDelta, my_id, flatbuffers_uint8, uint8_t, UINT8_C(0))
-__flatbuffers_define_scalar_field(8, GameStateDelta, winner_id, flatbuffers_uint8, uint8_t, UINT8_C(0))
+__flatbuffers_define_vector_field(3, GameStateDelta, single_block_entity_updates, SingleBlockEntityUpdate_vec_t, 0)
+__flatbuffers_define_vector_field(4, GameStateDelta, dead_entities, flatbuffers_uint64_vec_t, 0)
+__flatbuffers_define_vector_field(5, GameStateDelta, new_projectiles, Projectile_vec_t, 0)
+__flatbuffers_define_vector_field(6, GameStateDelta, dead_projectiles, DeadProjectile_vec_t, 0)
+__flatbuffers_define_vector_field(7, GameStateDelta, explosions, Explosion_vec_t, 0)
+__flatbuffers_define_scalar_field(8, GameStateDelta, my_id, flatbuffers_uint8, uint8_t, UINT8_C(0))
+__flatbuffers_define_scalar_field(9, GameStateDelta, winner_id, flatbuffers_uint8, uint8_t, UINT8_C(0))
 
 
 #include "flatcc/flatcc_epilogue.h"
