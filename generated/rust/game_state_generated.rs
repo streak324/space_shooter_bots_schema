@@ -133,6 +133,754 @@ impl<'a> Vec2 {
 
 }
 
+// struct BlockHitUpdate, aligned to 4
+#[repr(transparent)]
+#[derive(Clone, Copy, PartialEq)]
+pub struct BlockHitUpdate(pub [u8; 12]);
+impl Default for BlockHitUpdate { 
+  fn default() -> Self { 
+    Self([0; 12])
+  }
+}
+impl core::fmt::Debug for BlockHitUpdate {
+  fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    f.debug_struct("BlockHitUpdate")
+      .field("block_index", &self.block_index())
+      .field("hitpoints", &self.hitpoints())
+      .field("is_destroyed", &self.is_destroyed())
+      .finish()
+  }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for BlockHitUpdate {}
+impl<'a> flatbuffers::Follow<'a> for BlockHitUpdate {
+  type Inner = &'a BlockHitUpdate;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    <&'a BlockHitUpdate>::follow(buf, loc)
+  }
+}
+impl<'a> flatbuffers::Follow<'a> for &'a BlockHitUpdate {
+  type Inner = &'a BlockHitUpdate;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    flatbuffers::follow_cast_ref::<BlockHitUpdate>(buf, loc)
+  }
+}
+impl<'b> flatbuffers::Push for BlockHitUpdate {
+    type Output = BlockHitUpdate;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        let src = ::core::slice::from_raw_parts(self as *const BlockHitUpdate as *const u8, Self::size());
+        dst.copy_from_slice(src);
+    }
+}
+
+impl<'a> flatbuffers::Verifiable for BlockHitUpdate {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.in_buffer::<Self>(pos)
+  }
+}
+
+impl<'a> BlockHitUpdate {
+  #[allow(clippy::too_many_arguments)]
+  pub fn new(
+    block_index: u16,
+    hitpoints: f32,
+    is_destroyed: bool,
+  ) -> Self {
+    let mut s = Self([0; 12]);
+    s.set_block_index(block_index);
+    s.set_hitpoints(hitpoints);
+    s.set_is_destroyed(is_destroyed);
+    s
+  }
+
+  pub fn block_index(&self) -> u16 {
+    let mut mem = core::mem::MaybeUninit::<<u16 as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[0..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<u16 as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
+  }
+
+  pub fn set_block_index(&mut self, x: u16) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[0..].as_mut_ptr(),
+        core::mem::size_of::<<u16 as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
+  pub fn hitpoints(&self) -> f32 {
+    let mut mem = core::mem::MaybeUninit::<<f32 as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[4..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<f32 as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
+  }
+
+  pub fn set_hitpoints(&mut self, x: f32) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[4..].as_mut_ptr(),
+        core::mem::size_of::<<f32 as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
+  pub fn is_destroyed(&self) -> bool {
+    let mut mem = core::mem::MaybeUninit::<<bool as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[8..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<bool as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
+  }
+
+  pub fn set_is_destroyed(&mut self, x: bool) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[8..].as_mut_ptr(),
+        core::mem::size_of::<<bool as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
+}
+
+// struct ThrusterUpdate, aligned to 4
+#[repr(transparent)]
+#[derive(Clone, Copy, PartialEq)]
+pub struct ThrusterUpdate(pub [u8; 8]);
+impl Default for ThrusterUpdate { 
+  fn default() -> Self { 
+    Self([0; 8])
+  }
+}
+impl core::fmt::Debug for ThrusterUpdate {
+  fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    f.debug_struct("ThrusterUpdate")
+      .field("block_index", &self.block_index())
+      .field("applied_thrust", &self.applied_thrust())
+      .finish()
+  }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for ThrusterUpdate {}
+impl<'a> flatbuffers::Follow<'a> for ThrusterUpdate {
+  type Inner = &'a ThrusterUpdate;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    <&'a ThrusterUpdate>::follow(buf, loc)
+  }
+}
+impl<'a> flatbuffers::Follow<'a> for &'a ThrusterUpdate {
+  type Inner = &'a ThrusterUpdate;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    flatbuffers::follow_cast_ref::<ThrusterUpdate>(buf, loc)
+  }
+}
+impl<'b> flatbuffers::Push for ThrusterUpdate {
+    type Output = ThrusterUpdate;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        let src = ::core::slice::from_raw_parts(self as *const ThrusterUpdate as *const u8, Self::size());
+        dst.copy_from_slice(src);
+    }
+}
+
+impl<'a> flatbuffers::Verifiable for ThrusterUpdate {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.in_buffer::<Self>(pos)
+  }
+}
+
+impl<'a> ThrusterUpdate {
+  #[allow(clippy::too_many_arguments)]
+  pub fn new(
+    block_index: u16,
+    applied_thrust: f32,
+  ) -> Self {
+    let mut s = Self([0; 8]);
+    s.set_block_index(block_index);
+    s.set_applied_thrust(applied_thrust);
+    s
+  }
+
+  pub fn block_index(&self) -> u16 {
+    let mut mem = core::mem::MaybeUninit::<<u16 as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[0..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<u16 as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
+  }
+
+  pub fn set_block_index(&mut self, x: u16) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[0..].as_mut_ptr(),
+        core::mem::size_of::<<u16 as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
+  pub fn applied_thrust(&self) -> f32 {
+    let mut mem = core::mem::MaybeUninit::<<f32 as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[4..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<f32 as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
+  }
+
+  pub fn set_applied_thrust(&mut self, x: f32) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[4..].as_mut_ptr(),
+        core::mem::size_of::<<f32 as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
+}
+
+// struct ShieldUpdate, aligned to 4
+#[repr(transparent)]
+#[derive(Clone, Copy, PartialEq)]
+pub struct ShieldUpdate(pub [u8; 12]);
+impl Default for ShieldUpdate { 
+  fn default() -> Self { 
+    Self([0; 12])
+  }
+}
+impl core::fmt::Debug for ShieldUpdate {
+  fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    f.debug_struct("ShieldUpdate")
+      .field("block_index", &self.block_index())
+      .field("hitpoints", &self.hitpoints())
+      .field("is_destroyed", &self.is_destroyed())
+      .finish()
+  }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for ShieldUpdate {}
+impl<'a> flatbuffers::Follow<'a> for ShieldUpdate {
+  type Inner = &'a ShieldUpdate;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    <&'a ShieldUpdate>::follow(buf, loc)
+  }
+}
+impl<'a> flatbuffers::Follow<'a> for &'a ShieldUpdate {
+  type Inner = &'a ShieldUpdate;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    flatbuffers::follow_cast_ref::<ShieldUpdate>(buf, loc)
+  }
+}
+impl<'b> flatbuffers::Push for ShieldUpdate {
+    type Output = ShieldUpdate;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        let src = ::core::slice::from_raw_parts(self as *const ShieldUpdate as *const u8, Self::size());
+        dst.copy_from_slice(src);
+    }
+}
+
+impl<'a> flatbuffers::Verifiable for ShieldUpdate {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.in_buffer::<Self>(pos)
+  }
+}
+
+impl<'a> ShieldUpdate {
+  #[allow(clippy::too_many_arguments)]
+  pub fn new(
+    block_index: u16,
+    hitpoints: f32,
+    is_destroyed: bool,
+  ) -> Self {
+    let mut s = Self([0; 12]);
+    s.set_block_index(block_index);
+    s.set_hitpoints(hitpoints);
+    s.set_is_destroyed(is_destroyed);
+    s
+  }
+
+  pub fn block_index(&self) -> u16 {
+    let mut mem = core::mem::MaybeUninit::<<u16 as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[0..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<u16 as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
+  }
+
+  pub fn set_block_index(&mut self, x: u16) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[0..].as_mut_ptr(),
+        core::mem::size_of::<<u16 as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
+  pub fn hitpoints(&self) -> f32 {
+    let mut mem = core::mem::MaybeUninit::<<f32 as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[4..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<f32 as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
+  }
+
+  pub fn set_hitpoints(&mut self, x: f32) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[4..].as_mut_ptr(),
+        core::mem::size_of::<<f32 as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
+  pub fn is_destroyed(&self) -> bool {
+    let mut mem = core::mem::MaybeUninit::<<bool as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[8..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<bool as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
+  }
+
+  pub fn set_is_destroyed(&mut self, x: bool) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[8..].as_mut_ptr(),
+        core::mem::size_of::<<bool as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
+}
+
+// struct MissileSlotUpdate, aligned to 4
+#[repr(transparent)]
+#[derive(Clone, Copy, PartialEq)]
+pub struct MissileSlotUpdate(pub [u8; 8]);
+impl Default for MissileSlotUpdate { 
+  fn default() -> Self { 
+    Self([0; 8])
+  }
+}
+impl core::fmt::Debug for MissileSlotUpdate {
+  fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    f.debug_struct("MissileSlotUpdate")
+      .field("block_index", &self.block_index())
+      .field("slot_index", &self.slot_index())
+      .field("is_loaded", &self.is_loaded())
+      .field("local_rotation", &self.local_rotation())
+      .finish()
+  }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for MissileSlotUpdate {}
+impl<'a> flatbuffers::Follow<'a> for MissileSlotUpdate {
+  type Inner = &'a MissileSlotUpdate;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    <&'a MissileSlotUpdate>::follow(buf, loc)
+  }
+}
+impl<'a> flatbuffers::Follow<'a> for &'a MissileSlotUpdate {
+  type Inner = &'a MissileSlotUpdate;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    flatbuffers::follow_cast_ref::<MissileSlotUpdate>(buf, loc)
+  }
+}
+impl<'b> flatbuffers::Push for MissileSlotUpdate {
+    type Output = MissileSlotUpdate;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        let src = ::core::slice::from_raw_parts(self as *const MissileSlotUpdate as *const u8, Self::size());
+        dst.copy_from_slice(src);
+    }
+}
+
+impl<'a> flatbuffers::Verifiable for MissileSlotUpdate {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.in_buffer::<Self>(pos)
+  }
+}
+
+impl<'a> MissileSlotUpdate {
+  #[allow(clippy::too_many_arguments)]
+  pub fn new(
+    block_index: u16,
+    slot_index: u8,
+    is_loaded: bool,
+    local_rotation: f32,
+  ) -> Self {
+    let mut s = Self([0; 8]);
+    s.set_block_index(block_index);
+    s.set_slot_index(slot_index);
+    s.set_is_loaded(is_loaded);
+    s.set_local_rotation(local_rotation);
+    s
+  }
+
+  pub fn block_index(&self) -> u16 {
+    let mut mem = core::mem::MaybeUninit::<<u16 as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[0..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<u16 as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
+  }
+
+  pub fn set_block_index(&mut self, x: u16) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[0..].as_mut_ptr(),
+        core::mem::size_of::<<u16 as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
+  pub fn slot_index(&self) -> u8 {
+    let mut mem = core::mem::MaybeUninit::<<u8 as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[2..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<u8 as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
+  }
+
+  pub fn set_slot_index(&mut self, x: u8) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[2..].as_mut_ptr(),
+        core::mem::size_of::<<u8 as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
+  pub fn is_loaded(&self) -> bool {
+    let mut mem = core::mem::MaybeUninit::<<bool as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[3..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<bool as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
+  }
+
+  pub fn set_is_loaded(&mut self, x: bool) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[3..].as_mut_ptr(),
+        core::mem::size_of::<<bool as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
+  pub fn local_rotation(&self) -> f32 {
+    let mut mem = core::mem::MaybeUninit::<<f32 as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[4..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<f32 as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
+  }
+
+  pub fn set_local_rotation(&mut self, x: f32) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[4..].as_mut_ptr(),
+        core::mem::size_of::<<f32 as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
+}
+
+// struct TurretUpdate, aligned to 4
+#[repr(transparent)]
+#[derive(Clone, Copy, PartialEq)]
+pub struct TurretUpdate(pub [u8; 8]);
+impl Default for TurretUpdate { 
+  fn default() -> Self { 
+    Self([0; 8])
+  }
+}
+impl core::fmt::Debug for TurretUpdate {
+  fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    f.debug_struct("TurretUpdate")
+      .field("block_index", &self.block_index())
+      .field("local_rotation", &self.local_rotation())
+      .finish()
+  }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for TurretUpdate {}
+impl<'a> flatbuffers::Follow<'a> for TurretUpdate {
+  type Inner = &'a TurretUpdate;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    <&'a TurretUpdate>::follow(buf, loc)
+  }
+}
+impl<'a> flatbuffers::Follow<'a> for &'a TurretUpdate {
+  type Inner = &'a TurretUpdate;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    flatbuffers::follow_cast_ref::<TurretUpdate>(buf, loc)
+  }
+}
+impl<'b> flatbuffers::Push for TurretUpdate {
+    type Output = TurretUpdate;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        let src = ::core::slice::from_raw_parts(self as *const TurretUpdate as *const u8, Self::size());
+        dst.copy_from_slice(src);
+    }
+}
+
+impl<'a> flatbuffers::Verifiable for TurretUpdate {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.in_buffer::<Self>(pos)
+  }
+}
+
+impl<'a> TurretUpdate {
+  #[allow(clippy::too_many_arguments)]
+  pub fn new(
+    block_index: u16,
+    local_rotation: f32,
+  ) -> Self {
+    let mut s = Self([0; 8]);
+    s.set_block_index(block_index);
+    s.set_local_rotation(local_rotation);
+    s
+  }
+
+  pub fn block_index(&self) -> u16 {
+    let mut mem = core::mem::MaybeUninit::<<u16 as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[0..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<u16 as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
+  }
+
+  pub fn set_block_index(&mut self, x: u16) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[0..].as_mut_ptr(),
+        core::mem::size_of::<<u16 as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
+  pub fn local_rotation(&self) -> f32 {
+    let mut mem = core::mem::MaybeUninit::<<f32 as EndianScalar>::Scalar>::uninit();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    EndianScalar::from_little_endian(unsafe {
+      core::ptr::copy_nonoverlapping(
+        self.0[4..].as_ptr(),
+        mem.as_mut_ptr() as *mut u8,
+        core::mem::size_of::<<f32 as EndianScalar>::Scalar>(),
+      );
+      mem.assume_init()
+    })
+  }
+
+  pub fn set_local_rotation(&mut self, x: f32) {
+    let x_le = x.to_little_endian();
+    // Safety:
+    // Created from a valid Table for this object
+    // Which contains a valid value in this slot
+    unsafe {
+      core::ptr::copy_nonoverlapping(
+        &x_le as *const _ as *const u8,
+        self.0[4..].as_mut_ptr(),
+        core::mem::size_of::<<f32 as EndianScalar>::Scalar>(),
+      );
+    }
+  }
+
+}
+
 pub enum MissileSlotOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -1754,644 +2502,6 @@ impl core::fmt::Debug for GameState<'_> {
       ds.finish()
   }
 }
-pub enum BlockHitUpdateOffset {}
-#[derive(Copy, Clone, PartialEq)]
-
-pub struct BlockHitUpdate<'a> {
-  pub _tab: flatbuffers::Table<'a>,
-}
-
-impl<'a> flatbuffers::Follow<'a> for BlockHitUpdate<'a> {
-  type Inner = BlockHitUpdate<'a>;
-  #[inline]
-  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
-    Self { _tab: flatbuffers::Table::new(buf, loc) }
-  }
-}
-
-impl<'a> BlockHitUpdate<'a> {
-  pub const VT_BLOCK_INDEX: flatbuffers::VOffsetT = 4;
-  pub const VT_HITPOINTS: flatbuffers::VOffsetT = 6;
-  pub const VT_IS_DESTROYED: flatbuffers::VOffsetT = 8;
-
-  #[inline]
-  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
-    BlockHitUpdate { _tab: table }
-  }
-  #[allow(unused_mut)]
-  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
-    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
-    args: &'args BlockHitUpdateArgs
-  ) -> flatbuffers::WIPOffset<BlockHitUpdate<'bldr>> {
-    let mut builder = BlockHitUpdateBuilder::new(_fbb);
-    builder.add_hitpoints(args.hitpoints);
-    builder.add_block_index(args.block_index);
-    builder.add_is_destroyed(args.is_destroyed);
-    builder.finish()
-  }
-
-
-  #[inline]
-  pub fn block_index(&self) -> u16 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<u16>(BlockHitUpdate::VT_BLOCK_INDEX, Some(0)).unwrap()}
-  }
-  #[inline]
-  pub fn hitpoints(&self) -> f32 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<f32>(BlockHitUpdate::VT_HITPOINTS, Some(0.0)).unwrap()}
-  }
-  #[inline]
-  pub fn is_destroyed(&self) -> bool {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<bool>(BlockHitUpdate::VT_IS_DESTROYED, Some(false)).unwrap()}
-  }
-}
-
-impl flatbuffers::Verifiable for BlockHitUpdate<'_> {
-  #[inline]
-  fn run_verifier(
-    v: &mut flatbuffers::Verifier, pos: usize
-  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
-    use self::flatbuffers::Verifiable;
-    v.visit_table(pos)?
-     .visit_field::<u16>("block_index", Self::VT_BLOCK_INDEX, false)?
-     .visit_field::<f32>("hitpoints", Self::VT_HITPOINTS, false)?
-     .visit_field::<bool>("is_destroyed", Self::VT_IS_DESTROYED, false)?
-     .finish();
-    Ok(())
-  }
-}
-pub struct BlockHitUpdateArgs {
-    pub block_index: u16,
-    pub hitpoints: f32,
-    pub is_destroyed: bool,
-}
-impl<'a> Default for BlockHitUpdateArgs {
-  #[inline]
-  fn default() -> Self {
-    BlockHitUpdateArgs {
-      block_index: 0,
-      hitpoints: 0.0,
-      is_destroyed: false,
-    }
-  }
-}
-
-pub struct BlockHitUpdateBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
-  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
-  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
-}
-impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> BlockHitUpdateBuilder<'a, 'b, A> {
-  #[inline]
-  pub fn add_block_index(&mut self, block_index: u16) {
-    self.fbb_.push_slot::<u16>(BlockHitUpdate::VT_BLOCK_INDEX, block_index, 0);
-  }
-  #[inline]
-  pub fn add_hitpoints(&mut self, hitpoints: f32) {
-    self.fbb_.push_slot::<f32>(BlockHitUpdate::VT_HITPOINTS, hitpoints, 0.0);
-  }
-  #[inline]
-  pub fn add_is_destroyed(&mut self, is_destroyed: bool) {
-    self.fbb_.push_slot::<bool>(BlockHitUpdate::VT_IS_DESTROYED, is_destroyed, false);
-  }
-  #[inline]
-  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> BlockHitUpdateBuilder<'a, 'b, A> {
-    let start = _fbb.start_table();
-    BlockHitUpdateBuilder {
-      fbb_: _fbb,
-      start_: start,
-    }
-  }
-  #[inline]
-  pub fn finish(self) -> flatbuffers::WIPOffset<BlockHitUpdate<'a>> {
-    let o = self.fbb_.end_table(self.start_);
-    flatbuffers::WIPOffset::new(o.value())
-  }
-}
-
-impl core::fmt::Debug for BlockHitUpdate<'_> {
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    let mut ds = f.debug_struct("BlockHitUpdate");
-      ds.field("block_index", &self.block_index());
-      ds.field("hitpoints", &self.hitpoints());
-      ds.field("is_destroyed", &self.is_destroyed());
-      ds.finish()
-  }
-}
-pub enum ThrusterUpdateOffset {}
-#[derive(Copy, Clone, PartialEq)]
-
-pub struct ThrusterUpdate<'a> {
-  pub _tab: flatbuffers::Table<'a>,
-}
-
-impl<'a> flatbuffers::Follow<'a> for ThrusterUpdate<'a> {
-  type Inner = ThrusterUpdate<'a>;
-  #[inline]
-  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
-    Self { _tab: flatbuffers::Table::new(buf, loc) }
-  }
-}
-
-impl<'a> ThrusterUpdate<'a> {
-  pub const VT_BLOCK_INDEX: flatbuffers::VOffsetT = 4;
-  pub const VT_APPLIED_THRUST: flatbuffers::VOffsetT = 6;
-
-  #[inline]
-  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
-    ThrusterUpdate { _tab: table }
-  }
-  #[allow(unused_mut)]
-  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
-    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
-    args: &'args ThrusterUpdateArgs
-  ) -> flatbuffers::WIPOffset<ThrusterUpdate<'bldr>> {
-    let mut builder = ThrusterUpdateBuilder::new(_fbb);
-    builder.add_applied_thrust(args.applied_thrust);
-    builder.add_block_index(args.block_index);
-    builder.finish()
-  }
-
-
-  #[inline]
-  pub fn block_index(&self) -> u16 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<u16>(ThrusterUpdate::VT_BLOCK_INDEX, Some(0)).unwrap()}
-  }
-  #[inline]
-  pub fn applied_thrust(&self) -> f32 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<f32>(ThrusterUpdate::VT_APPLIED_THRUST, Some(0.0)).unwrap()}
-  }
-}
-
-impl flatbuffers::Verifiable for ThrusterUpdate<'_> {
-  #[inline]
-  fn run_verifier(
-    v: &mut flatbuffers::Verifier, pos: usize
-  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
-    use self::flatbuffers::Verifiable;
-    v.visit_table(pos)?
-     .visit_field::<u16>("block_index", Self::VT_BLOCK_INDEX, false)?
-     .visit_field::<f32>("applied_thrust", Self::VT_APPLIED_THRUST, false)?
-     .finish();
-    Ok(())
-  }
-}
-pub struct ThrusterUpdateArgs {
-    pub block_index: u16,
-    pub applied_thrust: f32,
-}
-impl<'a> Default for ThrusterUpdateArgs {
-  #[inline]
-  fn default() -> Self {
-    ThrusterUpdateArgs {
-      block_index: 0,
-      applied_thrust: 0.0,
-    }
-  }
-}
-
-pub struct ThrusterUpdateBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
-  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
-  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
-}
-impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ThrusterUpdateBuilder<'a, 'b, A> {
-  #[inline]
-  pub fn add_block_index(&mut self, block_index: u16) {
-    self.fbb_.push_slot::<u16>(ThrusterUpdate::VT_BLOCK_INDEX, block_index, 0);
-  }
-  #[inline]
-  pub fn add_applied_thrust(&mut self, applied_thrust: f32) {
-    self.fbb_.push_slot::<f32>(ThrusterUpdate::VT_APPLIED_THRUST, applied_thrust, 0.0);
-  }
-  #[inline]
-  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ThrusterUpdateBuilder<'a, 'b, A> {
-    let start = _fbb.start_table();
-    ThrusterUpdateBuilder {
-      fbb_: _fbb,
-      start_: start,
-    }
-  }
-  #[inline]
-  pub fn finish(self) -> flatbuffers::WIPOffset<ThrusterUpdate<'a>> {
-    let o = self.fbb_.end_table(self.start_);
-    flatbuffers::WIPOffset::new(o.value())
-  }
-}
-
-impl core::fmt::Debug for ThrusterUpdate<'_> {
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    let mut ds = f.debug_struct("ThrusterUpdate");
-      ds.field("block_index", &self.block_index());
-      ds.field("applied_thrust", &self.applied_thrust());
-      ds.finish()
-  }
-}
-pub enum ShieldUpdateOffset {}
-#[derive(Copy, Clone, PartialEq)]
-
-pub struct ShieldUpdate<'a> {
-  pub _tab: flatbuffers::Table<'a>,
-}
-
-impl<'a> flatbuffers::Follow<'a> for ShieldUpdate<'a> {
-  type Inner = ShieldUpdate<'a>;
-  #[inline]
-  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
-    Self { _tab: flatbuffers::Table::new(buf, loc) }
-  }
-}
-
-impl<'a> ShieldUpdate<'a> {
-  pub const VT_BLOCK_INDEX: flatbuffers::VOffsetT = 4;
-  pub const VT_HITPOINTS: flatbuffers::VOffsetT = 6;
-  pub const VT_IS_DESTROYED: flatbuffers::VOffsetT = 8;
-
-  #[inline]
-  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
-    ShieldUpdate { _tab: table }
-  }
-  #[allow(unused_mut)]
-  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
-    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
-    args: &'args ShieldUpdateArgs
-  ) -> flatbuffers::WIPOffset<ShieldUpdate<'bldr>> {
-    let mut builder = ShieldUpdateBuilder::new(_fbb);
-    builder.add_hitpoints(args.hitpoints);
-    builder.add_block_index(args.block_index);
-    builder.add_is_destroyed(args.is_destroyed);
-    builder.finish()
-  }
-
-
-  #[inline]
-  pub fn block_index(&self) -> u16 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<u16>(ShieldUpdate::VT_BLOCK_INDEX, Some(0)).unwrap()}
-  }
-  #[inline]
-  pub fn hitpoints(&self) -> f32 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<f32>(ShieldUpdate::VT_HITPOINTS, Some(0.0)).unwrap()}
-  }
-  #[inline]
-  pub fn is_destroyed(&self) -> bool {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<bool>(ShieldUpdate::VT_IS_DESTROYED, Some(false)).unwrap()}
-  }
-}
-
-impl flatbuffers::Verifiable for ShieldUpdate<'_> {
-  #[inline]
-  fn run_verifier(
-    v: &mut flatbuffers::Verifier, pos: usize
-  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
-    use self::flatbuffers::Verifiable;
-    v.visit_table(pos)?
-     .visit_field::<u16>("block_index", Self::VT_BLOCK_INDEX, false)?
-     .visit_field::<f32>("hitpoints", Self::VT_HITPOINTS, false)?
-     .visit_field::<bool>("is_destroyed", Self::VT_IS_DESTROYED, false)?
-     .finish();
-    Ok(())
-  }
-}
-pub struct ShieldUpdateArgs {
-    pub block_index: u16,
-    pub hitpoints: f32,
-    pub is_destroyed: bool,
-}
-impl<'a> Default for ShieldUpdateArgs {
-  #[inline]
-  fn default() -> Self {
-    ShieldUpdateArgs {
-      block_index: 0,
-      hitpoints: 0.0,
-      is_destroyed: false,
-    }
-  }
-}
-
-pub struct ShieldUpdateBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
-  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
-  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
-}
-impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ShieldUpdateBuilder<'a, 'b, A> {
-  #[inline]
-  pub fn add_block_index(&mut self, block_index: u16) {
-    self.fbb_.push_slot::<u16>(ShieldUpdate::VT_BLOCK_INDEX, block_index, 0);
-  }
-  #[inline]
-  pub fn add_hitpoints(&mut self, hitpoints: f32) {
-    self.fbb_.push_slot::<f32>(ShieldUpdate::VT_HITPOINTS, hitpoints, 0.0);
-  }
-  #[inline]
-  pub fn add_is_destroyed(&mut self, is_destroyed: bool) {
-    self.fbb_.push_slot::<bool>(ShieldUpdate::VT_IS_DESTROYED, is_destroyed, false);
-  }
-  #[inline]
-  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> ShieldUpdateBuilder<'a, 'b, A> {
-    let start = _fbb.start_table();
-    ShieldUpdateBuilder {
-      fbb_: _fbb,
-      start_: start,
-    }
-  }
-  #[inline]
-  pub fn finish(self) -> flatbuffers::WIPOffset<ShieldUpdate<'a>> {
-    let o = self.fbb_.end_table(self.start_);
-    flatbuffers::WIPOffset::new(o.value())
-  }
-}
-
-impl core::fmt::Debug for ShieldUpdate<'_> {
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    let mut ds = f.debug_struct("ShieldUpdate");
-      ds.field("block_index", &self.block_index());
-      ds.field("hitpoints", &self.hitpoints());
-      ds.field("is_destroyed", &self.is_destroyed());
-      ds.finish()
-  }
-}
-pub enum MissileSlotUpdateOffset {}
-#[derive(Copy, Clone, PartialEq)]
-
-pub struct MissileSlotUpdate<'a> {
-  pub _tab: flatbuffers::Table<'a>,
-}
-
-impl<'a> flatbuffers::Follow<'a> for MissileSlotUpdate<'a> {
-  type Inner = MissileSlotUpdate<'a>;
-  #[inline]
-  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
-    Self { _tab: flatbuffers::Table::new(buf, loc) }
-  }
-}
-
-impl<'a> MissileSlotUpdate<'a> {
-  pub const VT_BLOCK_INDEX: flatbuffers::VOffsetT = 4;
-  pub const VT_SLOT_INDEX: flatbuffers::VOffsetT = 6;
-  pub const VT_IS_LOADED: flatbuffers::VOffsetT = 8;
-  pub const VT_LOCAL_ROTATION: flatbuffers::VOffsetT = 10;
-
-  #[inline]
-  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
-    MissileSlotUpdate { _tab: table }
-  }
-  #[allow(unused_mut)]
-  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
-    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
-    args: &'args MissileSlotUpdateArgs
-  ) -> flatbuffers::WIPOffset<MissileSlotUpdate<'bldr>> {
-    let mut builder = MissileSlotUpdateBuilder::new(_fbb);
-    builder.add_local_rotation(args.local_rotation);
-    builder.add_block_index(args.block_index);
-    builder.add_is_loaded(args.is_loaded);
-    builder.add_slot_index(args.slot_index);
-    builder.finish()
-  }
-
-
-  #[inline]
-  pub fn block_index(&self) -> u16 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<u16>(MissileSlotUpdate::VT_BLOCK_INDEX, Some(0)).unwrap()}
-  }
-  #[inline]
-  pub fn slot_index(&self) -> u8 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<u8>(MissileSlotUpdate::VT_SLOT_INDEX, Some(0)).unwrap()}
-  }
-  #[inline]
-  pub fn is_loaded(&self) -> bool {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<bool>(MissileSlotUpdate::VT_IS_LOADED, Some(false)).unwrap()}
-  }
-  #[inline]
-  pub fn local_rotation(&self) -> f32 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<f32>(MissileSlotUpdate::VT_LOCAL_ROTATION, Some(0.0)).unwrap()}
-  }
-}
-
-impl flatbuffers::Verifiable for MissileSlotUpdate<'_> {
-  #[inline]
-  fn run_verifier(
-    v: &mut flatbuffers::Verifier, pos: usize
-  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
-    use self::flatbuffers::Verifiable;
-    v.visit_table(pos)?
-     .visit_field::<u16>("block_index", Self::VT_BLOCK_INDEX, false)?
-     .visit_field::<u8>("slot_index", Self::VT_SLOT_INDEX, false)?
-     .visit_field::<bool>("is_loaded", Self::VT_IS_LOADED, false)?
-     .visit_field::<f32>("local_rotation", Self::VT_LOCAL_ROTATION, false)?
-     .finish();
-    Ok(())
-  }
-}
-pub struct MissileSlotUpdateArgs {
-    pub block_index: u16,
-    pub slot_index: u8,
-    pub is_loaded: bool,
-    pub local_rotation: f32,
-}
-impl<'a> Default for MissileSlotUpdateArgs {
-  #[inline]
-  fn default() -> Self {
-    MissileSlotUpdateArgs {
-      block_index: 0,
-      slot_index: 0,
-      is_loaded: false,
-      local_rotation: 0.0,
-    }
-  }
-}
-
-pub struct MissileSlotUpdateBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
-  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
-  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
-}
-impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> MissileSlotUpdateBuilder<'a, 'b, A> {
-  #[inline]
-  pub fn add_block_index(&mut self, block_index: u16) {
-    self.fbb_.push_slot::<u16>(MissileSlotUpdate::VT_BLOCK_INDEX, block_index, 0);
-  }
-  #[inline]
-  pub fn add_slot_index(&mut self, slot_index: u8) {
-    self.fbb_.push_slot::<u8>(MissileSlotUpdate::VT_SLOT_INDEX, slot_index, 0);
-  }
-  #[inline]
-  pub fn add_is_loaded(&mut self, is_loaded: bool) {
-    self.fbb_.push_slot::<bool>(MissileSlotUpdate::VT_IS_LOADED, is_loaded, false);
-  }
-  #[inline]
-  pub fn add_local_rotation(&mut self, local_rotation: f32) {
-    self.fbb_.push_slot::<f32>(MissileSlotUpdate::VT_LOCAL_ROTATION, local_rotation, 0.0);
-  }
-  #[inline]
-  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> MissileSlotUpdateBuilder<'a, 'b, A> {
-    let start = _fbb.start_table();
-    MissileSlotUpdateBuilder {
-      fbb_: _fbb,
-      start_: start,
-    }
-  }
-  #[inline]
-  pub fn finish(self) -> flatbuffers::WIPOffset<MissileSlotUpdate<'a>> {
-    let o = self.fbb_.end_table(self.start_);
-    flatbuffers::WIPOffset::new(o.value())
-  }
-}
-
-impl core::fmt::Debug for MissileSlotUpdate<'_> {
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    let mut ds = f.debug_struct("MissileSlotUpdate");
-      ds.field("block_index", &self.block_index());
-      ds.field("slot_index", &self.slot_index());
-      ds.field("is_loaded", &self.is_loaded());
-      ds.field("local_rotation", &self.local_rotation());
-      ds.finish()
-  }
-}
-pub enum TurretUpdateOffset {}
-#[derive(Copy, Clone, PartialEq)]
-
-pub struct TurretUpdate<'a> {
-  pub _tab: flatbuffers::Table<'a>,
-}
-
-impl<'a> flatbuffers::Follow<'a> for TurretUpdate<'a> {
-  type Inner = TurretUpdate<'a>;
-  #[inline]
-  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
-    Self { _tab: flatbuffers::Table::new(buf, loc) }
-  }
-}
-
-impl<'a> TurretUpdate<'a> {
-  pub const VT_BLOCK_INDEX: flatbuffers::VOffsetT = 4;
-  pub const VT_LOCAL_ROTATION: flatbuffers::VOffsetT = 6;
-
-  #[inline]
-  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
-    TurretUpdate { _tab: table }
-  }
-  #[allow(unused_mut)]
-  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
-    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
-    args: &'args TurretUpdateArgs
-  ) -> flatbuffers::WIPOffset<TurretUpdate<'bldr>> {
-    let mut builder = TurretUpdateBuilder::new(_fbb);
-    builder.add_local_rotation(args.local_rotation);
-    builder.add_block_index(args.block_index);
-    builder.finish()
-  }
-
-
-  #[inline]
-  pub fn block_index(&self) -> u16 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<u16>(TurretUpdate::VT_BLOCK_INDEX, Some(0)).unwrap()}
-  }
-  #[inline]
-  pub fn local_rotation(&self) -> f32 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<f32>(TurretUpdate::VT_LOCAL_ROTATION, Some(0.0)).unwrap()}
-  }
-}
-
-impl flatbuffers::Verifiable for TurretUpdate<'_> {
-  #[inline]
-  fn run_verifier(
-    v: &mut flatbuffers::Verifier, pos: usize
-  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
-    use self::flatbuffers::Verifiable;
-    v.visit_table(pos)?
-     .visit_field::<u16>("block_index", Self::VT_BLOCK_INDEX, false)?
-     .visit_field::<f32>("local_rotation", Self::VT_LOCAL_ROTATION, false)?
-     .finish();
-    Ok(())
-  }
-}
-pub struct TurretUpdateArgs {
-    pub block_index: u16,
-    pub local_rotation: f32,
-}
-impl<'a> Default for TurretUpdateArgs {
-  #[inline]
-  fn default() -> Self {
-    TurretUpdateArgs {
-      block_index: 0,
-      local_rotation: 0.0,
-    }
-  }
-}
-
-pub struct TurretUpdateBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
-  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
-  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
-}
-impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> TurretUpdateBuilder<'a, 'b, A> {
-  #[inline]
-  pub fn add_block_index(&mut self, block_index: u16) {
-    self.fbb_.push_slot::<u16>(TurretUpdate::VT_BLOCK_INDEX, block_index, 0);
-  }
-  #[inline]
-  pub fn add_local_rotation(&mut self, local_rotation: f32) {
-    self.fbb_.push_slot::<f32>(TurretUpdate::VT_LOCAL_ROTATION, local_rotation, 0.0);
-  }
-  #[inline]
-  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> TurretUpdateBuilder<'a, 'b, A> {
-    let start = _fbb.start_table();
-    TurretUpdateBuilder {
-      fbb_: _fbb,
-      start_: start,
-    }
-  }
-  #[inline]
-  pub fn finish(self) -> flatbuffers::WIPOffset<TurretUpdate<'a>> {
-    let o = self.fbb_.end_table(self.start_);
-    flatbuffers::WIPOffset::new(o.value())
-  }
-}
-
-impl core::fmt::Debug for TurretUpdate<'_> {
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    let mut ds = f.debug_struct("TurretUpdate");
-      ds.field("block_index", &self.block_index());
-      ds.field("local_rotation", &self.local_rotation());
-      ds.finish()
-  }
-}
 pub enum EntityUpdateOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -2479,39 +2589,39 @@ impl<'a> EntityUpdate<'a> {
     unsafe { self._tab.get::<bool>(EntityUpdate::VT_IS_COMMANDABLE, Some(false)).unwrap()}
   }
   #[inline]
-  pub fn block_hit_updates(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<BlockHitUpdate<'a>>>> {
+  pub fn block_hit_updates(&self) -> Option<flatbuffers::Vector<'a, BlockHitUpdate>> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<BlockHitUpdate>>>>(EntityUpdate::VT_BLOCK_HIT_UPDATES, None)}
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, BlockHitUpdate>>>(EntityUpdate::VT_BLOCK_HIT_UPDATES, None)}
   }
   #[inline]
-  pub fn thruster_updates(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ThrusterUpdate<'a>>>> {
+  pub fn thruster_updates(&self) -> Option<flatbuffers::Vector<'a, ThrusterUpdate>> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ThrusterUpdate>>>>(EntityUpdate::VT_THRUSTER_UPDATES, None)}
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, ThrusterUpdate>>>(EntityUpdate::VT_THRUSTER_UPDATES, None)}
   }
   #[inline]
-  pub fn shield_updates(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ShieldUpdate<'a>>>> {
+  pub fn shield_updates(&self) -> Option<flatbuffers::Vector<'a, ShieldUpdate>> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ShieldUpdate>>>>(EntityUpdate::VT_SHIELD_UPDATES, None)}
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, ShieldUpdate>>>(EntityUpdate::VT_SHIELD_UPDATES, None)}
   }
   #[inline]
-  pub fn missile_slot_updates(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<MissileSlotUpdate<'a>>>> {
+  pub fn missile_slot_updates(&self) -> Option<flatbuffers::Vector<'a, MissileSlotUpdate>> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<MissileSlotUpdate>>>>(EntityUpdate::VT_MISSILE_SLOT_UPDATES, None)}
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, MissileSlotUpdate>>>(EntityUpdate::VT_MISSILE_SLOT_UPDATES, None)}
   }
   #[inline]
-  pub fn turret_updates(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<TurretUpdate<'a>>>> {
+  pub fn turret_updates(&self) -> Option<flatbuffers::Vector<'a, TurretUpdate>> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<TurretUpdate>>>>(EntityUpdate::VT_TURRET_UPDATES, None)}
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, TurretUpdate>>>(EntityUpdate::VT_TURRET_UPDATES, None)}
   }
 }
 
@@ -2527,11 +2637,11 @@ impl flatbuffers::Verifiable for EntityUpdate<'_> {
      .visit_field::<Vec2>("linear_velocity", Self::VT_LINEAR_VELOCITY, false)?
      .visit_field::<f32>("rotation", Self::VT_ROTATION, false)?
      .visit_field::<bool>("is_commandable", Self::VT_IS_COMMANDABLE, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<BlockHitUpdate>>>>("block_hit_updates", Self::VT_BLOCK_HIT_UPDATES, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<ThrusterUpdate>>>>("thruster_updates", Self::VT_THRUSTER_UPDATES, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<ShieldUpdate>>>>("shield_updates", Self::VT_SHIELD_UPDATES, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<MissileSlotUpdate>>>>("missile_slot_updates", Self::VT_MISSILE_SLOT_UPDATES, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<TurretUpdate>>>>("turret_updates", Self::VT_TURRET_UPDATES, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, BlockHitUpdate>>>("block_hit_updates", Self::VT_BLOCK_HIT_UPDATES, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, ThrusterUpdate>>>("thruster_updates", Self::VT_THRUSTER_UPDATES, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, ShieldUpdate>>>("shield_updates", Self::VT_SHIELD_UPDATES, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, MissileSlotUpdate>>>("missile_slot_updates", Self::VT_MISSILE_SLOT_UPDATES, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, TurretUpdate>>>("turret_updates", Self::VT_TURRET_UPDATES, false)?
      .finish();
     Ok(())
   }
@@ -2542,11 +2652,11 @@ pub struct EntityUpdateArgs<'a> {
     pub linear_velocity: Option<&'a Vec2>,
     pub rotation: f32,
     pub is_commandable: bool,
-    pub block_hit_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<BlockHitUpdate<'a>>>>>,
-    pub thruster_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ThrusterUpdate<'a>>>>>,
-    pub shield_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<ShieldUpdate<'a>>>>>,
-    pub missile_slot_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<MissileSlotUpdate<'a>>>>>,
-    pub turret_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<TurretUpdate<'a>>>>>,
+    pub block_hit_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, BlockHitUpdate>>>,
+    pub thruster_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, ThrusterUpdate>>>,
+    pub shield_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, ShieldUpdate>>>,
+    pub missile_slot_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, MissileSlotUpdate>>>,
+    pub turret_updates: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, TurretUpdate>>>,
 }
 impl<'a> Default for EntityUpdateArgs<'a> {
   #[inline]
@@ -2592,23 +2702,23 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> EntityUpdateBuilder<'a, 'b, A> 
     self.fbb_.push_slot::<bool>(EntityUpdate::VT_IS_COMMANDABLE, is_commandable, false);
   }
   #[inline]
-  pub fn add_block_hit_updates(&mut self, block_hit_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<BlockHitUpdate<'b >>>>) {
+  pub fn add_block_hit_updates(&mut self, block_hit_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , BlockHitUpdate>>) {
     self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(EntityUpdate::VT_BLOCK_HIT_UPDATES, block_hit_updates);
   }
   #[inline]
-  pub fn add_thruster_updates(&mut self, thruster_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<ThrusterUpdate<'b >>>>) {
+  pub fn add_thruster_updates(&mut self, thruster_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , ThrusterUpdate>>) {
     self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(EntityUpdate::VT_THRUSTER_UPDATES, thruster_updates);
   }
   #[inline]
-  pub fn add_shield_updates(&mut self, shield_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<ShieldUpdate<'b >>>>) {
+  pub fn add_shield_updates(&mut self, shield_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , ShieldUpdate>>) {
     self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(EntityUpdate::VT_SHIELD_UPDATES, shield_updates);
   }
   #[inline]
-  pub fn add_missile_slot_updates(&mut self, missile_slot_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<MissileSlotUpdate<'b >>>>) {
+  pub fn add_missile_slot_updates(&mut self, missile_slot_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , MissileSlotUpdate>>) {
     self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(EntityUpdate::VT_MISSILE_SLOT_UPDATES, missile_slot_updates);
   }
   #[inline]
-  pub fn add_turret_updates(&mut self, turret_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<TurretUpdate<'b >>>>) {
+  pub fn add_turret_updates(&mut self, turret_updates: flatbuffers::WIPOffset<flatbuffers::Vector<'b , TurretUpdate>>) {
     self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(EntityUpdate::VT_TURRET_UPDATES, turret_updates);
   }
   #[inline]
