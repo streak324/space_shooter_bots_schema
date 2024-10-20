@@ -74,16 +74,6 @@ table Flag {
 	carrier_id: uint64; // the entity id that is carrying this flag. ignore if is_carried is false
 }
 
-table GameState {
-	flags: [Flag];
-	entities: [Entity]; // ships, debris, missiles.
-	new_projectiles: [Projectile]; // new projectiles generated at this tick.
-	dead_projectiles: [DeadProjectile];
-	explosions: [Explosion];
-	my_id: uint8; // the owner id of the script reading this state
-	winner_id: uint8; // The owner id of the script that won the game. Do not consider this value until the very last snapshot of the gamestate. 0 means game tied
-}
-
 struct BlockHitUpdate {
 	block_index: uint16;
 	hitpoints: float32;
@@ -118,7 +108,7 @@ table EntityUpdate {
 	position: Vec2;
 	linear_velocity: Vec2;
 	rotation: float32;
-	is_commandable: bool;
+	is_commandable: bool; //if it was previously true and now false, then the entity was a ship that is now debris
 	block_hit_updates: [BlockHitUpdate];
 	thruster_updates: [ThrusterUpdate];
 	shield_updates: [ShieldUpdate];
@@ -151,4 +141,4 @@ table GameStateDelta {
 	winner_id: uint8; // The owner id of the script that won the game. Do not consider this value until the very last snapshot of the gamestate. 0 means game tied
 }
 
-root_type GameState;
+root_type GameStateDelta;

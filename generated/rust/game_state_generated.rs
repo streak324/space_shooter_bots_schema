@@ -2303,205 +2303,6 @@ impl core::fmt::Debug for Flag<'_> {
       ds.finish()
   }
 }
-pub enum GameStateOffset {}
-#[derive(Copy, Clone, PartialEq)]
-
-pub struct GameState<'a> {
-  pub _tab: flatbuffers::Table<'a>,
-}
-
-impl<'a> flatbuffers::Follow<'a> for GameState<'a> {
-  type Inner = GameState<'a>;
-  #[inline]
-  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
-    Self { _tab: flatbuffers::Table::new(buf, loc) }
-  }
-}
-
-impl<'a> GameState<'a> {
-  pub const VT_FLAGS: flatbuffers::VOffsetT = 4;
-  pub const VT_ENTITIES: flatbuffers::VOffsetT = 6;
-  pub const VT_NEW_PROJECTILES: flatbuffers::VOffsetT = 8;
-  pub const VT_DEAD_PROJECTILES: flatbuffers::VOffsetT = 10;
-  pub const VT_EXPLOSIONS: flatbuffers::VOffsetT = 12;
-  pub const VT_MY_ID: flatbuffers::VOffsetT = 14;
-  pub const VT_WINNER_ID: flatbuffers::VOffsetT = 16;
-
-  #[inline]
-  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
-    GameState { _tab: table }
-  }
-  #[allow(unused_mut)]
-  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
-    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
-    args: &'args GameStateArgs<'args>
-  ) -> flatbuffers::WIPOffset<GameState<'bldr>> {
-    let mut builder = GameStateBuilder::new(_fbb);
-    if let Some(x) = args.explosions { builder.add_explosions(x); }
-    if let Some(x) = args.dead_projectiles { builder.add_dead_projectiles(x); }
-    if let Some(x) = args.new_projectiles { builder.add_new_projectiles(x); }
-    if let Some(x) = args.entities { builder.add_entities(x); }
-    if let Some(x) = args.flags { builder.add_flags(x); }
-    builder.add_winner_id(args.winner_id);
-    builder.add_my_id(args.my_id);
-    builder.finish()
-  }
-
-
-  #[inline]
-  pub fn flags(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag<'a>>>> {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag>>>>(GameState::VT_FLAGS, None)}
-  }
-  #[inline]
-  pub fn entities(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Entity<'a>>>> {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Entity>>>>(GameState::VT_ENTITIES, None)}
-  }
-  #[inline]
-  pub fn new_projectiles(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Projectile<'a>>>> {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Projectile>>>>(GameState::VT_NEW_PROJECTILES, None)}
-  }
-  #[inline]
-  pub fn dead_projectiles(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<DeadProjectile<'a>>>> {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<DeadProjectile>>>>(GameState::VT_DEAD_PROJECTILES, None)}
-  }
-  #[inline]
-  pub fn explosions(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Explosion<'a>>>> {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Explosion>>>>(GameState::VT_EXPLOSIONS, None)}
-  }
-  #[inline]
-  pub fn my_id(&self) -> u8 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<u8>(GameState::VT_MY_ID, Some(0)).unwrap()}
-  }
-  #[inline]
-  pub fn winner_id(&self) -> u8 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<u8>(GameState::VT_WINNER_ID, Some(0)).unwrap()}
-  }
-}
-
-impl flatbuffers::Verifiable for GameState<'_> {
-  #[inline]
-  fn run_verifier(
-    v: &mut flatbuffers::Verifier, pos: usize
-  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
-    use self::flatbuffers::Verifiable;
-    v.visit_table(pos)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Flag>>>>("flags", Self::VT_FLAGS, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Entity>>>>("entities", Self::VT_ENTITIES, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Projectile>>>>("new_projectiles", Self::VT_NEW_PROJECTILES, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<DeadProjectile>>>>("dead_projectiles", Self::VT_DEAD_PROJECTILES, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Explosion>>>>("explosions", Self::VT_EXPLOSIONS, false)?
-     .visit_field::<u8>("my_id", Self::VT_MY_ID, false)?
-     .visit_field::<u8>("winner_id", Self::VT_WINNER_ID, false)?
-     .finish();
-    Ok(())
-  }
-}
-pub struct GameStateArgs<'a> {
-    pub flags: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag<'a>>>>>,
-    pub entities: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Entity<'a>>>>>,
-    pub new_projectiles: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Projectile<'a>>>>>,
-    pub dead_projectiles: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<DeadProjectile<'a>>>>>,
-    pub explosions: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Explosion<'a>>>>>,
-    pub my_id: u8,
-    pub winner_id: u8,
-}
-impl<'a> Default for GameStateArgs<'a> {
-  #[inline]
-  fn default() -> Self {
-    GameStateArgs {
-      flags: None,
-      entities: None,
-      new_projectiles: None,
-      dead_projectiles: None,
-      explosions: None,
-      my_id: 0,
-      winner_id: 0,
-    }
-  }
-}
-
-pub struct GameStateBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
-  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
-  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
-}
-impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GameStateBuilder<'a, 'b, A> {
-  #[inline]
-  pub fn add_flags(&mut self, flags: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Flag<'b >>>>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameState::VT_FLAGS, flags);
-  }
-  #[inline]
-  pub fn add_entities(&mut self, entities: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Entity<'b >>>>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameState::VT_ENTITIES, entities);
-  }
-  #[inline]
-  pub fn add_new_projectiles(&mut self, new_projectiles: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Projectile<'b >>>>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameState::VT_NEW_PROJECTILES, new_projectiles);
-  }
-  #[inline]
-  pub fn add_dead_projectiles(&mut self, dead_projectiles: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<DeadProjectile<'b >>>>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameState::VT_DEAD_PROJECTILES, dead_projectiles);
-  }
-  #[inline]
-  pub fn add_explosions(&mut self, explosions: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Explosion<'b >>>>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameState::VT_EXPLOSIONS, explosions);
-  }
-  #[inline]
-  pub fn add_my_id(&mut self, my_id: u8) {
-    self.fbb_.push_slot::<u8>(GameState::VT_MY_ID, my_id, 0);
-  }
-  #[inline]
-  pub fn add_winner_id(&mut self, winner_id: u8) {
-    self.fbb_.push_slot::<u8>(GameState::VT_WINNER_ID, winner_id, 0);
-  }
-  #[inline]
-  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> GameStateBuilder<'a, 'b, A> {
-    let start = _fbb.start_table();
-    GameStateBuilder {
-      fbb_: _fbb,
-      start_: start,
-    }
-  }
-  #[inline]
-  pub fn finish(self) -> flatbuffers::WIPOffset<GameState<'a>> {
-    let o = self.fbb_.end_table(self.start_);
-    flatbuffers::WIPOffset::new(o.value())
-  }
-}
-
-impl core::fmt::Debug for GameState<'_> {
-  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    let mut ds = f.debug_struct("GameState");
-      ds.field("flags", &self.flags());
-      ds.field("entities", &self.entities());
-      ds.field("new_projectiles", &self.new_projectiles());
-      ds.field("dead_projectiles", &self.dead_projectiles());
-      ds.field("explosions", &self.explosions());
-      ds.field("my_id", &self.my_id());
-      ds.field("winner_id", &self.winner_id());
-      ds.finish()
-  }
-}
 pub enum EntityUpdateOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -3202,73 +3003,73 @@ impl core::fmt::Debug for GameStateDelta<'_> {
   }
 }
 #[inline]
-/// Verifies that a buffer of bytes contains a `GameState`
+/// Verifies that a buffer of bytes contains a `GameStateDelta`
 /// and returns it.
 /// Note that verification is still experimental and may not
 /// catch every error, or be maximally performant. For the
 /// previous, unchecked, behavior use
-/// `root_as_game_state_unchecked`.
-pub fn root_as_game_state(buf: &[u8]) -> Result<GameState, flatbuffers::InvalidFlatbuffer> {
-  flatbuffers::root::<GameState>(buf)
+/// `root_as_game_state_delta_unchecked`.
+pub fn root_as_game_state_delta(buf: &[u8]) -> Result<GameStateDelta, flatbuffers::InvalidFlatbuffer> {
+  flatbuffers::root::<GameStateDelta>(buf)
 }
 #[inline]
 /// Verifies that a buffer of bytes contains a size prefixed
-/// `GameState` and returns it.
+/// `GameStateDelta` and returns it.
 /// Note that verification is still experimental and may not
 /// catch every error, or be maximally performant. For the
 /// previous, unchecked, behavior use
-/// `size_prefixed_root_as_game_state_unchecked`.
-pub fn size_prefixed_root_as_game_state(buf: &[u8]) -> Result<GameState, flatbuffers::InvalidFlatbuffer> {
-  flatbuffers::size_prefixed_root::<GameState>(buf)
+/// `size_prefixed_root_as_game_state_delta_unchecked`.
+pub fn size_prefixed_root_as_game_state_delta(buf: &[u8]) -> Result<GameStateDelta, flatbuffers::InvalidFlatbuffer> {
+  flatbuffers::size_prefixed_root::<GameStateDelta>(buf)
 }
 #[inline]
 /// Verifies, with the given options, that a buffer of bytes
-/// contains a `GameState` and returns it.
+/// contains a `GameStateDelta` and returns it.
 /// Note that verification is still experimental and may not
 /// catch every error, or be maximally performant. For the
 /// previous, unchecked, behavior use
-/// `root_as_game_state_unchecked`.
-pub fn root_as_game_state_with_opts<'b, 'o>(
+/// `root_as_game_state_delta_unchecked`.
+pub fn root_as_game_state_delta_with_opts<'b, 'o>(
   opts: &'o flatbuffers::VerifierOptions,
   buf: &'b [u8],
-) -> Result<GameState<'b>, flatbuffers::InvalidFlatbuffer> {
-  flatbuffers::root_with_opts::<GameState<'b>>(opts, buf)
+) -> Result<GameStateDelta<'b>, flatbuffers::InvalidFlatbuffer> {
+  flatbuffers::root_with_opts::<GameStateDelta<'b>>(opts, buf)
 }
 #[inline]
 /// Verifies, with the given verifier options, that a buffer of
-/// bytes contains a size prefixed `GameState` and returns
+/// bytes contains a size prefixed `GameStateDelta` and returns
 /// it. Note that verification is still experimental and may not
 /// catch every error, or be maximally performant. For the
 /// previous, unchecked, behavior use
-/// `root_as_game_state_unchecked`.
-pub fn size_prefixed_root_as_game_state_with_opts<'b, 'o>(
+/// `root_as_game_state_delta_unchecked`.
+pub fn size_prefixed_root_as_game_state_delta_with_opts<'b, 'o>(
   opts: &'o flatbuffers::VerifierOptions,
   buf: &'b [u8],
-) -> Result<GameState<'b>, flatbuffers::InvalidFlatbuffer> {
-  flatbuffers::size_prefixed_root_with_opts::<GameState<'b>>(opts, buf)
+) -> Result<GameStateDelta<'b>, flatbuffers::InvalidFlatbuffer> {
+  flatbuffers::size_prefixed_root_with_opts::<GameStateDelta<'b>>(opts, buf)
 }
 #[inline]
-/// Assumes, without verification, that a buffer of bytes contains a GameState and returns it.
+/// Assumes, without verification, that a buffer of bytes contains a GameStateDelta and returns it.
 /// # Safety
-/// Callers must trust the given bytes do indeed contain a valid `GameState`.
-pub unsafe fn root_as_game_state_unchecked(buf: &[u8]) -> GameState {
-  flatbuffers::root_unchecked::<GameState>(buf)
+/// Callers must trust the given bytes do indeed contain a valid `GameStateDelta`.
+pub unsafe fn root_as_game_state_delta_unchecked(buf: &[u8]) -> GameStateDelta {
+  flatbuffers::root_unchecked::<GameStateDelta>(buf)
 }
 #[inline]
-/// Assumes, without verification, that a buffer of bytes contains a size prefixed GameState and returns it.
+/// Assumes, without verification, that a buffer of bytes contains a size prefixed GameStateDelta and returns it.
 /// # Safety
-/// Callers must trust the given bytes do indeed contain a valid size prefixed `GameState`.
-pub unsafe fn size_prefixed_root_as_game_state_unchecked(buf: &[u8]) -> GameState {
-  flatbuffers::size_prefixed_root_unchecked::<GameState>(buf)
+/// Callers must trust the given bytes do indeed contain a valid size prefixed `GameStateDelta`.
+pub unsafe fn size_prefixed_root_as_game_state_delta_unchecked(buf: &[u8]) -> GameStateDelta {
+  flatbuffers::size_prefixed_root_unchecked::<GameStateDelta>(buf)
 }
 #[inline]
-pub fn finish_game_state_buffer<'a, 'b, A: flatbuffers::Allocator + 'a>(
+pub fn finish_game_state_delta_buffer<'a, 'b, A: flatbuffers::Allocator + 'a>(
     fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
-    root: flatbuffers::WIPOffset<GameState<'a>>) {
+    root: flatbuffers::WIPOffset<GameStateDelta<'a>>) {
   fbb.finish(root, None);
 }
 
 #[inline]
-pub fn finish_size_prefixed_game_state_buffer<'a, 'b, A: flatbuffers::Allocator + 'a>(fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>, root: flatbuffers::WIPOffset<GameState<'a>>) {
+pub fn finish_size_prefixed_game_state_delta_buffer<'a, 'b, A: flatbuffers::Allocator + 'a>(fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>, root: flatbuffers::WIPOffset<GameStateDelta<'a>>) {
   fbb.finish_size_prefixed(root, None);
 }

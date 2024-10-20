@@ -39,9 +39,6 @@ struct DeadProjectileBuilder;
 struct Flag;
 struct FlagBuilder;
 
-struct GameState;
-struct GameStateBuilder;
-
 struct BlockHitUpdate;
 
 struct ThrusterUpdate;
@@ -1028,142 +1025,6 @@ inline ::flatbuffers::Offset<Flag> CreateFlag(
   return builder_.Finish();
 }
 
-struct GameState FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef GameStateBuilder Builder;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_FLAGS = 4,
-    VT_ENTITIES = 6,
-    VT_NEW_PROJECTILES = 8,
-    VT_DEAD_PROJECTILES = 10,
-    VT_EXPLOSIONS = 12,
-    VT_MY_ID = 14,
-    VT_WINNER_ID = 16
-  };
-  const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *flags() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *>(VT_FLAGS);
-  }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<Entity>> *entities() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Entity>> *>(VT_ENTITIES);
-  }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<Projectile>> *new_projectiles() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Projectile>> *>(VT_NEW_PROJECTILES);
-  }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<DeadProjectile>> *dead_projectiles() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<DeadProjectile>> *>(VT_DEAD_PROJECTILES);
-  }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<Explosion>> *explosions() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Explosion>> *>(VT_EXPLOSIONS);
-  }
-  uint8_t my_id() const {
-    return GetField<uint8_t>(VT_MY_ID, 0);
-  }
-  uint8_t winner_id() const {
-    return GetField<uint8_t>(VT_WINNER_ID, 0);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_FLAGS) &&
-           verifier.VerifyVector(flags()) &&
-           verifier.VerifyVectorOfTables(flags()) &&
-           VerifyOffset(verifier, VT_ENTITIES) &&
-           verifier.VerifyVector(entities()) &&
-           verifier.VerifyVectorOfTables(entities()) &&
-           VerifyOffset(verifier, VT_NEW_PROJECTILES) &&
-           verifier.VerifyVector(new_projectiles()) &&
-           verifier.VerifyVectorOfTables(new_projectiles()) &&
-           VerifyOffset(verifier, VT_DEAD_PROJECTILES) &&
-           verifier.VerifyVector(dead_projectiles()) &&
-           verifier.VerifyVectorOfTables(dead_projectiles()) &&
-           VerifyOffset(verifier, VT_EXPLOSIONS) &&
-           verifier.VerifyVector(explosions()) &&
-           verifier.VerifyVectorOfTables(explosions()) &&
-           VerifyField<uint8_t>(verifier, VT_MY_ID, 1) &&
-           VerifyField<uint8_t>(verifier, VT_WINNER_ID, 1) &&
-           verifier.EndTable();
-  }
-};
-
-struct GameStateBuilder {
-  typedef GameState Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_flags(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Flag>>> flags) {
-    fbb_.AddOffset(GameState::VT_FLAGS, flags);
-  }
-  void add_entities(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Entity>>> entities) {
-    fbb_.AddOffset(GameState::VT_ENTITIES, entities);
-  }
-  void add_new_projectiles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Projectile>>> new_projectiles) {
-    fbb_.AddOffset(GameState::VT_NEW_PROJECTILES, new_projectiles);
-  }
-  void add_dead_projectiles(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DeadProjectile>>> dead_projectiles) {
-    fbb_.AddOffset(GameState::VT_DEAD_PROJECTILES, dead_projectiles);
-  }
-  void add_explosions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Explosion>>> explosions) {
-    fbb_.AddOffset(GameState::VT_EXPLOSIONS, explosions);
-  }
-  void add_my_id(uint8_t my_id) {
-    fbb_.AddElement<uint8_t>(GameState::VT_MY_ID, my_id, 0);
-  }
-  void add_winner_id(uint8_t winner_id) {
-    fbb_.AddElement<uint8_t>(GameState::VT_WINNER_ID, winner_id, 0);
-  }
-  explicit GameStateBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<GameState> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<GameState>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<GameState> CreateGameState(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Flag>>> flags = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Entity>>> entities = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Projectile>>> new_projectiles = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DeadProjectile>>> dead_projectiles = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Explosion>>> explosions = 0,
-    uint8_t my_id = 0,
-    uint8_t winner_id = 0) {
-  GameStateBuilder builder_(_fbb);
-  builder_.add_explosions(explosions);
-  builder_.add_dead_projectiles(dead_projectiles);
-  builder_.add_new_projectiles(new_projectiles);
-  builder_.add_entities(entities);
-  builder_.add_flags(flags);
-  builder_.add_winner_id(winner_id);
-  builder_.add_my_id(my_id);
-  return builder_.Finish();
-}
-
-inline ::flatbuffers::Offset<GameState> CreateGameStateDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<::flatbuffers::Offset<Flag>> *flags = nullptr,
-    const std::vector<::flatbuffers::Offset<Entity>> *entities = nullptr,
-    const std::vector<::flatbuffers::Offset<Projectile>> *new_projectiles = nullptr,
-    const std::vector<::flatbuffers::Offset<DeadProjectile>> *dead_projectiles = nullptr,
-    const std::vector<::flatbuffers::Offset<Explosion>> *explosions = nullptr,
-    uint8_t my_id = 0,
-    uint8_t winner_id = 0) {
-  auto flags__ = flags ? _fbb.CreateVector<::flatbuffers::Offset<Flag>>(*flags) : 0;
-  auto entities__ = entities ? _fbb.CreateVector<::flatbuffers::Offset<Entity>>(*entities) : 0;
-  auto new_projectiles__ = new_projectiles ? _fbb.CreateVector<::flatbuffers::Offset<Projectile>>(*new_projectiles) : 0;
-  auto dead_projectiles__ = dead_projectiles ? _fbb.CreateVector<::flatbuffers::Offset<DeadProjectile>>(*dead_projectiles) : 0;
-  auto explosions__ = explosions ? _fbb.CreateVector<::flatbuffers::Offset<Explosion>>(*explosions) : 0;
-  return CreateGameState(
-      _fbb,
-      flags__,
-      entities__,
-      new_projectiles__,
-      dead_projectiles__,
-      explosions__,
-      my_id,
-      winner_id);
-}
-
 struct EntityUpdate FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef EntityUpdateBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -1612,33 +1473,33 @@ inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDeltaDirect(
       winner_id);
 }
 
-inline const GameState *GetGameState(const void *buf) {
-  return ::flatbuffers::GetRoot<GameState>(buf);
+inline const GameStateDelta *GetGameStateDelta(const void *buf) {
+  return ::flatbuffers::GetRoot<GameStateDelta>(buf);
 }
 
-inline const GameState *GetSizePrefixedGameState(const void *buf) {
-  return ::flatbuffers::GetSizePrefixedRoot<GameState>(buf);
+inline const GameStateDelta *GetSizePrefixedGameStateDelta(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<GameStateDelta>(buf);
 }
 
-inline bool VerifyGameStateBuffer(
+inline bool VerifyGameStateDeltaBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<GameState>(nullptr);
+  return verifier.VerifyBuffer<GameStateDelta>(nullptr);
 }
 
-inline bool VerifySizePrefixedGameStateBuffer(
+inline bool VerifySizePrefixedGameStateDeltaBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<GameState>(nullptr);
+  return verifier.VerifySizePrefixedBuffer<GameStateDelta>(nullptr);
 }
 
-inline void FinishGameStateBuffer(
+inline void FinishGameStateDeltaBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<GameState> root) {
+    ::flatbuffers::Offset<GameStateDelta> root) {
   fbb.Finish(root);
 }
 
-inline void FinishSizePrefixedGameStateBuffer(
+inline void FinishSizePrefixedGameStateDeltaBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<GameState> root) {
+    ::flatbuffers::Offset<GameStateDelta> root) {
   fbb.FinishSizePrefixed(root);
 }
 

@@ -81,10 +81,6 @@ typedef const struct Flag_table *Flag_table_t;
 typedef struct Flag_table *Flag_mutable_table_t;
 typedef const flatbuffers_uoffset_t *Flag_vec_t;
 typedef flatbuffers_uoffset_t *Flag_mutable_vec_t;
-typedef const struct GameState_table *GameState_table_t;
-typedef struct GameState_table *GameState_mutable_table_t;
-typedef const flatbuffers_uoffset_t *GameState_vec_t;
-typedef flatbuffers_uoffset_t *GameState_mutable_vec_t;
 typedef const struct EntityUpdate_table *EntityUpdate_table_t;
 typedef struct EntityUpdate_table *EntityUpdate_mutable_table_t;
 typedef const flatbuffers_uoffset_t *EntityUpdate_vec_t;
@@ -204,18 +200,6 @@ typedef flatbuffers_uoffset_t *GameStateDelta_mutable_vec_t;
 #define Flag_type_identifier "\xf7\xf4\x16\x3e"
 #ifndef Flag_file_extension
 #define Flag_file_extension "bin"
-#endif
-#ifndef GameState_file_identifier
-#define GameState_file_identifier 0
-#endif
-/* deprecated, use GameState_file_identifier */
-#ifndef GameState_identifier
-#define GameState_identifier 0
-#endif
-#define GameState_type_hash ((flatbuffers_thash_t)0x392e5808)
-#define GameState_type_identifier "\x08\x58\x2e\x39"
-#ifndef GameState_file_extension
-#define GameState_file_extension "bin"
 #endif
 #ifndef BlockHitUpdate_file_identifier
 #define BlockHitUpdate_file_identifier 0
@@ -549,22 +533,6 @@ __flatbuffers_define_scalar_field(1, Flag, x, flatbuffers_float, float, 0.000000
 __flatbuffers_define_scalar_field(2, Flag, y, flatbuffers_float, float, 0.00000000f)
 __flatbuffers_define_scalar_field(3, Flag, is_carried, flatbuffers_bool, flatbuffers_bool_t, UINT8_C(0))
 __flatbuffers_define_scalar_field(4, Flag, carrier_id, flatbuffers_uint64, uint64_t, UINT64_C(0))
-
-struct GameState_table { uint8_t unused__; };
-
-static inline size_t GameState_vec_len(GameState_vec_t vec)
-__flatbuffers_vec_len(vec)
-static inline GameState_table_t GameState_vec_at(GameState_vec_t vec, size_t i)
-__flatbuffers_offset_vec_at(GameState_table_t, vec, i, 0)
-__flatbuffers_table_as_root(GameState)
-
-__flatbuffers_define_vector_field(0, GameState, flags, Flag_vec_t, 0)
-__flatbuffers_define_vector_field(1, GameState, entities, Entity_vec_t, 0)
-__flatbuffers_define_vector_field(2, GameState, new_projectiles, Projectile_vec_t, 0)
-__flatbuffers_define_vector_field(3, GameState, dead_projectiles, DeadProjectile_vec_t, 0)
-__flatbuffers_define_vector_field(4, GameState, explosions, Explosion_vec_t, 0)
-__flatbuffers_define_scalar_field(5, GameState, my_id, flatbuffers_uint8, uint8_t, UINT8_C(0))
-__flatbuffers_define_scalar_field(6, GameState, winner_id, flatbuffers_uint8, uint8_t, UINT8_C(0))
 
 struct EntityUpdate_table { uint8_t unused__; };
 
