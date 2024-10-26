@@ -648,20 +648,19 @@ struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef EntityBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ID = 4,
-    VT_MY = 6,
+    VT_OWNER = 6,
     VT_IS_COMMANDABLE = 8,
     VT_POSITION = 10,
     VT_LINEAR_VELOCITY = 12,
-    VT_OWNER = 14,
-    VT_ROTATION = 16,
-    VT_ANGULAR_VELOCITY = 18,
-    VT_BLOCKS = 20
+    VT_ROTATION = 14,
+    VT_ANGULAR_VELOCITY = 16,
+    VT_BLOCKS = 18
   };
   uint64_t id() const {
     return GetField<uint64_t>(VT_ID, 0);
   }
-  bool my() const {
-    return GetField<uint8_t>(VT_MY, 0) != 0;
+  uint8_t owner() const {
+    return GetField<uint8_t>(VT_OWNER, 0);
   }
   bool is_commandable() const {
     return GetField<uint8_t>(VT_IS_COMMANDABLE, 0) != 0;
@@ -671,9 +670,6 @@ struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   const Vec2 *linear_velocity() const {
     return GetStruct<const Vec2 *>(VT_LINEAR_VELOCITY);
-  }
-  uint8_t owner() const {
-    return GetField<uint8_t>(VT_OWNER, 0);
   }
   float rotation() const {
     return GetField<float>(VT_ROTATION, 0.0f);
@@ -687,11 +683,10 @@ struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_ID, 8) &&
-           VerifyField<uint8_t>(verifier, VT_MY, 1) &&
+           VerifyField<uint8_t>(verifier, VT_OWNER, 1) &&
            VerifyField<uint8_t>(verifier, VT_IS_COMMANDABLE, 1) &&
            VerifyField<Vec2>(verifier, VT_POSITION, 4) &&
            VerifyField<Vec2>(verifier, VT_LINEAR_VELOCITY, 4) &&
-           VerifyField<uint8_t>(verifier, VT_OWNER, 1) &&
            VerifyField<float>(verifier, VT_ROTATION, 4) &&
            VerifyField<float>(verifier, VT_ANGULAR_VELOCITY, 4) &&
            VerifyOffset(verifier, VT_BLOCKS) &&
@@ -708,8 +703,8 @@ struct EntityBuilder {
   void add_id(uint64_t id) {
     fbb_.AddElement<uint64_t>(Entity::VT_ID, id, 0);
   }
-  void add_my(bool my) {
-    fbb_.AddElement<uint8_t>(Entity::VT_MY, static_cast<uint8_t>(my), 0);
+  void add_owner(uint8_t owner) {
+    fbb_.AddElement<uint8_t>(Entity::VT_OWNER, owner, 0);
   }
   void add_is_commandable(bool is_commandable) {
     fbb_.AddElement<uint8_t>(Entity::VT_IS_COMMANDABLE, static_cast<uint8_t>(is_commandable), 0);
@@ -719,9 +714,6 @@ struct EntityBuilder {
   }
   void add_linear_velocity(const Vec2 *linear_velocity) {
     fbb_.AddStruct(Entity::VT_LINEAR_VELOCITY, linear_velocity);
-  }
-  void add_owner(uint8_t owner) {
-    fbb_.AddElement<uint8_t>(Entity::VT_OWNER, owner, 0);
   }
   void add_rotation(float rotation) {
     fbb_.AddElement<float>(Entity::VT_ROTATION, rotation, 0.0f);
@@ -746,11 +738,10 @@ struct EntityBuilder {
 inline ::flatbuffers::Offset<Entity> CreateEntity(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint64_t id = 0,
-    bool my = false,
+    uint8_t owner = 0,
     bool is_commandable = false,
     const Vec2 *position = nullptr,
     const Vec2 *linear_velocity = nullptr,
-    uint8_t owner = 0,
     float rotation = 0.0f,
     float angular_velocity = 0.0f,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Block>>> blocks = 0) {
@@ -761,20 +752,18 @@ inline ::flatbuffers::Offset<Entity> CreateEntity(
   builder_.add_rotation(rotation);
   builder_.add_linear_velocity(linear_velocity);
   builder_.add_position(position);
-  builder_.add_owner(owner);
   builder_.add_is_commandable(is_commandable);
-  builder_.add_my(my);
+  builder_.add_owner(owner);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<Entity> CreateEntityDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint64_t id = 0,
-    bool my = false,
+    uint8_t owner = 0,
     bool is_commandable = false,
     const Vec2 *position = nullptr,
     const Vec2 *linear_velocity = nullptr,
-    uint8_t owner = 0,
     float rotation = 0.0f,
     float angular_velocity = 0.0f,
     const std::vector<::flatbuffers::Offset<Block>> *blocks = nullptr) {
@@ -782,11 +771,10 @@ inline ::flatbuffers::Offset<Entity> CreateEntityDirect(
   return CreateEntity(
       _fbb,
       id,
-      my,
+      owner,
       is_commandable,
       position,
       linear_velocity,
-      owner,
       rotation,
       angular_velocity,
       blocks__);
@@ -796,7 +784,7 @@ struct Projectile FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef ProjectileBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ID = 4,
-    VT_MY = 6,
+    VT_OWNER = 6,
     VT_POSITION = 8,
     VT_LINEAR_VELOCITY = 10,
     VT_DAMAGE = 12,
@@ -806,8 +794,8 @@ struct Projectile FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   uint64_t id() const {
     return GetField<uint64_t>(VT_ID, 0);
   }
-  bool my() const {
-    return GetField<uint8_t>(VT_MY, 0) != 0;
+  uint8_t owner() const {
+    return GetField<uint8_t>(VT_OWNER, 0);
   }
   const Vec2 *position() const {
     return GetStruct<const Vec2 *>(VT_POSITION);
@@ -827,7 +815,7 @@ struct Projectile FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_ID, 8) &&
-           VerifyField<uint8_t>(verifier, VT_MY, 1) &&
+           VerifyField<uint8_t>(verifier, VT_OWNER, 1) &&
            VerifyField<Vec2>(verifier, VT_POSITION, 4) &&
            VerifyField<Vec2>(verifier, VT_LINEAR_VELOCITY, 4) &&
            VerifyField<float>(verifier, VT_DAMAGE, 4) &&
@@ -844,8 +832,8 @@ struct ProjectileBuilder {
   void add_id(uint64_t id) {
     fbb_.AddElement<uint64_t>(Projectile::VT_ID, id, 0);
   }
-  void add_my(bool my) {
-    fbb_.AddElement<uint8_t>(Projectile::VT_MY, static_cast<uint8_t>(my), 0);
+  void add_owner(uint8_t owner) {
+    fbb_.AddElement<uint8_t>(Projectile::VT_OWNER, owner, 0);
   }
   void add_position(const Vec2 *position) {
     fbb_.AddStruct(Projectile::VT_POSITION, position);
@@ -876,7 +864,7 @@ struct ProjectileBuilder {
 inline ::flatbuffers::Offset<Projectile> CreateProjectile(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint64_t id = 0,
-    bool my = false,
+    uint8_t owner = 0,
     const Vec2 *position = nullptr,
     const Vec2 *linear_velocity = nullptr,
     float damage = 0.0f,
@@ -889,7 +877,7 @@ inline ::flatbuffers::Offset<Projectile> CreateProjectile(
   builder_.add_damage(damage);
   builder_.add_linear_velocity(linear_velocity);
   builder_.add_position(position);
-  builder_.add_my(my);
+  builder_.add_owner(owner);
   return builder_.Finish();
 }
 

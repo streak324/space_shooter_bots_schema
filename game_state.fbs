@@ -41,11 +41,10 @@ table Explosion {
 // Define the Entity table for game entities
 table Entity {
 	id: uint64;               // Unique identifier for the entity
-	my: bool;                // Flag indicating if the entity is "my" entity
+	owner: uint8;              // Owner of the entity
 	is_commandable: bool;    // whether this entity is controllable by a program
 	position: Vec2;          // Position of the entity
 	linear_velocity: Vec2;   // Linear velocity of the entity
-	owner: uint8;              // Owner of the entity
 	rotation: float32;         // Rotation angle of the entity
 	angular_velocity: float32; // Angular velocity of the entity
 	blocks: [Block];
@@ -53,7 +52,7 @@ table Entity {
 
 table Projectile {
 	id: uint64;
-	my: bool;
+	owner: uint8;
     position: Vec2;
     linear_velocity: Vec2;
     damage: float32;

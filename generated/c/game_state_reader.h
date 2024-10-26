@@ -484,14 +484,13 @@ __flatbuffers_offset_vec_at(Entity_table_t, vec, i, 0)
 __flatbuffers_table_as_root(Entity)
 
 __flatbuffers_define_scalar_field(0, Entity, id, flatbuffers_uint64, uint64_t, UINT64_C(0))
-__flatbuffers_define_scalar_field(1, Entity, my, flatbuffers_bool, flatbuffers_bool_t, UINT8_C(0))
+__flatbuffers_define_scalar_field(1, Entity, owner, flatbuffers_uint8, uint8_t, UINT8_C(0))
 __flatbuffers_define_scalar_field(2, Entity, is_commandable, flatbuffers_bool, flatbuffers_bool_t, UINT8_C(0))
 __flatbuffers_define_struct_field(3, Entity, position, Vec2_struct_t, 0)
 __flatbuffers_define_struct_field(4, Entity, linear_velocity, Vec2_struct_t, 0)
-__flatbuffers_define_scalar_field(5, Entity, owner, flatbuffers_uint8, uint8_t, UINT8_C(0))
-__flatbuffers_define_scalar_field(6, Entity, rotation, flatbuffers_float, float, 0.00000000f)
-__flatbuffers_define_scalar_field(7, Entity, angular_velocity, flatbuffers_float, float, 0.00000000f)
-__flatbuffers_define_vector_field(8, Entity, blocks, Block_vec_t, 0)
+__flatbuffers_define_scalar_field(5, Entity, rotation, flatbuffers_float, float, 0.00000000f)
+__flatbuffers_define_scalar_field(6, Entity, angular_velocity, flatbuffers_float, float, 0.00000000f)
+__flatbuffers_define_vector_field(7, Entity, blocks, Block_vec_t, 0)
 
 struct Projectile_table { uint8_t unused__; };
 
@@ -502,7 +501,7 @@ __flatbuffers_offset_vec_at(Projectile_table_t, vec, i, 0)
 __flatbuffers_table_as_root(Projectile)
 
 __flatbuffers_define_scalar_field(0, Projectile, id, flatbuffers_uint64, uint64_t, UINT64_C(0))
-__flatbuffers_define_scalar_field(1, Projectile, my, flatbuffers_bool, flatbuffers_bool_t, UINT8_C(0))
+__flatbuffers_define_scalar_field(1, Projectile, owner, flatbuffers_uint8, uint8_t, UINT8_C(0))
 __flatbuffers_define_struct_field(2, Projectile, position, Vec2_struct_t, 0)
 __flatbuffers_define_struct_field(3, Projectile, linear_velocity, Vec2_struct_t, 0)
 __flatbuffers_define_scalar_field(4, Projectile, damage, flatbuffers_float, float, 0.00000000f)

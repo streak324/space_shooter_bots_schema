@@ -1609,14 +1609,13 @@ impl<'a> flatbuffers::Follow<'a> for Entity<'a> {
 
 impl<'a> Entity<'a> {
   pub const VT_ID: flatbuffers::VOffsetT = 4;
-  pub const VT_MY: flatbuffers::VOffsetT = 6;
+  pub const VT_OWNER: flatbuffers::VOffsetT = 6;
   pub const VT_IS_COMMANDABLE: flatbuffers::VOffsetT = 8;
   pub const VT_POSITION: flatbuffers::VOffsetT = 10;
   pub const VT_LINEAR_VELOCITY: flatbuffers::VOffsetT = 12;
-  pub const VT_OWNER: flatbuffers::VOffsetT = 14;
-  pub const VT_ROTATION: flatbuffers::VOffsetT = 16;
-  pub const VT_ANGULAR_VELOCITY: flatbuffers::VOffsetT = 18;
-  pub const VT_BLOCKS: flatbuffers::VOffsetT = 20;
+  pub const VT_ROTATION: flatbuffers::VOffsetT = 14;
+  pub const VT_ANGULAR_VELOCITY: flatbuffers::VOffsetT = 16;
+  pub const VT_BLOCKS: flatbuffers::VOffsetT = 18;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -1634,9 +1633,8 @@ impl<'a> Entity<'a> {
     builder.add_rotation(args.rotation);
     if let Some(x) = args.linear_velocity { builder.add_linear_velocity(x); }
     if let Some(x) = args.position { builder.add_position(x); }
-    builder.add_owner(args.owner);
     builder.add_is_commandable(args.is_commandable);
-    builder.add_my(args.my);
+    builder.add_owner(args.owner);
     builder.finish()
   }
 
@@ -1649,11 +1647,11 @@ impl<'a> Entity<'a> {
     unsafe { self._tab.get::<u64>(Entity::VT_ID, Some(0)).unwrap()}
   }
   #[inline]
-  pub fn my(&self) -> bool {
+  pub fn owner(&self) -> u8 {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<bool>(Entity::VT_MY, Some(false)).unwrap()}
+    unsafe { self._tab.get::<u8>(Entity::VT_OWNER, Some(0)).unwrap()}
   }
   #[inline]
   pub fn is_commandable(&self) -> bool {
@@ -1675,13 +1673,6 @@ impl<'a> Entity<'a> {
     // Created from valid Table for this object
     // which contains a valid value in this slot
     unsafe { self._tab.get::<Vec2>(Entity::VT_LINEAR_VELOCITY, None)}
-  }
-  #[inline]
-  pub fn owner(&self) -> u8 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<u8>(Entity::VT_OWNER, Some(0)).unwrap()}
   }
   #[inline]
   pub fn rotation(&self) -> f32 {
@@ -1714,11 +1705,10 @@ impl flatbuffers::Verifiable for Entity<'_> {
     use self::flatbuffers::Verifiable;
     v.visit_table(pos)?
      .visit_field::<u64>("id", Self::VT_ID, false)?
-     .visit_field::<bool>("my", Self::VT_MY, false)?
+     .visit_field::<u8>("owner", Self::VT_OWNER, false)?
      .visit_field::<bool>("is_commandable", Self::VT_IS_COMMANDABLE, false)?
      .visit_field::<Vec2>("position", Self::VT_POSITION, false)?
      .visit_field::<Vec2>("linear_velocity", Self::VT_LINEAR_VELOCITY, false)?
-     .visit_field::<u8>("owner", Self::VT_OWNER, false)?
      .visit_field::<f32>("rotation", Self::VT_ROTATION, false)?
      .visit_field::<f32>("angular_velocity", Self::VT_ANGULAR_VELOCITY, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Block>>>>("blocks", Self::VT_BLOCKS, false)?
@@ -1728,11 +1718,10 @@ impl flatbuffers::Verifiable for Entity<'_> {
 }
 pub struct EntityArgs<'a> {
     pub id: u64,
-    pub my: bool,
+    pub owner: u8,
     pub is_commandable: bool,
     pub position: Option<&'a Vec2>,
     pub linear_velocity: Option<&'a Vec2>,
-    pub owner: u8,
     pub rotation: f32,
     pub angular_velocity: f32,
     pub blocks: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Block<'a>>>>>,
@@ -1742,11 +1731,10 @@ impl<'a> Default for EntityArgs<'a> {
   fn default() -> Self {
     EntityArgs {
       id: 0,
-      my: false,
+      owner: 0,
       is_commandable: false,
       position: None,
       linear_velocity: None,
-      owner: 0,
       rotation: 0.0,
       angular_velocity: 0.0,
       blocks: None,
@@ -1764,8 +1752,8 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> EntityBuilder<'a, 'b, A> {
     self.fbb_.push_slot::<u64>(Entity::VT_ID, id, 0);
   }
   #[inline]
-  pub fn add_my(&mut self, my: bool) {
-    self.fbb_.push_slot::<bool>(Entity::VT_MY, my, false);
+  pub fn add_owner(&mut self, owner: u8) {
+    self.fbb_.push_slot::<u8>(Entity::VT_OWNER, owner, 0);
   }
   #[inline]
   pub fn add_is_commandable(&mut self, is_commandable: bool) {
@@ -1778,10 +1766,6 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> EntityBuilder<'a, 'b, A> {
   #[inline]
   pub fn add_linear_velocity(&mut self, linear_velocity: &Vec2) {
     self.fbb_.push_slot_always::<&Vec2>(Entity::VT_LINEAR_VELOCITY, linear_velocity);
-  }
-  #[inline]
-  pub fn add_owner(&mut self, owner: u8) {
-    self.fbb_.push_slot::<u8>(Entity::VT_OWNER, owner, 0);
   }
   #[inline]
   pub fn add_rotation(&mut self, rotation: f32) {
@@ -1814,11 +1798,10 @@ impl core::fmt::Debug for Entity<'_> {
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ds = f.debug_struct("Entity");
       ds.field("id", &self.id());
-      ds.field("my", &self.my());
+      ds.field("owner", &self.owner());
       ds.field("is_commandable", &self.is_commandable());
       ds.field("position", &self.position());
       ds.field("linear_velocity", &self.linear_velocity());
-      ds.field("owner", &self.owner());
       ds.field("rotation", &self.rotation());
       ds.field("angular_velocity", &self.angular_velocity());
       ds.field("blocks", &self.blocks());
@@ -1842,7 +1825,7 @@ impl<'a> flatbuffers::Follow<'a> for Projectile<'a> {
 
 impl<'a> Projectile<'a> {
   pub const VT_ID: flatbuffers::VOffsetT = 4;
-  pub const VT_MY: flatbuffers::VOffsetT = 6;
+  pub const VT_OWNER: flatbuffers::VOffsetT = 6;
   pub const VT_POSITION: flatbuffers::VOffsetT = 8;
   pub const VT_LINEAR_VELOCITY: flatbuffers::VOffsetT = 10;
   pub const VT_DAMAGE: flatbuffers::VOffsetT = 12;
@@ -1865,7 +1848,7 @@ impl<'a> Projectile<'a> {
     builder.add_damage(args.damage);
     if let Some(x) = args.linear_velocity { builder.add_linear_velocity(x); }
     if let Some(x) = args.position { builder.add_position(x); }
-    builder.add_my(args.my);
+    builder.add_owner(args.owner);
     builder.finish()
   }
 
@@ -1878,11 +1861,11 @@ impl<'a> Projectile<'a> {
     unsafe { self._tab.get::<u64>(Projectile::VT_ID, Some(0)).unwrap()}
   }
   #[inline]
-  pub fn my(&self) -> bool {
+  pub fn owner(&self) -> u8 {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<bool>(Projectile::VT_MY, Some(false)).unwrap()}
+    unsafe { self._tab.get::<u8>(Projectile::VT_OWNER, Some(0)).unwrap()}
   }
   #[inline]
   pub fn position(&self) -> Option<&'a Vec2> {
@@ -1929,7 +1912,7 @@ impl flatbuffers::Verifiable for Projectile<'_> {
     use self::flatbuffers::Verifiable;
     v.visit_table(pos)?
      .visit_field::<u64>("id", Self::VT_ID, false)?
-     .visit_field::<bool>("my", Self::VT_MY, false)?
+     .visit_field::<u8>("owner", Self::VT_OWNER, false)?
      .visit_field::<Vec2>("position", Self::VT_POSITION, false)?
      .visit_field::<Vec2>("linear_velocity", Self::VT_LINEAR_VELOCITY, false)?
      .visit_field::<f32>("damage", Self::VT_DAMAGE, false)?
@@ -1941,7 +1924,7 @@ impl flatbuffers::Verifiable for Projectile<'_> {
 }
 pub struct ProjectileArgs<'a> {
     pub id: u64,
-    pub my: bool,
+    pub owner: u8,
     pub position: Option<&'a Vec2>,
     pub linear_velocity: Option<&'a Vec2>,
     pub damage: f32,
@@ -1953,7 +1936,7 @@ impl<'a> Default for ProjectileArgs<'a> {
   fn default() -> Self {
     ProjectileArgs {
       id: 0,
-      my: false,
+      owner: 0,
       position: None,
       linear_velocity: None,
       damage: 0.0,
@@ -1973,8 +1956,8 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ProjectileBuilder<'a, 'b, A> {
     self.fbb_.push_slot::<u64>(Projectile::VT_ID, id, 0);
   }
   #[inline]
-  pub fn add_my(&mut self, my: bool) {
-    self.fbb_.push_slot::<bool>(Projectile::VT_MY, my, false);
+  pub fn add_owner(&mut self, owner: u8) {
+    self.fbb_.push_slot::<u8>(Projectile::VT_OWNER, owner, 0);
   }
   #[inline]
   pub fn add_position(&mut self, position: &Vec2) {
@@ -2015,7 +1998,7 @@ impl core::fmt::Debug for Projectile<'_> {
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ds = f.debug_struct("Projectile");
       ds.field("id", &self.id());
-      ds.field("my", &self.my());
+      ds.field("owner", &self.owner());
       ds.field("position", &self.position());
       ds.field("linear_velocity", &self.linear_velocity());
       ds.field("damage", &self.damage());
