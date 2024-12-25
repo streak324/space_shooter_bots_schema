@@ -1949,3 +1949,69 @@ func GameStateDeltaAddWinnerId(builder *flatbuffers.Builder, winnerId byte) {
 func GameStateDeltaEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
+type Path struct {
+	_tab flatbuffers.Table
+}
+
+func GetRootAsPath(buf []byte, offset flatbuffers.UOffsetT) *Path {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &Path{}
+	x.Init(buf, n+offset)
+	return x
+}
+
+func FinishPathBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.Finish(offset)
+}
+
+func GetSizePrefixedRootAsPath(buf []byte, offset flatbuffers.UOffsetT) *Path {
+	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
+	x := &Path{}
+	x.Init(buf, n+offset+flatbuffers.SizeUint32)
+	return x
+}
+
+func FinishSizePrefixedPathBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+	builder.FinishSizePrefixed(offset)
+}
+
+func (rcv *Path) Init(buf []byte, i flatbuffers.UOffsetT) {
+	rcv._tab.Bytes = buf
+	rcv._tab.Pos = i
+}
+
+func (rcv *Path) Table() flatbuffers.Table {
+	return rcv._tab
+}
+
+func (rcv *Path) Waypoints(obj *Vec2, j int) bool {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		x := rcv._tab.Vector(o)
+		x += flatbuffers.UOffsetT(j) * 8
+		obj.Init(rcv._tab.Bytes, x)
+		return true
+	}
+	return false
+}
+
+func (rcv *Path) WaypointsLength() int {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
+	if o != 0 {
+		return rcv._tab.VectorLen(o)
+	}
+	return 0
+}
+
+func PathStart(builder *flatbuffers.Builder) {
+	builder.StartObject(1)
+}
+func PathAddWaypoints(builder *flatbuffers.Builder, waypoints flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(waypoints), 0)
+}
+func PathStartWaypointsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+	return builder.StartVector(8, numElems, 4)
+}
+func PathEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+	return builder.EndObject()
+}

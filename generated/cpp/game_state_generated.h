@@ -58,6 +58,9 @@ struct SingleBlockEntityUpdateBuilder;
 struct GameStateDelta;
 struct GameStateDeltaBuilder;
 
+struct Path;
+struct PathBuilder;
+
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vec2 FLATBUFFERS_FINAL_CLASS {
  private:
   float x_;
@@ -1459,6 +1462,57 @@ inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDeltaDirect(
       explosions__,
       my_id,
       winner_id);
+}
+
+struct Path FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef PathBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_WAYPOINTS = 4
+  };
+  const ::flatbuffers::Vector<const Vec2 *> *waypoints() const {
+    return GetPointer<const ::flatbuffers::Vector<const Vec2 *> *>(VT_WAYPOINTS);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_WAYPOINTS) &&
+           verifier.VerifyVector(waypoints()) &&
+           verifier.EndTable();
+  }
+};
+
+struct PathBuilder {
+  typedef Path Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_waypoints(::flatbuffers::Offset<::flatbuffers::Vector<const Vec2 *>> waypoints) {
+    fbb_.AddOffset(Path::VT_WAYPOINTS, waypoints);
+  }
+  explicit PathBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<Path> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<Path>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<Path> CreatePath(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<::flatbuffers::Vector<const Vec2 *>> waypoints = 0) {
+  PathBuilder builder_(_fbb);
+  builder_.add_waypoints(waypoints);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<Path> CreatePathDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<Vec2> *waypoints = nullptr) {
+  auto waypoints__ = waypoints ? _fbb.CreateVectorOfStructs<Vec2>(*waypoints) : 0;
+  return CreatePath(
+      _fbb,
+      waypoints__);
 }
 
 inline const GameStateDelta *GetGameStateDelta(const void *buf) {

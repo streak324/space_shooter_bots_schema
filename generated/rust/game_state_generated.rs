@@ -2985,6 +2985,103 @@ impl core::fmt::Debug for GameStateDelta<'_> {
       ds.finish()
   }
 }
+pub enum PathOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct Path<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for Path<'a> {
+  type Inner = Path<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> Path<'a> {
+  pub const VT_WAYPOINTS: flatbuffers::VOffsetT = 4;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    Path { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+    args: &'args PathArgs<'args>
+  ) -> flatbuffers::WIPOffset<Path<'bldr>> {
+    let mut builder = PathBuilder::new(_fbb);
+    if let Some(x) = args.waypoints { builder.add_waypoints(x); }
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn waypoints(&self) -> Option<flatbuffers::Vector<'a, Vec2>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, Vec2>>>(Path::VT_WAYPOINTS, None)}
+  }
+}
+
+impl flatbuffers::Verifiable for Path<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, Vec2>>>("waypoints", Self::VT_WAYPOINTS, false)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct PathArgs<'a> {
+    pub waypoints: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, Vec2>>>,
+}
+impl<'a> Default for PathArgs<'a> {
+  #[inline]
+  fn default() -> Self {
+    PathArgs {
+      waypoints: None,
+    }
+  }
+}
+
+pub struct PathBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> PathBuilder<'a, 'b, A> {
+  #[inline]
+  pub fn add_waypoints(&mut self, waypoints: flatbuffers::WIPOffset<flatbuffers::Vector<'b , Vec2>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(Path::VT_WAYPOINTS, waypoints);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> PathBuilder<'a, 'b, A> {
+    let start = _fbb.start_table();
+    PathBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<Path<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for Path<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("Path");
+      ds.field("waypoints", &self.waypoints());
+      ds.finish()
+  }
+}
 #[inline]
 /// Verifies that a buffer of bytes contains a `GameStateDelta`
 /// and returns it.

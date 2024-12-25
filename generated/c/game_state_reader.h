@@ -93,6 +93,10 @@ typedef const struct GameStateDelta_table *GameStateDelta_table_t;
 typedef struct GameStateDelta_table *GameStateDelta_mutable_table_t;
 typedef const flatbuffers_uoffset_t *GameStateDelta_vec_t;
 typedef flatbuffers_uoffset_t *GameStateDelta_mutable_vec_t;
+typedef const struct Path_table *Path_table_t;
+typedef struct Path_table *Path_mutable_table_t;
+typedef const flatbuffers_uoffset_t *Path_vec_t;
+typedef flatbuffers_uoffset_t *Path_mutable_vec_t;
 #ifndef Vec2_file_identifier
 #define Vec2_file_identifier 0
 #endif
@@ -296,6 +300,18 @@ typedef flatbuffers_uoffset_t *GameStateDelta_mutable_vec_t;
 #define GameStateDelta_type_identifier "\x8e\x18\xc9\xdc"
 #ifndef GameStateDelta_file_extension
 #define GameStateDelta_file_extension "bin"
+#endif
+#ifndef Path_file_identifier
+#define Path_file_identifier 0
+#endif
+/* deprecated, use Path_file_identifier */
+#ifndef Path_identifier
+#define Path_identifier 0
+#endif
+#define Path_type_hash ((flatbuffers_thash_t)0xeb66e456)
+#define Path_type_identifier "\x56\xe4\x66\xeb"
+#ifndef Path_file_extension
+#define Path_file_extension "bin"
 #endif
 
 
@@ -586,6 +602,16 @@ __flatbuffers_define_vector_field(6, GameStateDelta, dead_projectiles, DeadProje
 __flatbuffers_define_vector_field(7, GameStateDelta, explosions, Explosion_vec_t, 0)
 __flatbuffers_define_scalar_field(8, GameStateDelta, my_id, flatbuffers_uint8, uint8_t, UINT8_C(0))
 __flatbuffers_define_scalar_field(9, GameStateDelta, winner_id, flatbuffers_uint8, uint8_t, UINT8_C(0))
+
+struct Path_table { uint8_t unused__; };
+
+static inline size_t Path_vec_len(Path_vec_t vec)
+__flatbuffers_vec_len(vec)
+static inline Path_table_t Path_vec_at(Path_vec_t vec, size_t i)
+__flatbuffers_offset_vec_at(Path_table_t, vec, i, 0)
+__flatbuffers_table_as_root(Path)
+
+__flatbuffers_define_vector_field(0, Path, waypoints, Vec2_vec_t, 0)
 
 
 #include "flatcc/flatcc_epilogue.h"
