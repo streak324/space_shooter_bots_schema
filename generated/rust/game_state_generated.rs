@@ -2954,8 +2954,8 @@ impl<'a> flatbuffers::Follow<'a> for GameStartingParams<'a> {
 impl<'a> GameStartingParams<'a> {
   pub const VT_MY_ID: flatbuffers::VOffsetT = 4;
   pub const VT_SEED: flatbuffers::VOffsetT = 6;
-  pub const VT_TEAM_BASES: flatbuffers::VOffsetT = 8;
-  pub const VT_STARTING_ENTITIES: flatbuffers::VOffsetT = 10;
+  pub const VT_MEMORY_CAPACITY: flatbuffers::VOffsetT = 8;
+  pub const VT_FLAGS: flatbuffers::VOffsetT = 10;
   pub const VT_ARENA_BOUNDS_TYPE: flatbuffers::VOffsetT = 12;
   pub const VT_ARENA_BOUNDS: flatbuffers::VOffsetT = 14;
 
@@ -2969,10 +2969,10 @@ impl<'a> GameStartingParams<'a> {
     args: &'args GameStartingParamsArgs<'args>
   ) -> flatbuffers::WIPOffset<GameStartingParams<'bldr>> {
     let mut builder = GameStartingParamsBuilder::new(_fbb);
+    builder.add_memory_capacity(args.memory_capacity);
     builder.add_seed(args.seed);
     if let Some(x) = args.arena_bounds { builder.add_arena_bounds(x); }
-    if let Some(x) = args.starting_entities { builder.add_starting_entities(x); }
-    if let Some(x) = args.team_bases { builder.add_team_bases(x); }
+    if let Some(x) = args.flags { builder.add_flags(x); }
     builder.add_arena_bounds_type(args.arena_bounds_type);
     builder.add_my_id(args.my_id);
     builder.finish()
@@ -2994,18 +2994,18 @@ impl<'a> GameStartingParams<'a> {
     unsafe { self._tab.get::<u64>(GameStartingParams::VT_SEED, Some(0)).unwrap()}
   }
   #[inline]
-  pub fn team_bases(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag<'a>>>> {
+  pub fn memory_capacity(&self) -> u64 {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag>>>>(GameStartingParams::VT_TEAM_BASES, None)}
+    unsafe { self._tab.get::<u64>(GameStartingParams::VT_MEMORY_CAPACITY, Some(0)).unwrap()}
   }
   #[inline]
-  pub fn starting_entities(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Entity<'a>>>> {
+  pub fn flags(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag<'a>>>> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Entity>>>>(GameStartingParams::VT_STARTING_ENTITIES, None)}
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag>>>>(GameStartingParams::VT_FLAGS, None)}
   }
   #[inline]
   pub fn arena_bounds_type(&self) -> ArenaBounds {
@@ -3047,8 +3047,8 @@ impl flatbuffers::Verifiable for GameStartingParams<'_> {
     v.visit_table(pos)?
      .visit_field::<u8>("my_id", Self::VT_MY_ID, false)?
      .visit_field::<u64>("seed", Self::VT_SEED, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Flag>>>>("team_bases", Self::VT_TEAM_BASES, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Entity>>>>("starting_entities", Self::VT_STARTING_ENTITIES, false)?
+     .visit_field::<u64>("memory_capacity", Self::VT_MEMORY_CAPACITY, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Flag>>>>("flags", Self::VT_FLAGS, false)?
      .visit_union::<ArenaBounds, _>("arena_bounds_type", Self::VT_ARENA_BOUNDS_TYPE, "arena_bounds", Self::VT_ARENA_BOUNDS, false, |key, v, pos| {
         match key {
           ArenaBounds::regular_convex_polygon => v.verify_union_variant::<flatbuffers::ForwardsUOffset<RegularConvexPolygon>>("ArenaBounds::regular_convex_polygon", pos),
@@ -3062,8 +3062,8 @@ impl flatbuffers::Verifiable for GameStartingParams<'_> {
 pub struct GameStartingParamsArgs<'a> {
     pub my_id: u8,
     pub seed: u64,
-    pub team_bases: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag<'a>>>>>,
-    pub starting_entities: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Entity<'a>>>>>,
+    pub memory_capacity: u64,
+    pub flags: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag<'a>>>>>,
     pub arena_bounds_type: ArenaBounds,
     pub arena_bounds: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
 }
@@ -3073,8 +3073,8 @@ impl<'a> Default for GameStartingParamsArgs<'a> {
     GameStartingParamsArgs {
       my_id: 0,
       seed: 0,
-      team_bases: None,
-      starting_entities: None,
+      memory_capacity: 0,
+      flags: None,
       arena_bounds_type: ArenaBounds::NONE,
       arena_bounds: None,
     }
@@ -3095,12 +3095,12 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GameStartingParamsBuilder<'a, '
     self.fbb_.push_slot::<u64>(GameStartingParams::VT_SEED, seed, 0);
   }
   #[inline]
-  pub fn add_team_bases(&mut self, team_bases: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Flag<'b >>>>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStartingParams::VT_TEAM_BASES, team_bases);
+  pub fn add_memory_capacity(&mut self, memory_capacity: u64) {
+    self.fbb_.push_slot::<u64>(GameStartingParams::VT_MEMORY_CAPACITY, memory_capacity, 0);
   }
   #[inline]
-  pub fn add_starting_entities(&mut self, starting_entities: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Entity<'b >>>>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStartingParams::VT_STARTING_ENTITIES, starting_entities);
+  pub fn add_flags(&mut self, flags: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Flag<'b >>>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStartingParams::VT_FLAGS, flags);
   }
   #[inline]
   pub fn add_arena_bounds_type(&mut self, arena_bounds_type: ArenaBounds) {
@@ -3130,8 +3130,8 @@ impl core::fmt::Debug for GameStartingParams<'_> {
     let mut ds = f.debug_struct("GameStartingParams");
       ds.field("my_id", &self.my_id());
       ds.field("seed", &self.seed());
-      ds.field("team_bases", &self.team_bases());
-      ds.field("starting_entities", &self.starting_entities());
+      ds.field("memory_capacity", &self.memory_capacity());
+      ds.field("flags", &self.flags());
       ds.field("arena_bounds_type", &self.arena_bounds_type());
       match self.arena_bounds_type() {
         ArenaBounds::regular_convex_polygon => {
@@ -3365,133 +3365,99 @@ impl core::fmt::Debug for GameStateDelta<'_> {
       ds.finish()
   }
 }
-pub enum CompleteGameOffset {}
+pub enum EndGameOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
-pub struct CompleteGame<'a> {
+pub struct EndGame<'a> {
   pub _tab: flatbuffers::Table<'a>,
 }
 
-impl<'a> flatbuffers::Follow<'a> for CompleteGame<'a> {
-  type Inner = CompleteGame<'a>;
+impl<'a> flatbuffers::Follow<'a> for EndGame<'a> {
+  type Inner = EndGame<'a>;
   #[inline]
   unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
     Self { _tab: flatbuffers::Table::new(buf, loc) }
   }
 }
 
-impl<'a> CompleteGame<'a> {
-  pub const VT_START: flatbuffers::VOffsetT = 4;
-  pub const VT_SNAPSHOTS: flatbuffers::VOffsetT = 6;
-  pub const VT_WINNER_ID: flatbuffers::VOffsetT = 8;
+impl<'a> EndGame<'a> {
+  pub const VT_WINNER_ID: flatbuffers::VOffsetT = 4;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
-    CompleteGame { _tab: table }
+    EndGame { _tab: table }
   }
   #[allow(unused_mut)]
   pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
     _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
-    args: &'args CompleteGameArgs<'args>
-  ) -> flatbuffers::WIPOffset<CompleteGame<'bldr>> {
-    let mut builder = CompleteGameBuilder::new(_fbb);
-    if let Some(x) = args.snapshots { builder.add_snapshots(x); }
-    if let Some(x) = args.start { builder.add_start(x); }
+    args: &'args EndGameArgs
+  ) -> flatbuffers::WIPOffset<EndGame<'bldr>> {
+    let mut builder = EndGameBuilder::new(_fbb);
     builder.add_winner_id(args.winner_id);
     builder.finish()
   }
 
 
   #[inline]
-  pub fn start(&self) -> Option<GameStartingParams<'a>> {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<GameStartingParams>>(CompleteGame::VT_START, None)}
-  }
-  #[inline]
-  pub fn snapshots(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<GameStateDelta<'a>>>> {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<GameStateDelta>>>>(CompleteGame::VT_SNAPSHOTS, None)}
-  }
-  #[inline]
   pub fn winner_id(&self) -> u8 {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<u8>(CompleteGame::VT_WINNER_ID, Some(0)).unwrap()}
+    unsafe { self._tab.get::<u8>(EndGame::VT_WINNER_ID, Some(0)).unwrap()}
   }
 }
 
-impl flatbuffers::Verifiable for CompleteGame<'_> {
+impl flatbuffers::Verifiable for EndGame<'_> {
   #[inline]
   fn run_verifier(
     v: &mut flatbuffers::Verifier, pos: usize
   ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
     use self::flatbuffers::Verifiable;
     v.visit_table(pos)?
-     .visit_field::<flatbuffers::ForwardsUOffset<GameStartingParams>>("start", Self::VT_START, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<GameStateDelta>>>>("snapshots", Self::VT_SNAPSHOTS, false)?
      .visit_field::<u8>("winner_id", Self::VT_WINNER_ID, false)?
      .finish();
     Ok(())
   }
 }
-pub struct CompleteGameArgs<'a> {
-    pub start: Option<flatbuffers::WIPOffset<GameStartingParams<'a>>>,
-    pub snapshots: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<GameStateDelta<'a>>>>>,
+pub struct EndGameArgs {
     pub winner_id: u8,
 }
-impl<'a> Default for CompleteGameArgs<'a> {
+impl<'a> Default for EndGameArgs {
   #[inline]
   fn default() -> Self {
-    CompleteGameArgs {
-      start: None,
-      snapshots: None,
+    EndGameArgs {
       winner_id: 0,
     }
   }
 }
 
-pub struct CompleteGameBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+pub struct EndGameBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
   fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
   start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> CompleteGameBuilder<'a, 'b, A> {
-  #[inline]
-  pub fn add_start(&mut self, start: flatbuffers::WIPOffset<GameStartingParams<'b >>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<GameStartingParams>>(CompleteGame::VT_START, start);
-  }
-  #[inline]
-  pub fn add_snapshots(&mut self, snapshots: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<GameStateDelta<'b >>>>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(CompleteGame::VT_SNAPSHOTS, snapshots);
-  }
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> EndGameBuilder<'a, 'b, A> {
   #[inline]
   pub fn add_winner_id(&mut self, winner_id: u8) {
-    self.fbb_.push_slot::<u8>(CompleteGame::VT_WINNER_ID, winner_id, 0);
+    self.fbb_.push_slot::<u8>(EndGame::VT_WINNER_ID, winner_id, 0);
   }
   #[inline]
-  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> CompleteGameBuilder<'a, 'b, A> {
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> EndGameBuilder<'a, 'b, A> {
     let start = _fbb.start_table();
-    CompleteGameBuilder {
+    EndGameBuilder {
       fbb_: _fbb,
       start_: start,
     }
   }
   #[inline]
-  pub fn finish(self) -> flatbuffers::WIPOffset<CompleteGame<'a>> {
+  pub fn finish(self) -> flatbuffers::WIPOffset<EndGame<'a>> {
     let o = self.fbb_.end_table(self.start_);
     flatbuffers::WIPOffset::new(o.value())
   }
 }
 
-impl core::fmt::Debug for CompleteGame<'_> {
+impl core::fmt::Debug for EndGame<'_> {
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    let mut ds = f.debug_struct("CompleteGame");
-      ds.field("start", &self.start());
-      ds.field("snapshots", &self.snapshots());
+    let mut ds = f.debug_struct("EndGame");
       ds.field("winner_id", &self.winner_id());
       ds.finish()
   }
@@ -3592,75 +3558,4 @@ impl core::fmt::Debug for Path<'_> {
       ds.field("waypoints", &self.waypoints());
       ds.finish()
   }
-}
-#[inline]
-/// Verifies that a buffer of bytes contains a `CompleteGame`
-/// and returns it.
-/// Note that verification is still experimental and may not
-/// catch every error, or be maximally performant. For the
-/// previous, unchecked, behavior use
-/// `root_as_complete_game_unchecked`.
-pub fn root_as_complete_game(buf: &[u8]) -> Result<CompleteGame, flatbuffers::InvalidFlatbuffer> {
-  flatbuffers::root::<CompleteGame>(buf)
-}
-#[inline]
-/// Verifies that a buffer of bytes contains a size prefixed
-/// `CompleteGame` and returns it.
-/// Note that verification is still experimental and may not
-/// catch every error, or be maximally performant. For the
-/// previous, unchecked, behavior use
-/// `size_prefixed_root_as_complete_game_unchecked`.
-pub fn size_prefixed_root_as_complete_game(buf: &[u8]) -> Result<CompleteGame, flatbuffers::InvalidFlatbuffer> {
-  flatbuffers::size_prefixed_root::<CompleteGame>(buf)
-}
-#[inline]
-/// Verifies, with the given options, that a buffer of bytes
-/// contains a `CompleteGame` and returns it.
-/// Note that verification is still experimental and may not
-/// catch every error, or be maximally performant. For the
-/// previous, unchecked, behavior use
-/// `root_as_complete_game_unchecked`.
-pub fn root_as_complete_game_with_opts<'b, 'o>(
-  opts: &'o flatbuffers::VerifierOptions,
-  buf: &'b [u8],
-) -> Result<CompleteGame<'b>, flatbuffers::InvalidFlatbuffer> {
-  flatbuffers::root_with_opts::<CompleteGame<'b>>(opts, buf)
-}
-#[inline]
-/// Verifies, with the given verifier options, that a buffer of
-/// bytes contains a size prefixed `CompleteGame` and returns
-/// it. Note that verification is still experimental and may not
-/// catch every error, or be maximally performant. For the
-/// previous, unchecked, behavior use
-/// `root_as_complete_game_unchecked`.
-pub fn size_prefixed_root_as_complete_game_with_opts<'b, 'o>(
-  opts: &'o flatbuffers::VerifierOptions,
-  buf: &'b [u8],
-) -> Result<CompleteGame<'b>, flatbuffers::InvalidFlatbuffer> {
-  flatbuffers::size_prefixed_root_with_opts::<CompleteGame<'b>>(opts, buf)
-}
-#[inline]
-/// Assumes, without verification, that a buffer of bytes contains a CompleteGame and returns it.
-/// # Safety
-/// Callers must trust the given bytes do indeed contain a valid `CompleteGame`.
-pub unsafe fn root_as_complete_game_unchecked(buf: &[u8]) -> CompleteGame {
-  flatbuffers::root_unchecked::<CompleteGame>(buf)
-}
-#[inline]
-/// Assumes, without verification, that a buffer of bytes contains a size prefixed CompleteGame and returns it.
-/// # Safety
-/// Callers must trust the given bytes do indeed contain a valid size prefixed `CompleteGame`.
-pub unsafe fn size_prefixed_root_as_complete_game_unchecked(buf: &[u8]) -> CompleteGame {
-  flatbuffers::size_prefixed_root_unchecked::<CompleteGame>(buf)
-}
-#[inline]
-pub fn finish_complete_game_buffer<'a, 'b, A: flatbuffers::Allocator + 'a>(
-    fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
-    root: flatbuffers::WIPOffset<CompleteGame<'a>>) {
-  fbb.finish(root, None);
-}
-
-#[inline]
-pub fn finish_size_prefixed_complete_game_buffer<'a, 'b, A: flatbuffers::Allocator + 'a>(fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>, root: flatbuffers::WIPOffset<CompleteGame<'a>>) {
-  fbb.finish_size_prefixed(root, None);
 }

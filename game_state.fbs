@@ -138,8 +138,8 @@ union ArenaBounds {
 table GameStartingParams {
 	my_id: uint8;
 	seed: uint64;
-	team_bases: [Flag];
-	starting_entities: [Entity];
+	memory_capacity: uint64;
+	flags: [Flag];
 	arena_bounds: ArenaBounds;
 }
 
@@ -154,14 +154,10 @@ table GameStateDelta {
 	explosions: [Explosion];
 }
 
-table CompleteGame {
-	start: GameStartingParams;
-	snapshots: [GameStateDelta];
+table EndGame {
 	winner_id: uint8; // 0 means game tied. my_id == winner_id means you won.
 }
 
 table Path {
 	waypoints: [Vec2];
 }
-
-root_type CompleteGame;

@@ -64,8 +64,8 @@ struct GameStartingParamsBuilder;
 struct GameStateDelta;
 struct GameStateDeltaBuilder;
 
-struct CompleteGame;
-struct CompleteGameBuilder;
+struct EndGame;
+struct EndGameBuilder;
 
 struct Path;
 struct PathBuilder;
@@ -1390,8 +1390,8 @@ struct GameStartingParams FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_MY_ID = 4,
     VT_SEED = 6,
-    VT_TEAM_BASES = 8,
-    VT_STARTING_ENTITIES = 10,
+    VT_MEMORY_CAPACITY = 8,
+    VT_FLAGS = 10,
     VT_ARENA_BOUNDS_TYPE = 12,
     VT_ARENA_BOUNDS = 14
   };
@@ -1401,11 +1401,11 @@ struct GameStartingParams FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   uint64_t seed() const {
     return GetField<uint64_t>(VT_SEED, 0);
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *team_bases() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *>(VT_TEAM_BASES);
+  uint64_t memory_capacity() const {
+    return GetField<uint64_t>(VT_MEMORY_CAPACITY, 0);
   }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<Entity>> *starting_entities() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Entity>> *>(VT_STARTING_ENTITIES);
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *flags() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *>(VT_FLAGS);
   }
   ArenaBounds arena_bounds_type() const {
     return static_cast<ArenaBounds>(GetField<uint8_t>(VT_ARENA_BOUNDS_TYPE, 0));
@@ -1421,12 +1421,10 @@ struct GameStartingParams FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_MY_ID, 1) &&
            VerifyField<uint64_t>(verifier, VT_SEED, 8) &&
-           VerifyOffset(verifier, VT_TEAM_BASES) &&
-           verifier.VerifyVector(team_bases()) &&
-           verifier.VerifyVectorOfTables(team_bases()) &&
-           VerifyOffset(verifier, VT_STARTING_ENTITIES) &&
-           verifier.VerifyVector(starting_entities()) &&
-           verifier.VerifyVectorOfTables(starting_entities()) &&
+           VerifyField<uint64_t>(verifier, VT_MEMORY_CAPACITY, 8) &&
+           VerifyOffset(verifier, VT_FLAGS) &&
+           verifier.VerifyVector(flags()) &&
+           verifier.VerifyVectorOfTables(flags()) &&
            VerifyField<uint8_t>(verifier, VT_ARENA_BOUNDS_TYPE, 1) &&
            VerifyOffset(verifier, VT_ARENA_BOUNDS) &&
            VerifyArenaBounds(verifier, arena_bounds(), arena_bounds_type()) &&
@@ -1448,11 +1446,11 @@ struct GameStartingParamsBuilder {
   void add_seed(uint64_t seed) {
     fbb_.AddElement<uint64_t>(GameStartingParams::VT_SEED, seed, 0);
   }
-  void add_team_bases(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Flag>>> team_bases) {
-    fbb_.AddOffset(GameStartingParams::VT_TEAM_BASES, team_bases);
+  void add_memory_capacity(uint64_t memory_capacity) {
+    fbb_.AddElement<uint64_t>(GameStartingParams::VT_MEMORY_CAPACITY, memory_capacity, 0);
   }
-  void add_starting_entities(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Entity>>> starting_entities) {
-    fbb_.AddOffset(GameStartingParams::VT_STARTING_ENTITIES, starting_entities);
+  void add_flags(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Flag>>> flags) {
+    fbb_.AddOffset(GameStartingParams::VT_FLAGS, flags);
   }
   void add_arena_bounds_type(ArenaBounds arena_bounds_type) {
     fbb_.AddElement<uint8_t>(GameStartingParams::VT_ARENA_BOUNDS_TYPE, static_cast<uint8_t>(arena_bounds_type), 0);
@@ -1475,15 +1473,15 @@ inline ::flatbuffers::Offset<GameStartingParams> CreateGameStartingParams(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint8_t my_id = 0,
     uint64_t seed = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Flag>>> team_bases = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Entity>>> starting_entities = 0,
+    uint64_t memory_capacity = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Flag>>> flags = 0,
     ArenaBounds arena_bounds_type = ArenaBounds_NONE,
     ::flatbuffers::Offset<void> arena_bounds = 0) {
   GameStartingParamsBuilder builder_(_fbb);
+  builder_.add_memory_capacity(memory_capacity);
   builder_.add_seed(seed);
   builder_.add_arena_bounds(arena_bounds);
-  builder_.add_starting_entities(starting_entities);
-  builder_.add_team_bases(team_bases);
+  builder_.add_flags(flags);
   builder_.add_arena_bounds_type(arena_bounds_type);
   builder_.add_my_id(my_id);
   return builder_.Finish();
@@ -1493,18 +1491,17 @@ inline ::flatbuffers::Offset<GameStartingParams> CreateGameStartingParamsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint8_t my_id = 0,
     uint64_t seed = 0,
-    const std::vector<::flatbuffers::Offset<Flag>> *team_bases = nullptr,
-    const std::vector<::flatbuffers::Offset<Entity>> *starting_entities = nullptr,
+    uint64_t memory_capacity = 0,
+    const std::vector<::flatbuffers::Offset<Flag>> *flags = nullptr,
     ArenaBounds arena_bounds_type = ArenaBounds_NONE,
     ::flatbuffers::Offset<void> arena_bounds = 0) {
-  auto team_bases__ = team_bases ? _fbb.CreateVector<::flatbuffers::Offset<Flag>>(*team_bases) : 0;
-  auto starting_entities__ = starting_entities ? _fbb.CreateVector<::flatbuffers::Offset<Entity>>(*starting_entities) : 0;
+  auto flags__ = flags ? _fbb.CreateVector<::flatbuffers::Offset<Flag>>(*flags) : 0;
   return CreateGameStartingParams(
       _fbb,
       my_id,
       seed,
-      team_bases__,
-      starting_entities__,
+      memory_capacity,
+      flags__,
       arena_bounds_type,
       arena_bounds);
 }
@@ -1665,81 +1662,45 @@ inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDeltaDirect(
       explosions__);
 }
 
-struct CompleteGame FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef CompleteGameBuilder Builder;
+struct EndGame FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef EndGameBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_START = 4,
-    VT_SNAPSHOTS = 6,
-    VT_WINNER_ID = 8
+    VT_WINNER_ID = 4
   };
-  const GameStartingParams *start() const {
-    return GetPointer<const GameStartingParams *>(VT_START);
-  }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<GameStateDelta>> *snapshots() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<GameStateDelta>> *>(VT_SNAPSHOTS);
-  }
   uint8_t winner_id() const {
     return GetField<uint8_t>(VT_WINNER_ID, 0);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_START) &&
-           verifier.VerifyTable(start()) &&
-           VerifyOffset(verifier, VT_SNAPSHOTS) &&
-           verifier.VerifyVector(snapshots()) &&
-           verifier.VerifyVectorOfTables(snapshots()) &&
            VerifyField<uint8_t>(verifier, VT_WINNER_ID, 1) &&
            verifier.EndTable();
   }
 };
 
-struct CompleteGameBuilder {
-  typedef CompleteGame Table;
+struct EndGameBuilder {
+  typedef EndGame Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_start(::flatbuffers::Offset<GameStartingParams> start) {
-    fbb_.AddOffset(CompleteGame::VT_START, start);
-  }
-  void add_snapshots(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<GameStateDelta>>> snapshots) {
-    fbb_.AddOffset(CompleteGame::VT_SNAPSHOTS, snapshots);
-  }
   void add_winner_id(uint8_t winner_id) {
-    fbb_.AddElement<uint8_t>(CompleteGame::VT_WINNER_ID, winner_id, 0);
+    fbb_.AddElement<uint8_t>(EndGame::VT_WINNER_ID, winner_id, 0);
   }
-  explicit CompleteGameBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit EndGameBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<CompleteGame> Finish() {
+  ::flatbuffers::Offset<EndGame> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<CompleteGame>(end);
+    auto o = ::flatbuffers::Offset<EndGame>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<CompleteGame> CreateCompleteGame(
+inline ::flatbuffers::Offset<EndGame> CreateEndGame(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<GameStartingParams> start = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<GameStateDelta>>> snapshots = 0,
     uint8_t winner_id = 0) {
-  CompleteGameBuilder builder_(_fbb);
-  builder_.add_snapshots(snapshots);
-  builder_.add_start(start);
+  EndGameBuilder builder_(_fbb);
   builder_.add_winner_id(winner_id);
   return builder_.Finish();
-}
-
-inline ::flatbuffers::Offset<CompleteGame> CreateCompleteGameDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<GameStartingParams> start = 0,
-    const std::vector<::flatbuffers::Offset<GameStateDelta>> *snapshots = nullptr,
-    uint8_t winner_id = 0) {
-  auto snapshots__ = snapshots ? _fbb.CreateVector<::flatbuffers::Offset<GameStateDelta>>(*snapshots) : 0;
-  return CreateCompleteGame(
-      _fbb,
-      start,
-      snapshots__,
-      winner_id);
 }
 
 struct Path FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
@@ -1816,36 +1777,6 @@ inline bool VerifyArenaBoundsVector(::flatbuffers::Verifier &verifier, const ::f
     }
   }
   return true;
-}
-
-inline const CompleteGame *GetCompleteGame(const void *buf) {
-  return ::flatbuffers::GetRoot<CompleteGame>(buf);
-}
-
-inline const CompleteGame *GetSizePrefixedCompleteGame(const void *buf) {
-  return ::flatbuffers::GetSizePrefixedRoot<CompleteGame>(buf);
-}
-
-inline bool VerifyCompleteGameBuffer(
-    ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<CompleteGame>(nullptr);
-}
-
-inline bool VerifySizePrefixedCompleteGameBuffer(
-    ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<CompleteGame>(nullptr);
-}
-
-inline void FinishCompleteGameBuffer(
-    ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<CompleteGame> root) {
-  fbb.Finish(root);
-}
-
-inline void FinishSizePrefixedCompleteGameBuffer(
-    ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<CompleteGame> root) {
-  fbb.FinishSizePrefixed(root);
 }
 
 #endif  // FLATBUFFERS_GENERATED_GAMESTATE_H_

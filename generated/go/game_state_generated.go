@@ -1819,27 +1819,19 @@ func (rcv *GameStartingParams) MutateSeed(n uint64) bool {
 	return rcv._tab.MutateUint64Slot(6, n)
 }
 
-func (rcv *GameStartingParams) TeamBases(obj *Flag, j int) bool {
+func (rcv *GameStartingParams) MemoryCapacity() uint64 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
 	if o != 0 {
-		x := rcv._tab.Vector(o)
-		x += flatbuffers.UOffsetT(j) * 4
-		x = rcv._tab.Indirect(x)
-		obj.Init(rcv._tab.Bytes, x)
-		return true
-	}
-	return false
-}
-
-func (rcv *GameStartingParams) TeamBasesLength() int {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
-	if o != 0 {
-		return rcv._tab.VectorLen(o)
+		return rcv._tab.GetUint64(o + rcv._tab.Pos)
 	}
 	return 0
 }
 
-func (rcv *GameStartingParams) StartingEntities(obj *Entity, j int) bool {
+func (rcv *GameStartingParams) MutateMemoryCapacity(n uint64) bool {
+	return rcv._tab.MutateUint64Slot(8, n)
+}
+
+func (rcv *GameStartingParams) Flags(obj *Flag, j int) bool {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
 	if o != 0 {
 		x := rcv._tab.Vector(o)
@@ -1851,7 +1843,7 @@ func (rcv *GameStartingParams) StartingEntities(obj *Entity, j int) bool {
 	return false
 }
 
-func (rcv *GameStartingParams) StartingEntitiesLength() int {
+func (rcv *GameStartingParams) FlagsLength() int {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
 	if o != 0 {
 		return rcv._tab.VectorLen(o)
@@ -1889,16 +1881,13 @@ func GameStartingParamsAddMyId(builder *flatbuffers.Builder, myId byte) {
 func GameStartingParamsAddSeed(builder *flatbuffers.Builder, seed uint64) {
 	builder.PrependUint64Slot(1, seed, 0)
 }
-func GameStartingParamsAddTeamBases(builder *flatbuffers.Builder, teamBases flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(2, flatbuffers.UOffsetT(teamBases), 0)
+func GameStartingParamsAddMemoryCapacity(builder *flatbuffers.Builder, memoryCapacity uint64) {
+	builder.PrependUint64Slot(2, memoryCapacity, 0)
 }
-func GameStartingParamsStartTeamBasesVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
-	return builder.StartVector(4, numElems, 4)
+func GameStartingParamsAddFlags(builder *flatbuffers.Builder, flags flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(3, flatbuffers.UOffsetT(flags), 0)
 }
-func GameStartingParamsAddStartingEntities(builder *flatbuffers.Builder, startingEntities flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(3, flatbuffers.UOffsetT(startingEntities), 0)
-}
-func GameStartingParamsStartStartingEntitiesVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+func GameStartingParamsStartFlagsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(4, numElems, 4)
 }
 func GameStartingParamsAddArenaBoundsType(builder *flatbuffers.Builder, arenaBoundsType ArenaBounds) {
@@ -2165,102 +2154,60 @@ func GameStateDeltaStartExplosionsVector(builder *flatbuffers.Builder, numElems 
 func GameStateDeltaEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
-type CompleteGame struct {
+type EndGame struct {
 	_tab flatbuffers.Table
 }
 
-func GetRootAsCompleteGame(buf []byte, offset flatbuffers.UOffsetT) *CompleteGame {
+func GetRootAsEndGame(buf []byte, offset flatbuffers.UOffsetT) *EndGame {
 	n := flatbuffers.GetUOffsetT(buf[offset:])
-	x := &CompleteGame{}
+	x := &EndGame{}
 	x.Init(buf, n+offset)
 	return x
 }
 
-func FinishCompleteGameBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+func FinishEndGameBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
 	builder.Finish(offset)
 }
 
-func GetSizePrefixedRootAsCompleteGame(buf []byte, offset flatbuffers.UOffsetT) *CompleteGame {
+func GetSizePrefixedRootAsEndGame(buf []byte, offset flatbuffers.UOffsetT) *EndGame {
 	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
-	x := &CompleteGame{}
+	x := &EndGame{}
 	x.Init(buf, n+offset+flatbuffers.SizeUint32)
 	return x
 }
 
-func FinishSizePrefixedCompleteGameBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+func FinishSizePrefixedEndGameBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
 	builder.FinishSizePrefixed(offset)
 }
 
-func (rcv *CompleteGame) Init(buf []byte, i flatbuffers.UOffsetT) {
+func (rcv *EndGame) Init(buf []byte, i flatbuffers.UOffsetT) {
 	rcv._tab.Bytes = buf
 	rcv._tab.Pos = i
 }
 
-func (rcv *CompleteGame) Table() flatbuffers.Table {
+func (rcv *EndGame) Table() flatbuffers.Table {
 	return rcv._tab
 }
 
-func (rcv *CompleteGame) Start(obj *GameStartingParams) *GameStartingParams {
+func (rcv *EndGame) WinnerId() byte {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
-	if o != 0 {
-		x := rcv._tab.Indirect(o + rcv._tab.Pos)
-		if obj == nil {
-			obj = new(GameStartingParams)
-		}
-		obj.Init(rcv._tab.Bytes, x)
-		return obj
-	}
-	return nil
-}
-
-func (rcv *CompleteGame) Snapshots(obj *GameStateDelta, j int) bool {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
-	if o != 0 {
-		x := rcv._tab.Vector(o)
-		x += flatbuffers.UOffsetT(j) * 4
-		x = rcv._tab.Indirect(x)
-		obj.Init(rcv._tab.Bytes, x)
-		return true
-	}
-	return false
-}
-
-func (rcv *CompleteGame) SnapshotsLength() int {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
-	if o != 0 {
-		return rcv._tab.VectorLen(o)
-	}
-	return 0
-}
-
-func (rcv *CompleteGame) WinnerId() byte {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(8))
 	if o != 0 {
 		return rcv._tab.GetByte(o + rcv._tab.Pos)
 	}
 	return 0
 }
 
-func (rcv *CompleteGame) MutateWinnerId(n byte) bool {
-	return rcv._tab.MutateByteSlot(8, n)
+func (rcv *EndGame) MutateWinnerId(n byte) bool {
+	return rcv._tab.MutateByteSlot(4, n)
 }
 
-func CompleteGameStart(builder *flatbuffers.Builder) {
-	builder.StartObject(3)
+func EndGameStart(builder *flatbuffers.Builder) {
+	builder.StartObject(1)
 }
-func CompleteGameAddStart(builder *flatbuffers.Builder, start flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(start), 0)
+func EndGameAddWinnerId(builder *flatbuffers.Builder, winnerId byte) {
+	builder.PrependByteSlot(0, winnerId, 0)
 }
-func CompleteGameAddSnapshots(builder *flatbuffers.Builder, snapshots flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(1, flatbuffers.UOffsetT(snapshots), 0)
-}
-func CompleteGameStartSnapshotsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
-	return builder.StartVector(4, numElems, 4)
-}
-func CompleteGameAddWinnerId(builder *flatbuffers.Builder, winnerId byte) {
-	builder.PrependByteSlot(2, winnerId, 0)
-}
-func CompleteGameEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+func EndGameEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
 type Path struct {

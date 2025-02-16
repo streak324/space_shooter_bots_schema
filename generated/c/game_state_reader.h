@@ -101,10 +101,10 @@ typedef const struct GameStateDelta_table *GameStateDelta_table_t;
 typedef struct GameStateDelta_table *GameStateDelta_mutable_table_t;
 typedef const flatbuffers_uoffset_t *GameStateDelta_vec_t;
 typedef flatbuffers_uoffset_t *GameStateDelta_mutable_vec_t;
-typedef const struct CompleteGame_table *CompleteGame_table_t;
-typedef struct CompleteGame_table *CompleteGame_mutable_table_t;
-typedef const flatbuffers_uoffset_t *CompleteGame_vec_t;
-typedef flatbuffers_uoffset_t *CompleteGame_mutable_vec_t;
+typedef const struct EndGame_table *EndGame_table_t;
+typedef struct EndGame_table *EndGame_mutable_table_t;
+typedef const flatbuffers_uoffset_t *EndGame_vec_t;
+typedef flatbuffers_uoffset_t *EndGame_mutable_vec_t;
 typedef const struct Path_table *Path_table_t;
 typedef struct Path_table *Path_mutable_table_t;
 typedef const flatbuffers_uoffset_t *Path_vec_t;
@@ -337,17 +337,17 @@ typedef flatbuffers_uoffset_t *Path_mutable_vec_t;
 #ifndef GameStateDelta_file_extension
 #define GameStateDelta_file_extension "bin"
 #endif
-#ifndef CompleteGame_file_identifier
-#define CompleteGame_file_identifier 0
+#ifndef EndGame_file_identifier
+#define EndGame_file_identifier 0
 #endif
-/* deprecated, use CompleteGame_file_identifier */
-#ifndef CompleteGame_identifier
-#define CompleteGame_identifier 0
+/* deprecated, use EndGame_file_identifier */
+#ifndef EndGame_identifier
+#define EndGame_identifier 0
 #endif
-#define CompleteGame_type_hash ((flatbuffers_thash_t)0x1c896ab0)
-#define CompleteGame_type_identifier "\xb0\x6a\x89\x1c"
-#ifndef CompleteGame_file_extension
-#define CompleteGame_file_extension "bin"
+#define EndGame_type_hash ((flatbuffers_thash_t)0x211964a8)
+#define EndGame_type_identifier "\xa8\x64\x19\x21"
+#ifndef EndGame_file_extension
+#define EndGame_file_extension "bin"
 #endif
 #ifndef Path_file_identifier
 #define Path_file_identifier 0
@@ -677,8 +677,8 @@ __flatbuffers_table_as_root(GameStartingParams)
 
 __flatbuffers_define_scalar_field(0, GameStartingParams, my_id, flatbuffers_uint8, uint8_t, UINT8_C(0))
 __flatbuffers_define_scalar_field(1, GameStartingParams, seed, flatbuffers_uint64, uint64_t, UINT64_C(0))
-__flatbuffers_define_vector_field(2, GameStartingParams, team_bases, Flag_vec_t, 0)
-__flatbuffers_define_vector_field(3, GameStartingParams, starting_entities, Entity_vec_t, 0)
+__flatbuffers_define_scalar_field(2, GameStartingParams, memory_capacity, flatbuffers_uint64, uint64_t, UINT64_C(0))
+__flatbuffers_define_vector_field(3, GameStartingParams, flags, Flag_vec_t, 0)
 __flatbuffers_define_union_field(flatbuffers_, 5, GameStartingParams, arena_bounds, ArenaBounds, 0)
 
 struct GameStateDelta_table { uint8_t unused__; };
@@ -698,17 +698,15 @@ __flatbuffers_define_vector_field(5, GameStateDelta, new_projectiles, Projectile
 __flatbuffers_define_vector_field(6, GameStateDelta, dead_projectiles, DeadProjectile_vec_t, 0)
 __flatbuffers_define_vector_field(7, GameStateDelta, explosions, Explosion_vec_t, 0)
 
-struct CompleteGame_table { uint8_t unused__; };
+struct EndGame_table { uint8_t unused__; };
 
-static inline size_t CompleteGame_vec_len(CompleteGame_vec_t vec)
+static inline size_t EndGame_vec_len(EndGame_vec_t vec)
 __flatbuffers_vec_len(vec)
-static inline CompleteGame_table_t CompleteGame_vec_at(CompleteGame_vec_t vec, size_t i)
-__flatbuffers_offset_vec_at(CompleteGame_table_t, vec, i, 0)
-__flatbuffers_table_as_root(CompleteGame)
+static inline EndGame_table_t EndGame_vec_at(EndGame_vec_t vec, size_t i)
+__flatbuffers_offset_vec_at(EndGame_table_t, vec, i, 0)
+__flatbuffers_table_as_root(EndGame)
 
-__flatbuffers_define_table_field(0, CompleteGame, start, GameStartingParams_table_t, 0)
-__flatbuffers_define_vector_field(1, CompleteGame, snapshots, GameStateDelta_vec_t, 0)
-__flatbuffers_define_scalar_field(2, CompleteGame, winner_id, flatbuffers_uint8, uint8_t, UINT8_C(0))
+__flatbuffers_define_scalar_field(0, EndGame, winner_id, flatbuffers_uint8, uint8_t, UINT8_C(0))
 
 struct Path_table { uint8_t unused__; };
 
