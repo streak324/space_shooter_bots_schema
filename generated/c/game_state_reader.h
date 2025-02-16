@@ -676,7 +676,7 @@ __flatbuffers_offset_vec_at(GameStartingParams_table_t, vec, i, 0)
 __flatbuffers_table_as_root(GameStartingParams)
 
 __flatbuffers_define_scalar_field(0, GameStartingParams, my_id, flatbuffers_uint8, uint8_t, UINT8_C(0))
-__flatbuffers_define_scalar_field(1, GameStartingParams, seed, flatbuffers_uint64, uint64_t, UINT64_C(0))
+__flatbuffers_define_scalar_field(1, GameStartingParams, random_seed, flatbuffers_uint64, uint64_t, UINT64_C(0))
 __flatbuffers_define_scalar_field(2, GameStartingParams, memory_capacity, flatbuffers_uint64, uint64_t, UINT64_C(0))
 __flatbuffers_define_vector_field(3, GameStartingParams, flags, Flag_vec_t, 0)
 __flatbuffers_define_union_field(flatbuffers_, 5, GameStartingParams, arena_bounds, ArenaBounds, 0)

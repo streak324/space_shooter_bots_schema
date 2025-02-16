@@ -2953,7 +2953,7 @@ impl<'a> flatbuffers::Follow<'a> for GameStartingParams<'a> {
 
 impl<'a> GameStartingParams<'a> {
   pub const VT_MY_ID: flatbuffers::VOffsetT = 4;
-  pub const VT_SEED: flatbuffers::VOffsetT = 6;
+  pub const VT_RANDOM_SEED: flatbuffers::VOffsetT = 6;
   pub const VT_MEMORY_CAPACITY: flatbuffers::VOffsetT = 8;
   pub const VT_FLAGS: flatbuffers::VOffsetT = 10;
   pub const VT_ARENA_BOUNDS_TYPE: flatbuffers::VOffsetT = 12;
@@ -2970,7 +2970,7 @@ impl<'a> GameStartingParams<'a> {
   ) -> flatbuffers::WIPOffset<GameStartingParams<'bldr>> {
     let mut builder = GameStartingParamsBuilder::new(_fbb);
     builder.add_memory_capacity(args.memory_capacity);
-    builder.add_seed(args.seed);
+    builder.add_random_seed(args.random_seed);
     if let Some(x) = args.arena_bounds { builder.add_arena_bounds(x); }
     if let Some(x) = args.flags { builder.add_flags(x); }
     builder.add_arena_bounds_type(args.arena_bounds_type);
@@ -2987,11 +2987,11 @@ impl<'a> GameStartingParams<'a> {
     unsafe { self._tab.get::<u8>(GameStartingParams::VT_MY_ID, Some(0)).unwrap()}
   }
   #[inline]
-  pub fn seed(&self) -> u64 {
+  pub fn random_seed(&self) -> u64 {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<u64>(GameStartingParams::VT_SEED, Some(0)).unwrap()}
+    unsafe { self._tab.get::<u64>(GameStartingParams::VT_RANDOM_SEED, Some(0)).unwrap()}
   }
   #[inline]
   pub fn memory_capacity(&self) -> u64 {
@@ -3046,7 +3046,7 @@ impl flatbuffers::Verifiable for GameStartingParams<'_> {
     use self::flatbuffers::Verifiable;
     v.visit_table(pos)?
      .visit_field::<u8>("my_id", Self::VT_MY_ID, false)?
-     .visit_field::<u64>("seed", Self::VT_SEED, false)?
+     .visit_field::<u64>("random_seed", Self::VT_RANDOM_SEED, false)?
      .visit_field::<u64>("memory_capacity", Self::VT_MEMORY_CAPACITY, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Flag>>>>("flags", Self::VT_FLAGS, false)?
      .visit_union::<ArenaBounds, _>("arena_bounds_type", Self::VT_ARENA_BOUNDS_TYPE, "arena_bounds", Self::VT_ARENA_BOUNDS, false, |key, v, pos| {
@@ -3061,7 +3061,7 @@ impl flatbuffers::Verifiable for GameStartingParams<'_> {
 }
 pub struct GameStartingParamsArgs<'a> {
     pub my_id: u8,
-    pub seed: u64,
+    pub random_seed: u64,
     pub memory_capacity: u64,
     pub flags: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag<'a>>>>>,
     pub arena_bounds_type: ArenaBounds,
@@ -3072,7 +3072,7 @@ impl<'a> Default for GameStartingParamsArgs<'a> {
   fn default() -> Self {
     GameStartingParamsArgs {
       my_id: 0,
-      seed: 0,
+      random_seed: 0,
       memory_capacity: 0,
       flags: None,
       arena_bounds_type: ArenaBounds::NONE,
@@ -3091,8 +3091,8 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GameStartingParamsBuilder<'a, '
     self.fbb_.push_slot::<u8>(GameStartingParams::VT_MY_ID, my_id, 0);
   }
   #[inline]
-  pub fn add_seed(&mut self, seed: u64) {
-    self.fbb_.push_slot::<u64>(GameStartingParams::VT_SEED, seed, 0);
+  pub fn add_random_seed(&mut self, random_seed: u64) {
+    self.fbb_.push_slot::<u64>(GameStartingParams::VT_RANDOM_SEED, random_seed, 0);
   }
   #[inline]
   pub fn add_memory_capacity(&mut self, memory_capacity: u64) {
@@ -3129,7 +3129,7 @@ impl core::fmt::Debug for GameStartingParams<'_> {
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ds = f.debug_struct("GameStartingParams");
       ds.field("my_id", &self.my_id());
-      ds.field("seed", &self.seed());
+      ds.field("random_seed", &self.random_seed());
       ds.field("memory_capacity", &self.memory_capacity());
       ds.field("flags", &self.flags());
       ds.field("arena_bounds_type", &self.arena_bounds_type());

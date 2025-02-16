@@ -1807,7 +1807,7 @@ func (rcv *GameStartingParams) MutateMyId(n byte) bool {
 	return rcv._tab.MutateByteSlot(4, n)
 }
 
-func (rcv *GameStartingParams) Seed() uint64 {
+func (rcv *GameStartingParams) RandomSeed() uint64 {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(6))
 	if o != 0 {
 		return rcv._tab.GetUint64(o + rcv._tab.Pos)
@@ -1815,7 +1815,7 @@ func (rcv *GameStartingParams) Seed() uint64 {
 	return 0
 }
 
-func (rcv *GameStartingParams) MutateSeed(n uint64) bool {
+func (rcv *GameStartingParams) MutateRandomSeed(n uint64) bool {
 	return rcv._tab.MutateUint64Slot(6, n)
 }
 
@@ -1878,8 +1878,8 @@ func GameStartingParamsStart(builder *flatbuffers.Builder) {
 func GameStartingParamsAddMyId(builder *flatbuffers.Builder, myId byte) {
 	builder.PrependByteSlot(0, myId, 0)
 }
-func GameStartingParamsAddSeed(builder *flatbuffers.Builder, seed uint64) {
-	builder.PrependUint64Slot(1, seed, 0)
+func GameStartingParamsAddRandomSeed(builder *flatbuffers.Builder, randomSeed uint64) {
+	builder.PrependUint64Slot(1, randomSeed, 0)
 }
 func GameStartingParamsAddMemoryCapacity(builder *flatbuffers.Builder, memoryCapacity uint64) {
 	builder.PrependUint64Slot(2, memoryCapacity, 0)
