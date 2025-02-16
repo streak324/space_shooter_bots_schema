@@ -55,11 +55,61 @@ struct EntityUpdateBuilder;
 struct SingleBlockEntityUpdate;
 struct SingleBlockEntityUpdateBuilder;
 
+struct RegularConvexPolygon;
+struct RegularConvexPolygonBuilder;
+
+struct GameStartingParams;
+struct GameStartingParamsBuilder;
+
 struct GameStateDelta;
 struct GameStateDeltaBuilder;
 
+struct CompleteGame;
+struct CompleteGameBuilder;
+
 struct Path;
 struct PathBuilder;
+
+enum ArenaBounds : uint8_t {
+  ArenaBounds_NONE = 0,
+  ArenaBounds_regular_convex_polygon = 1,
+  ArenaBounds_MIN = ArenaBounds_NONE,
+  ArenaBounds_MAX = ArenaBounds_regular_convex_polygon
+};
+
+inline const ArenaBounds (&EnumValuesArenaBounds())[2] {
+  static const ArenaBounds values[] = {
+    ArenaBounds_NONE,
+    ArenaBounds_regular_convex_polygon
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesArenaBounds() {
+  static const char * const names[3] = {
+    "NONE",
+    "regular_convex_polygon",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameArenaBounds(ArenaBounds e) {
+  if (::flatbuffers::IsOutRange(e, ArenaBounds_NONE, ArenaBounds_regular_convex_polygon)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesArenaBounds()[index];
+}
+
+template<typename T> struct ArenaBoundsTraits {
+  static const ArenaBounds enum_value = ArenaBounds_NONE;
+};
+
+template<> struct ArenaBoundsTraits<RegularConvexPolygon> {
+  static const ArenaBounds enum_value = ArenaBounds_regular_convex_polygon;
+};
+
+bool VerifyArenaBounds(::flatbuffers::Verifier &verifier, const void *obj, ArenaBounds type);
+bool VerifyArenaBoundsVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types);
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vec2 FLATBUFFERS_FINAL_CLASS {
  private:
@@ -651,7 +701,7 @@ struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef EntityBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ID = 4,
-    VT_OWNER = 6,
+    VT_OWNER_ID = 6,
     VT_IS_COMMANDABLE = 8,
     VT_POSITION = 10,
     VT_LINEAR_VELOCITY = 12,
@@ -662,8 +712,8 @@ struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   uint64_t id() const {
     return GetField<uint64_t>(VT_ID, 0);
   }
-  uint8_t owner() const {
-    return GetField<uint8_t>(VT_OWNER, 0);
+  uint8_t owner_id() const {
+    return GetField<uint8_t>(VT_OWNER_ID, 0);
   }
   bool is_commandable() const {
     return GetField<uint8_t>(VT_IS_COMMANDABLE, 0) != 0;
@@ -686,7 +736,7 @@ struct Entity FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_ID, 8) &&
-           VerifyField<uint8_t>(verifier, VT_OWNER, 1) &&
+           VerifyField<uint8_t>(verifier, VT_OWNER_ID, 1) &&
            VerifyField<uint8_t>(verifier, VT_IS_COMMANDABLE, 1) &&
            VerifyField<Vec2>(verifier, VT_POSITION, 4) &&
            VerifyField<Vec2>(verifier, VT_LINEAR_VELOCITY, 4) &&
@@ -706,8 +756,8 @@ struct EntityBuilder {
   void add_id(uint64_t id) {
     fbb_.AddElement<uint64_t>(Entity::VT_ID, id, 0);
   }
-  void add_owner(uint8_t owner) {
-    fbb_.AddElement<uint8_t>(Entity::VT_OWNER, owner, 0);
+  void add_owner_id(uint8_t owner_id) {
+    fbb_.AddElement<uint8_t>(Entity::VT_OWNER_ID, owner_id, 0);
   }
   void add_is_commandable(bool is_commandable) {
     fbb_.AddElement<uint8_t>(Entity::VT_IS_COMMANDABLE, static_cast<uint8_t>(is_commandable), 0);
@@ -741,7 +791,7 @@ struct EntityBuilder {
 inline ::flatbuffers::Offset<Entity> CreateEntity(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint64_t id = 0,
-    uint8_t owner = 0,
+    uint8_t owner_id = 0,
     bool is_commandable = false,
     const Vec2 *position = nullptr,
     const Vec2 *linear_velocity = nullptr,
@@ -756,14 +806,14 @@ inline ::flatbuffers::Offset<Entity> CreateEntity(
   builder_.add_linear_velocity(linear_velocity);
   builder_.add_position(position);
   builder_.add_is_commandable(is_commandable);
-  builder_.add_owner(owner);
+  builder_.add_owner_id(owner_id);
   return builder_.Finish();
 }
 
 inline ::flatbuffers::Offset<Entity> CreateEntityDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint64_t id = 0,
-    uint8_t owner = 0,
+    uint8_t owner_id = 0,
     bool is_commandable = false,
     const Vec2 *position = nullptr,
     const Vec2 *linear_velocity = nullptr,
@@ -774,7 +824,7 @@ inline ::flatbuffers::Offset<Entity> CreateEntityDirect(
   return CreateEntity(
       _fbb,
       id,
-      owner,
+      owner_id,
       is_commandable,
       position,
       linear_velocity,
@@ -787,7 +837,7 @@ struct Projectile FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef ProjectileBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_ID = 4,
-    VT_OWNER = 6,
+    VT_OWNER_ID = 6,
     VT_POSITION = 8,
     VT_LINEAR_VELOCITY = 10,
     VT_DAMAGE = 12,
@@ -797,8 +847,8 @@ struct Projectile FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   uint64_t id() const {
     return GetField<uint64_t>(VT_ID, 0);
   }
-  uint8_t owner() const {
-    return GetField<uint8_t>(VT_OWNER, 0);
+  uint8_t owner_id() const {
+    return GetField<uint8_t>(VT_OWNER_ID, 0);
   }
   const Vec2 *position() const {
     return GetStruct<const Vec2 *>(VT_POSITION);
@@ -818,7 +868,7 @@ struct Projectile FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint64_t>(verifier, VT_ID, 8) &&
-           VerifyField<uint8_t>(verifier, VT_OWNER, 1) &&
+           VerifyField<uint8_t>(verifier, VT_OWNER_ID, 1) &&
            VerifyField<Vec2>(verifier, VT_POSITION, 4) &&
            VerifyField<Vec2>(verifier, VT_LINEAR_VELOCITY, 4) &&
            VerifyField<float>(verifier, VT_DAMAGE, 4) &&
@@ -835,8 +885,8 @@ struct ProjectileBuilder {
   void add_id(uint64_t id) {
     fbb_.AddElement<uint64_t>(Projectile::VT_ID, id, 0);
   }
-  void add_owner(uint8_t owner) {
-    fbb_.AddElement<uint8_t>(Projectile::VT_OWNER, owner, 0);
+  void add_owner_id(uint8_t owner_id) {
+    fbb_.AddElement<uint8_t>(Projectile::VT_OWNER_ID, owner_id, 0);
   }
   void add_position(const Vec2 *position) {
     fbb_.AddStruct(Projectile::VT_POSITION, position);
@@ -867,7 +917,7 @@ struct ProjectileBuilder {
 inline ::flatbuffers::Offset<Projectile> CreateProjectile(
     ::flatbuffers::FlatBufferBuilder &_fbb,
     uint64_t id = 0,
-    uint8_t owner = 0,
+    uint8_t owner_id = 0,
     const Vec2 *position = nullptr,
     const Vec2 *linear_velocity = nullptr,
     float damage = 0.0f,
@@ -880,7 +930,7 @@ inline ::flatbuffers::Offset<Projectile> CreateProjectile(
   builder_.add_damage(damage);
   builder_.add_linear_velocity(linear_velocity);
   builder_.add_position(position);
-  builder_.add_owner(owner);
+  builder_.add_owner_id(owner_id);
   return builder_.Finish();
 }
 
@@ -1284,6 +1334,181 @@ inline ::flatbuffers::Offset<SingleBlockEntityUpdate> CreateSingleBlockEntityUpd
   return builder_.Finish();
 }
 
+struct RegularConvexPolygon FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef RegularConvexPolygonBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_RADIUS = 4,
+    VT_NUM_SIDES = 6
+  };
+  float radius() const {
+    return GetField<float>(VT_RADIUS, 0.0f);
+  }
+  uint32_t num_sides() const {
+    return GetField<uint32_t>(VT_NUM_SIDES, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<float>(verifier, VT_RADIUS, 4) &&
+           VerifyField<uint32_t>(verifier, VT_NUM_SIDES, 4) &&
+           verifier.EndTable();
+  }
+};
+
+struct RegularConvexPolygonBuilder {
+  typedef RegularConvexPolygon Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_radius(float radius) {
+    fbb_.AddElement<float>(RegularConvexPolygon::VT_RADIUS, radius, 0.0f);
+  }
+  void add_num_sides(uint32_t num_sides) {
+    fbb_.AddElement<uint32_t>(RegularConvexPolygon::VT_NUM_SIDES, num_sides, 0);
+  }
+  explicit RegularConvexPolygonBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<RegularConvexPolygon> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<RegularConvexPolygon>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<RegularConvexPolygon> CreateRegularConvexPolygon(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    float radius = 0.0f,
+    uint32_t num_sides = 0) {
+  RegularConvexPolygonBuilder builder_(_fbb);
+  builder_.add_num_sides(num_sides);
+  builder_.add_radius(radius);
+  return builder_.Finish();
+}
+
+struct GameStartingParams FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef GameStartingParamsBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_MY_ID = 4,
+    VT_SEED = 6,
+    VT_TEAM_BASES = 8,
+    VT_STARTING_ENTITIES = 10,
+    VT_ARENA_BOUNDS_TYPE = 12,
+    VT_ARENA_BOUNDS = 14
+  };
+  uint8_t my_id() const {
+    return GetField<uint8_t>(VT_MY_ID, 0);
+  }
+  uint64_t seed() const {
+    return GetField<uint64_t>(VT_SEED, 0);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *team_bases() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *>(VT_TEAM_BASES);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<Entity>> *starting_entities() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Entity>> *>(VT_STARTING_ENTITIES);
+  }
+  ArenaBounds arena_bounds_type() const {
+    return static_cast<ArenaBounds>(GetField<uint8_t>(VT_ARENA_BOUNDS_TYPE, 0));
+  }
+  const void *arena_bounds() const {
+    return GetPointer<const void *>(VT_ARENA_BOUNDS);
+  }
+  template<typename T> const T *arena_bounds_as() const;
+  const RegularConvexPolygon *arena_bounds_as_regular_convex_polygon() const {
+    return arena_bounds_type() == ArenaBounds_regular_convex_polygon ? static_cast<const RegularConvexPolygon *>(arena_bounds()) : nullptr;
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_MY_ID, 1) &&
+           VerifyField<uint64_t>(verifier, VT_SEED, 8) &&
+           VerifyOffset(verifier, VT_TEAM_BASES) &&
+           verifier.VerifyVector(team_bases()) &&
+           verifier.VerifyVectorOfTables(team_bases()) &&
+           VerifyOffset(verifier, VT_STARTING_ENTITIES) &&
+           verifier.VerifyVector(starting_entities()) &&
+           verifier.VerifyVectorOfTables(starting_entities()) &&
+           VerifyField<uint8_t>(verifier, VT_ARENA_BOUNDS_TYPE, 1) &&
+           VerifyOffset(verifier, VT_ARENA_BOUNDS) &&
+           VerifyArenaBounds(verifier, arena_bounds(), arena_bounds_type()) &&
+           verifier.EndTable();
+  }
+};
+
+template<> inline const RegularConvexPolygon *GameStartingParams::arena_bounds_as<RegularConvexPolygon>() const {
+  return arena_bounds_as_regular_convex_polygon();
+}
+
+struct GameStartingParamsBuilder {
+  typedef GameStartingParams Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_my_id(uint8_t my_id) {
+    fbb_.AddElement<uint8_t>(GameStartingParams::VT_MY_ID, my_id, 0);
+  }
+  void add_seed(uint64_t seed) {
+    fbb_.AddElement<uint64_t>(GameStartingParams::VT_SEED, seed, 0);
+  }
+  void add_team_bases(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Flag>>> team_bases) {
+    fbb_.AddOffset(GameStartingParams::VT_TEAM_BASES, team_bases);
+  }
+  void add_starting_entities(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Entity>>> starting_entities) {
+    fbb_.AddOffset(GameStartingParams::VT_STARTING_ENTITIES, starting_entities);
+  }
+  void add_arena_bounds_type(ArenaBounds arena_bounds_type) {
+    fbb_.AddElement<uint8_t>(GameStartingParams::VT_ARENA_BOUNDS_TYPE, static_cast<uint8_t>(arena_bounds_type), 0);
+  }
+  void add_arena_bounds(::flatbuffers::Offset<void> arena_bounds) {
+    fbb_.AddOffset(GameStartingParams::VT_ARENA_BOUNDS, arena_bounds);
+  }
+  explicit GameStartingParamsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<GameStartingParams> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<GameStartingParams>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<GameStartingParams> CreateGameStartingParams(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint8_t my_id = 0,
+    uint64_t seed = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Flag>>> team_bases = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Entity>>> starting_entities = 0,
+    ArenaBounds arena_bounds_type = ArenaBounds_NONE,
+    ::flatbuffers::Offset<void> arena_bounds = 0) {
+  GameStartingParamsBuilder builder_(_fbb);
+  builder_.add_seed(seed);
+  builder_.add_arena_bounds(arena_bounds);
+  builder_.add_starting_entities(starting_entities);
+  builder_.add_team_bases(team_bases);
+  builder_.add_arena_bounds_type(arena_bounds_type);
+  builder_.add_my_id(my_id);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<GameStartingParams> CreateGameStartingParamsDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    uint8_t my_id = 0,
+    uint64_t seed = 0,
+    const std::vector<::flatbuffers::Offset<Flag>> *team_bases = nullptr,
+    const std::vector<::flatbuffers::Offset<Entity>> *starting_entities = nullptr,
+    ArenaBounds arena_bounds_type = ArenaBounds_NONE,
+    ::flatbuffers::Offset<void> arena_bounds = 0) {
+  auto team_bases__ = team_bases ? _fbb.CreateVector<::flatbuffers::Offset<Flag>>(*team_bases) : 0;
+  auto starting_entities__ = starting_entities ? _fbb.CreateVector<::flatbuffers::Offset<Entity>>(*starting_entities) : 0;
+  return CreateGameStartingParams(
+      _fbb,
+      my_id,
+      seed,
+      team_bases__,
+      starting_entities__,
+      arena_bounds_type,
+      arena_bounds);
+}
+
 struct GameStateDelta FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   typedef GameStateDeltaBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -1294,9 +1519,7 @@ struct GameStateDelta FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
     VT_DEAD_ENTITIES = 12,
     VT_NEW_PROJECTILES = 14,
     VT_DEAD_PROJECTILES = 16,
-    VT_EXPLOSIONS = 18,
-    VT_MY_ID = 20,
-    VT_WINNER_ID = 22
+    VT_EXPLOSIONS = 18
   };
   const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *flag_updates() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *>(VT_FLAG_UPDATES);
@@ -1321,12 +1544,6 @@ struct GameStateDelta FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
   }
   const ::flatbuffers::Vector<::flatbuffers::Offset<Explosion>> *explosions() const {
     return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Explosion>> *>(VT_EXPLOSIONS);
-  }
-  uint8_t my_id() const {
-    return GetField<uint8_t>(VT_MY_ID, 0);
-  }
-  uint8_t winner_id() const {
-    return GetField<uint8_t>(VT_WINNER_ID, 0);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1353,8 +1570,6 @@ struct GameStateDelta FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
            VerifyOffset(verifier, VT_EXPLOSIONS) &&
            verifier.VerifyVector(explosions()) &&
            verifier.VerifyVectorOfTables(explosions()) &&
-           VerifyField<uint8_t>(verifier, VT_MY_ID, 1) &&
-           VerifyField<uint8_t>(verifier, VT_WINNER_ID, 1) &&
            verifier.EndTable();
   }
 };
@@ -1387,12 +1602,6 @@ struct GameStateDeltaBuilder {
   void add_explosions(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Explosion>>> explosions) {
     fbb_.AddOffset(GameStateDelta::VT_EXPLOSIONS, explosions);
   }
-  void add_my_id(uint8_t my_id) {
-    fbb_.AddElement<uint8_t>(GameStateDelta::VT_MY_ID, my_id, 0);
-  }
-  void add_winner_id(uint8_t winner_id) {
-    fbb_.AddElement<uint8_t>(GameStateDelta::VT_WINNER_ID, winner_id, 0);
-  }
   explicit GameStateDeltaBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1413,9 +1622,7 @@ inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDelta(
     ::flatbuffers::Offset<::flatbuffers::Vector<uint64_t>> dead_entities = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Projectile>>> new_projectiles = 0,
     ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<DeadProjectile>>> dead_projectiles = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Explosion>>> explosions = 0,
-    uint8_t my_id = 0,
-    uint8_t winner_id = 0) {
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Explosion>>> explosions = 0) {
   GameStateDeltaBuilder builder_(_fbb);
   builder_.add_explosions(explosions);
   builder_.add_dead_projectiles(dead_projectiles);
@@ -1425,8 +1632,6 @@ inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDelta(
   builder_.add_entity_updates(entity_updates);
   builder_.add_new_entities(new_entities);
   builder_.add_flag_updates(flag_updates);
-  builder_.add_winner_id(winner_id);
-  builder_.add_my_id(my_id);
   return builder_.Finish();
 }
 
@@ -1439,9 +1644,7 @@ inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDeltaDirect(
     const std::vector<uint64_t> *dead_entities = nullptr,
     const std::vector<::flatbuffers::Offset<Projectile>> *new_projectiles = nullptr,
     const std::vector<::flatbuffers::Offset<DeadProjectile>> *dead_projectiles = nullptr,
-    const std::vector<::flatbuffers::Offset<Explosion>> *explosions = nullptr,
-    uint8_t my_id = 0,
-    uint8_t winner_id = 0) {
+    const std::vector<::flatbuffers::Offset<Explosion>> *explosions = nullptr) {
   auto flag_updates__ = flag_updates ? _fbb.CreateVector<::flatbuffers::Offset<Flag>>(*flag_updates) : 0;
   auto new_entities__ = new_entities ? _fbb.CreateVector<::flatbuffers::Offset<Entity>>(*new_entities) : 0;
   auto entity_updates__ = entity_updates ? _fbb.CreateVector<::flatbuffers::Offset<EntityUpdate>>(*entity_updates) : 0;
@@ -1459,8 +1662,83 @@ inline ::flatbuffers::Offset<GameStateDelta> CreateGameStateDeltaDirect(
       dead_entities__,
       new_projectiles__,
       dead_projectiles__,
-      explosions__,
-      my_id,
+      explosions__);
+}
+
+struct CompleteGame FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef CompleteGameBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_START = 4,
+    VT_SNAPSHOTS = 6,
+    VT_WINNER_ID = 8
+  };
+  const GameStartingParams *start() const {
+    return GetPointer<const GameStartingParams *>(VT_START);
+  }
+  const ::flatbuffers::Vector<::flatbuffers::Offset<GameStateDelta>> *snapshots() const {
+    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<GameStateDelta>> *>(VT_SNAPSHOTS);
+  }
+  uint8_t winner_id() const {
+    return GetField<uint8_t>(VT_WINNER_ID, 0);
+  }
+  bool Verify(::flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_START) &&
+           verifier.VerifyTable(start()) &&
+           VerifyOffset(verifier, VT_SNAPSHOTS) &&
+           verifier.VerifyVector(snapshots()) &&
+           verifier.VerifyVectorOfTables(snapshots()) &&
+           VerifyField<uint8_t>(verifier, VT_WINNER_ID, 1) &&
+           verifier.EndTable();
+  }
+};
+
+struct CompleteGameBuilder {
+  typedef CompleteGame Table;
+  ::flatbuffers::FlatBufferBuilder &fbb_;
+  ::flatbuffers::uoffset_t start_;
+  void add_start(::flatbuffers::Offset<GameStartingParams> start) {
+    fbb_.AddOffset(CompleteGame::VT_START, start);
+  }
+  void add_snapshots(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<GameStateDelta>>> snapshots) {
+    fbb_.AddOffset(CompleteGame::VT_SNAPSHOTS, snapshots);
+  }
+  void add_winner_id(uint8_t winner_id) {
+    fbb_.AddElement<uint8_t>(CompleteGame::VT_WINNER_ID, winner_id, 0);
+  }
+  explicit CompleteGameBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  ::flatbuffers::Offset<CompleteGame> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = ::flatbuffers::Offset<CompleteGame>(end);
+    return o;
+  }
+};
+
+inline ::flatbuffers::Offset<CompleteGame> CreateCompleteGame(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<GameStartingParams> start = 0,
+    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<GameStateDelta>>> snapshots = 0,
+    uint8_t winner_id = 0) {
+  CompleteGameBuilder builder_(_fbb);
+  builder_.add_snapshots(snapshots);
+  builder_.add_start(start);
+  builder_.add_winner_id(winner_id);
+  return builder_.Finish();
+}
+
+inline ::flatbuffers::Offset<CompleteGame> CreateCompleteGameDirect(
+    ::flatbuffers::FlatBufferBuilder &_fbb,
+    ::flatbuffers::Offset<GameStartingParams> start = 0,
+    const std::vector<::flatbuffers::Offset<GameStateDelta>> *snapshots = nullptr,
+    uint8_t winner_id = 0) {
+  auto snapshots__ = snapshots ? _fbb.CreateVector<::flatbuffers::Offset<GameStateDelta>>(*snapshots) : 0;
+  return CreateCompleteGame(
+      _fbb,
+      start,
+      snapshots__,
       winner_id);
 }
 
@@ -1515,33 +1793,58 @@ inline ::flatbuffers::Offset<Path> CreatePathDirect(
       waypoints__);
 }
 
-inline const GameStateDelta *GetGameStateDelta(const void *buf) {
-  return ::flatbuffers::GetRoot<GameStateDelta>(buf);
+inline bool VerifyArenaBounds(::flatbuffers::Verifier &verifier, const void *obj, ArenaBounds type) {
+  switch (type) {
+    case ArenaBounds_NONE: {
+      return true;
+    }
+    case ArenaBounds_regular_convex_polygon: {
+      auto ptr = reinterpret_cast<const RegularConvexPolygon *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    default: return true;
+  }
 }
 
-inline const GameStateDelta *GetSizePrefixedGameStateDelta(const void *buf) {
-  return ::flatbuffers::GetSizePrefixedRoot<GameStateDelta>(buf);
+inline bool VerifyArenaBoundsVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<uint8_t> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (::flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifyArenaBounds(
+        verifier,  values->Get(i), types->GetEnum<ArenaBounds>(i))) {
+      return false;
+    }
+  }
+  return true;
 }
 
-inline bool VerifyGameStateDeltaBuffer(
+inline const CompleteGame *GetCompleteGame(const void *buf) {
+  return ::flatbuffers::GetRoot<CompleteGame>(buf);
+}
+
+inline const CompleteGame *GetSizePrefixedCompleteGame(const void *buf) {
+  return ::flatbuffers::GetSizePrefixedRoot<CompleteGame>(buf);
+}
+
+inline bool VerifyCompleteGameBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifyBuffer<GameStateDelta>(nullptr);
+  return verifier.VerifyBuffer<CompleteGame>(nullptr);
 }
 
-inline bool VerifySizePrefixedGameStateDeltaBuffer(
+inline bool VerifySizePrefixedCompleteGameBuffer(
     ::flatbuffers::Verifier &verifier) {
-  return verifier.VerifySizePrefixedBuffer<GameStateDelta>(nullptr);
+  return verifier.VerifySizePrefixedBuffer<CompleteGame>(nullptr);
 }
 
-inline void FinishGameStateDeltaBuffer(
+inline void FinishCompleteGameBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<GameStateDelta> root) {
+    ::flatbuffers::Offset<CompleteGame> root) {
   fbb.Finish(root);
 }
 
-inline void FinishSizePrefixedGameStateDeltaBuffer(
+inline void FinishSizePrefixedCompleteGameBuffer(
     ::flatbuffers::FlatBufferBuilder &fbb,
-    ::flatbuffers::Offset<GameStateDelta> root) {
+    ::flatbuffers::Offset<CompleteGame> root) {
   fbb.FinishSizePrefixed(root);
 }
 
