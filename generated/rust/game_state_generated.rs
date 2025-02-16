@@ -2955,9 +2955,8 @@ impl<'a> GameStartingParams<'a> {
   pub const VT_MY_ID: flatbuffers::VOffsetT = 4;
   pub const VT_RANDOM_SEED: flatbuffers::VOffsetT = 6;
   pub const VT_MEMORY_CAPACITY: flatbuffers::VOffsetT = 8;
-  pub const VT_FLAGS: flatbuffers::VOffsetT = 10;
-  pub const VT_ARENA_BOUNDS_TYPE: flatbuffers::VOffsetT = 12;
-  pub const VT_ARENA_BOUNDS: flatbuffers::VOffsetT = 14;
+  pub const VT_ARENA_BOUNDS_TYPE: flatbuffers::VOffsetT = 10;
+  pub const VT_ARENA_BOUNDS: flatbuffers::VOffsetT = 12;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -2966,13 +2965,12 @@ impl<'a> GameStartingParams<'a> {
   #[allow(unused_mut)]
   pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
     _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
-    args: &'args GameStartingParamsArgs<'args>
+    args: &'args GameStartingParamsArgs
   ) -> flatbuffers::WIPOffset<GameStartingParams<'bldr>> {
     let mut builder = GameStartingParamsBuilder::new(_fbb);
     builder.add_memory_capacity(args.memory_capacity);
     builder.add_random_seed(args.random_seed);
     if let Some(x) = args.arena_bounds { builder.add_arena_bounds(x); }
-    if let Some(x) = args.flags { builder.add_flags(x); }
     builder.add_arena_bounds_type(args.arena_bounds_type);
     builder.add_my_id(args.my_id);
     builder.finish()
@@ -2999,13 +2997,6 @@ impl<'a> GameStartingParams<'a> {
     // Created from valid Table for this object
     // which contains a valid value in this slot
     unsafe { self._tab.get::<u64>(GameStartingParams::VT_MEMORY_CAPACITY, Some(0)).unwrap()}
-  }
-  #[inline]
-  pub fn flags(&self) -> Option<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag<'a>>>> {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag>>>>(GameStartingParams::VT_FLAGS, None)}
   }
   #[inline]
   pub fn arena_bounds_type(&self) -> ArenaBounds {
@@ -3048,7 +3039,6 @@ impl flatbuffers::Verifiable for GameStartingParams<'_> {
      .visit_field::<u8>("my_id", Self::VT_MY_ID, false)?
      .visit_field::<u64>("random_seed", Self::VT_RANDOM_SEED, false)?
      .visit_field::<u64>("memory_capacity", Self::VT_MEMORY_CAPACITY, false)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Flag>>>>("flags", Self::VT_FLAGS, false)?
      .visit_union::<ArenaBounds, _>("arena_bounds_type", Self::VT_ARENA_BOUNDS_TYPE, "arena_bounds", Self::VT_ARENA_BOUNDS, false, |key, v, pos| {
         match key {
           ArenaBounds::regular_convex_polygon => v.verify_union_variant::<flatbuffers::ForwardsUOffset<RegularConvexPolygon>>("ArenaBounds::regular_convex_polygon", pos),
@@ -3059,22 +3049,20 @@ impl flatbuffers::Verifiable for GameStartingParams<'_> {
     Ok(())
   }
 }
-pub struct GameStartingParamsArgs<'a> {
+pub struct GameStartingParamsArgs {
     pub my_id: u8,
     pub random_seed: u64,
     pub memory_capacity: u64,
-    pub flags: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Flag<'a>>>>>,
     pub arena_bounds_type: ArenaBounds,
     pub arena_bounds: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
 }
-impl<'a> Default for GameStartingParamsArgs<'a> {
+impl<'a> Default for GameStartingParamsArgs {
   #[inline]
   fn default() -> Self {
     GameStartingParamsArgs {
       my_id: 0,
       random_seed: 0,
       memory_capacity: 0,
-      flags: None,
       arena_bounds_type: ArenaBounds::NONE,
       arena_bounds: None,
     }
@@ -3097,10 +3085,6 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GameStartingParamsBuilder<'a, '
   #[inline]
   pub fn add_memory_capacity(&mut self, memory_capacity: u64) {
     self.fbb_.push_slot::<u64>(GameStartingParams::VT_MEMORY_CAPACITY, memory_capacity, 0);
-  }
-  #[inline]
-  pub fn add_flags(&mut self, flags: flatbuffers::WIPOffset<flatbuffers::Vector<'b , flatbuffers::ForwardsUOffset<Flag<'b >>>>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStartingParams::VT_FLAGS, flags);
   }
   #[inline]
   pub fn add_arena_bounds_type(&mut self, arena_bounds_type: ArenaBounds) {
@@ -3131,7 +3115,6 @@ impl core::fmt::Debug for GameStartingParams<'_> {
       ds.field("my_id", &self.my_id());
       ds.field("random_seed", &self.random_seed());
       ds.field("memory_capacity", &self.memory_capacity());
-      ds.field("flags", &self.flags());
       ds.field("arena_bounds_type", &self.arena_bounds_type());
       match self.arena_bounds_type() {
         ArenaBounds::regular_convex_polygon => {

@@ -1831,28 +1831,8 @@ func (rcv *GameStartingParams) MutateMemoryCapacity(n uint64) bool {
 	return rcv._tab.MutateUint64Slot(8, n)
 }
 
-func (rcv *GameStartingParams) Flags(obj *Flag, j int) bool {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
-	if o != 0 {
-		x := rcv._tab.Vector(o)
-		x += flatbuffers.UOffsetT(j) * 4
-		x = rcv._tab.Indirect(x)
-		obj.Init(rcv._tab.Bytes, x)
-		return true
-	}
-	return false
-}
-
-func (rcv *GameStartingParams) FlagsLength() int {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
-	if o != 0 {
-		return rcv._tab.VectorLen(o)
-	}
-	return 0
-}
-
 func (rcv *GameStartingParams) ArenaBoundsType() ArenaBounds {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(10))
 	if o != 0 {
 		return ArenaBounds(rcv._tab.GetByte(o + rcv._tab.Pos))
 	}
@@ -1860,11 +1840,11 @@ func (rcv *GameStartingParams) ArenaBoundsType() ArenaBounds {
 }
 
 func (rcv *GameStartingParams) MutateArenaBoundsType(n ArenaBounds) bool {
-	return rcv._tab.MutateByteSlot(12, byte(n))
+	return rcv._tab.MutateByteSlot(10, byte(n))
 }
 
 func (rcv *GameStartingParams) ArenaBounds(obj *flatbuffers.Table) bool {
-	o := flatbuffers.UOffsetT(rcv._tab.Offset(14))
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(12))
 	if o != 0 {
 		rcv._tab.Union(obj, o)
 		return true
@@ -1873,7 +1853,7 @@ func (rcv *GameStartingParams) ArenaBounds(obj *flatbuffers.Table) bool {
 }
 
 func GameStartingParamsStart(builder *flatbuffers.Builder) {
-	builder.StartObject(6)
+	builder.StartObject(5)
 }
 func GameStartingParamsAddMyId(builder *flatbuffers.Builder, myId byte) {
 	builder.PrependByteSlot(0, myId, 0)
@@ -1884,17 +1864,11 @@ func GameStartingParamsAddRandomSeed(builder *flatbuffers.Builder, randomSeed ui
 func GameStartingParamsAddMemoryCapacity(builder *flatbuffers.Builder, memoryCapacity uint64) {
 	builder.PrependUint64Slot(2, memoryCapacity, 0)
 }
-func GameStartingParamsAddFlags(builder *flatbuffers.Builder, flags flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(3, flatbuffers.UOffsetT(flags), 0)
-}
-func GameStartingParamsStartFlagsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
-	return builder.StartVector(4, numElems, 4)
-}
 func GameStartingParamsAddArenaBoundsType(builder *flatbuffers.Builder, arenaBoundsType ArenaBounds) {
-	builder.PrependByteSlot(4, byte(arenaBoundsType), 0)
+	builder.PrependByteSlot(3, byte(arenaBoundsType), 0)
 }
 func GameStartingParamsAddArenaBounds(builder *flatbuffers.Builder, arenaBounds flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(5, flatbuffers.UOffsetT(arenaBounds), 0)
+	builder.PrependUOffsetTSlot(4, flatbuffers.UOffsetT(arenaBounds), 0)
 }
 func GameStartingParamsEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()

@@ -1391,9 +1391,8 @@ struct GameStartingParams FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
     VT_MY_ID = 4,
     VT_RANDOM_SEED = 6,
     VT_MEMORY_CAPACITY = 8,
-    VT_FLAGS = 10,
-    VT_ARENA_BOUNDS_TYPE = 12,
-    VT_ARENA_BOUNDS = 14
+    VT_ARENA_BOUNDS_TYPE = 10,
+    VT_ARENA_BOUNDS = 12
   };
   uint8_t my_id() const {
     return GetField<uint8_t>(VT_MY_ID, 0);
@@ -1403,9 +1402,6 @@ struct GameStartingParams FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   }
   uint64_t memory_capacity() const {
     return GetField<uint64_t>(VT_MEMORY_CAPACITY, 0);
-  }
-  const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *flags() const {
-    return GetPointer<const ::flatbuffers::Vector<::flatbuffers::Offset<Flag>> *>(VT_FLAGS);
   }
   ArenaBounds arena_bounds_type() const {
     return static_cast<ArenaBounds>(GetField<uint8_t>(VT_ARENA_BOUNDS_TYPE, 0));
@@ -1422,9 +1418,6 @@ struct GameStartingParams FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
            VerifyField<uint8_t>(verifier, VT_MY_ID, 1) &&
            VerifyField<uint64_t>(verifier, VT_RANDOM_SEED, 8) &&
            VerifyField<uint64_t>(verifier, VT_MEMORY_CAPACITY, 8) &&
-           VerifyOffset(verifier, VT_FLAGS) &&
-           verifier.VerifyVector(flags()) &&
-           verifier.VerifyVectorOfTables(flags()) &&
            VerifyField<uint8_t>(verifier, VT_ARENA_BOUNDS_TYPE, 1) &&
            VerifyOffset(verifier, VT_ARENA_BOUNDS) &&
            VerifyArenaBounds(verifier, arena_bounds(), arena_bounds_type()) &&
@@ -1449,9 +1442,6 @@ struct GameStartingParamsBuilder {
   void add_memory_capacity(uint64_t memory_capacity) {
     fbb_.AddElement<uint64_t>(GameStartingParams::VT_MEMORY_CAPACITY, memory_capacity, 0);
   }
-  void add_flags(::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Flag>>> flags) {
-    fbb_.AddOffset(GameStartingParams::VT_FLAGS, flags);
-  }
   void add_arena_bounds_type(ArenaBounds arena_bounds_type) {
     fbb_.AddElement<uint8_t>(GameStartingParams::VT_ARENA_BOUNDS_TYPE, static_cast<uint8_t>(arena_bounds_type), 0);
   }
@@ -1474,36 +1464,15 @@ inline ::flatbuffers::Offset<GameStartingParams> CreateGameStartingParams(
     uint8_t my_id = 0,
     uint64_t random_seed = 0,
     uint64_t memory_capacity = 0,
-    ::flatbuffers::Offset<::flatbuffers::Vector<::flatbuffers::Offset<Flag>>> flags = 0,
     ArenaBounds arena_bounds_type = ArenaBounds_NONE,
     ::flatbuffers::Offset<void> arena_bounds = 0) {
   GameStartingParamsBuilder builder_(_fbb);
   builder_.add_memory_capacity(memory_capacity);
   builder_.add_random_seed(random_seed);
   builder_.add_arena_bounds(arena_bounds);
-  builder_.add_flags(flags);
   builder_.add_arena_bounds_type(arena_bounds_type);
   builder_.add_my_id(my_id);
   return builder_.Finish();
-}
-
-inline ::flatbuffers::Offset<GameStartingParams> CreateGameStartingParamsDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    uint8_t my_id = 0,
-    uint64_t random_seed = 0,
-    uint64_t memory_capacity = 0,
-    const std::vector<::flatbuffers::Offset<Flag>> *flags = nullptr,
-    ArenaBounds arena_bounds_type = ArenaBounds_NONE,
-    ::flatbuffers::Offset<void> arena_bounds = 0) {
-  auto flags__ = flags ? _fbb.CreateVector<::flatbuffers::Offset<Flag>>(*flags) : 0;
-  return CreateGameStartingParams(
-      _fbb,
-      my_id,
-      random_seed,
-      memory_capacity,
-      flags__,
-      arena_bounds_type,
-      arena_bounds);
 }
 
 struct GameStateDelta FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {

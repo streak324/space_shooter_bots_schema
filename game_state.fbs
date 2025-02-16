@@ -139,7 +139,6 @@ table GameStartingParams {
 	my_id: uint8;
 	random_seed: uint64;
 	memory_capacity: uint64;
-	flags: [Flag];
 	arena_bounds: ArenaBounds;
 }
 
