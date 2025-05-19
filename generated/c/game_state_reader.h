@@ -679,6 +679,7 @@ __flatbuffers_define_scalar_field(0, GameStartingParams, my_id, flatbuffers_uint
 __flatbuffers_define_scalar_field(1, GameStartingParams, random_seed, flatbuffers_uint64, uint64_t, UINT64_C(0))
 __flatbuffers_define_scalar_field(2, GameStartingParams, memory_capacity, flatbuffers_uint64, uint64_t, UINT64_C(0))
 __flatbuffers_define_union_field(flatbuffers_, 4, GameStartingParams, arena_bounds, ArenaBounds, 0)
+__flatbuffers_define_scalar_field(5, GameStartingParams, fuel_per_step, flatbuffers_uint64, uint64_t, UINT64_C(0))
 
 struct GameStateDelta_table { uint8_t unused__; };
 

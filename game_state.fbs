@@ -140,6 +140,7 @@ table GameStartingParams {
 	random_seed: uint64;
 	memory_capacity: uint64;
 	arena_bounds: ArenaBounds;
+	fuel_per_step: uint64; // how many wasm instructions can be executed for each step(). read more here: https://docs.wasmtime.dev/api/wasmtime/struct.Store.html#method.set_fuel
 }
 
 table GameStateDelta {

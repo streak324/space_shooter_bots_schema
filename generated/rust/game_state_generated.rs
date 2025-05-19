@@ -2957,6 +2957,7 @@ impl<'a> GameStartingParams<'a> {
   pub const VT_MEMORY_CAPACITY: flatbuffers::VOffsetT = 8;
   pub const VT_ARENA_BOUNDS_TYPE: flatbuffers::VOffsetT = 10;
   pub const VT_ARENA_BOUNDS: flatbuffers::VOffsetT = 12;
+  pub const VT_FUEL_PER_STEP: flatbuffers::VOffsetT = 14;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -2968,6 +2969,7 @@ impl<'a> GameStartingParams<'a> {
     args: &'args GameStartingParamsArgs
   ) -> flatbuffers::WIPOffset<GameStartingParams<'bldr>> {
     let mut builder = GameStartingParamsBuilder::new(_fbb);
+    builder.add_fuel_per_step(args.fuel_per_step);
     builder.add_memory_capacity(args.memory_capacity);
     builder.add_random_seed(args.random_seed);
     if let Some(x) = args.arena_bounds { builder.add_arena_bounds(x); }
@@ -3013,6 +3015,13 @@ impl<'a> GameStartingParams<'a> {
     unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Table<'a>>>(GameStartingParams::VT_ARENA_BOUNDS, None)}
   }
   #[inline]
+  pub fn fuel_per_step(&self) -> u64 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u64>(GameStartingParams::VT_FUEL_PER_STEP, Some(0)).unwrap()}
+  }
+  #[inline]
   #[allow(non_snake_case)]
   pub fn arena_bounds_as_regular_convex_polygon(&self) -> Option<RegularConvexPolygon<'a>> {
     if self.arena_bounds_type() == ArenaBounds::regular_convex_polygon {
@@ -3045,6 +3054,7 @@ impl flatbuffers::Verifiable for GameStartingParams<'_> {
           _ => Ok(()),
         }
      })?
+     .visit_field::<u64>("fuel_per_step", Self::VT_FUEL_PER_STEP, false)?
      .finish();
     Ok(())
   }
@@ -3055,6 +3065,7 @@ pub struct GameStartingParamsArgs {
     pub memory_capacity: u64,
     pub arena_bounds_type: ArenaBounds,
     pub arena_bounds: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
+    pub fuel_per_step: u64,
 }
 impl<'a> Default for GameStartingParamsArgs {
   #[inline]
@@ -3065,6 +3076,7 @@ impl<'a> Default for GameStartingParamsArgs {
       memory_capacity: 0,
       arena_bounds_type: ArenaBounds::NONE,
       arena_bounds: None,
+      fuel_per_step: 0,
     }
   }
 }
@@ -3093,6 +3105,10 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GameStartingParamsBuilder<'a, '
   #[inline]
   pub fn add_arena_bounds(&mut self, arena_bounds: flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>) {
     self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStartingParams::VT_ARENA_BOUNDS, arena_bounds);
+  }
+  #[inline]
+  pub fn add_fuel_per_step(&mut self, fuel_per_step: u64) {
+    self.fbb_.push_slot::<u64>(GameStartingParams::VT_FUEL_PER_STEP, fuel_per_step, 0);
   }
   #[inline]
   pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> GameStartingParamsBuilder<'a, 'b, A> {
@@ -3129,6 +3145,7 @@ impl core::fmt::Debug for GameStartingParams<'_> {
           ds.field("arena_bounds", &x)
         },
       };
+      ds.field("fuel_per_step", &self.fuel_per_step());
       ds.finish()
   }
 }

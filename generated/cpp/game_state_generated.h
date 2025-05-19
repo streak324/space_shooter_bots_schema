@@ -1392,7 +1392,8 @@ struct GameStartingParams FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
     VT_RANDOM_SEED = 6,
     VT_MEMORY_CAPACITY = 8,
     VT_ARENA_BOUNDS_TYPE = 10,
-    VT_ARENA_BOUNDS = 12
+    VT_ARENA_BOUNDS = 12,
+    VT_FUEL_PER_STEP = 14
   };
   uint8_t my_id() const {
     return GetField<uint8_t>(VT_MY_ID, 0);
@@ -1413,6 +1414,9 @@ struct GameStartingParams FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
   const RegularConvexPolygon *arena_bounds_as_regular_convex_polygon() const {
     return arena_bounds_type() == ArenaBounds_regular_convex_polygon ? static_cast<const RegularConvexPolygon *>(arena_bounds()) : nullptr;
   }
+  uint64_t fuel_per_step() const {
+    return GetField<uint64_t>(VT_FUEL_PER_STEP, 0);
+  }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_MY_ID, 1) &&
@@ -1421,6 +1425,7 @@ struct GameStartingParams FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table
            VerifyField<uint8_t>(verifier, VT_ARENA_BOUNDS_TYPE, 1) &&
            VerifyOffset(verifier, VT_ARENA_BOUNDS) &&
            VerifyArenaBounds(verifier, arena_bounds(), arena_bounds_type()) &&
+           VerifyField<uint64_t>(verifier, VT_FUEL_PER_STEP, 8) &&
            verifier.EndTable();
   }
 };
@@ -1448,6 +1453,9 @@ struct GameStartingParamsBuilder {
   void add_arena_bounds(::flatbuffers::Offset<void> arena_bounds) {
     fbb_.AddOffset(GameStartingParams::VT_ARENA_BOUNDS, arena_bounds);
   }
+  void add_fuel_per_step(uint64_t fuel_per_step) {
+    fbb_.AddElement<uint64_t>(GameStartingParams::VT_FUEL_PER_STEP, fuel_per_step, 0);
+  }
   explicit GameStartingParamsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1465,8 +1473,10 @@ inline ::flatbuffers::Offset<GameStartingParams> CreateGameStartingParams(
     uint64_t random_seed = 0,
     uint64_t memory_capacity = 0,
     ArenaBounds arena_bounds_type = ArenaBounds_NONE,
-    ::flatbuffers::Offset<void> arena_bounds = 0) {
+    ::flatbuffers::Offset<void> arena_bounds = 0,
+    uint64_t fuel_per_step = 0) {
   GameStartingParamsBuilder builder_(_fbb);
+  builder_.add_fuel_per_step(fuel_per_step);
   builder_.add_memory_capacity(memory_capacity);
   builder_.add_random_seed(random_seed);
   builder_.add_arena_bounds(arena_bounds);

@@ -1852,8 +1852,20 @@ func (rcv *GameStartingParams) ArenaBounds(obj *flatbuffers.Table) bool {
 	return false
 }
 
+func (rcv *GameStartingParams) FuelPerStep() uint64 {
+	o := flatbuffers.UOffsetT(rcv._tab.Offset(14))
+	if o != 0 {
+		return rcv._tab.GetUint64(o + rcv._tab.Pos)
+	}
+	return 0
+}
+
+func (rcv *GameStartingParams) MutateFuelPerStep(n uint64) bool {
+	return rcv._tab.MutateUint64Slot(14, n)
+}
+
 func GameStartingParamsStart(builder *flatbuffers.Builder) {
-	builder.StartObject(5)
+	builder.StartObject(6)
 }
 func GameStartingParamsAddMyId(builder *flatbuffers.Builder, myId byte) {
 	builder.PrependByteSlot(0, myId, 0)
@@ -1869,6 +1881,9 @@ func GameStartingParamsAddArenaBoundsType(builder *flatbuffers.Builder, arenaBou
 }
 func GameStartingParamsAddArenaBounds(builder *flatbuffers.Builder, arenaBounds flatbuffers.UOffsetT) {
 	builder.PrependUOffsetTSlot(4, flatbuffers.UOffsetT(arenaBounds), 0)
+}
+func GameStartingParamsAddFuelPerStep(builder *flatbuffers.Builder, fuelPerStep uint64) {
+	builder.PrependUint64Slot(5, fuelPerStep, 0)
 }
 func GameStartingParamsEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
