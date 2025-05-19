@@ -9,6 +9,93 @@ use core::cmp::Ordering;
 extern crate flatbuffers;
 use self::flatbuffers::{EndianScalar, Follow};
 
+#[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
+pub const ENUM_MIN_ARENA_BOUNDS: u8 = 0;
+#[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
+pub const ENUM_MAX_ARENA_BOUNDS: u8 = 1;
+#[deprecated(since = "2.0.0", note = "Use associated constants instead. This will no longer be generated in 2021.")]
+#[allow(non_camel_case_types)]
+pub const ENUM_VALUES_ARENA_BOUNDS: [ArenaBounds; 2] = [
+  ArenaBounds::NONE,
+  ArenaBounds::regular_convex_polygon,
+];
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+#[repr(transparent)]
+pub struct ArenaBounds(pub u8);
+#[allow(non_upper_case_globals)]
+impl ArenaBounds {
+  pub const NONE: Self = Self(0);
+  pub const regular_convex_polygon: Self = Self(1);
+
+  pub const ENUM_MIN: u8 = 0;
+  pub const ENUM_MAX: u8 = 1;
+  pub const ENUM_VALUES: &'static [Self] = &[
+    Self::NONE,
+    Self::regular_convex_polygon,
+  ];
+  /// Returns the variant's name or "" if unknown.
+  pub fn variant_name(self) -> Option<&'static str> {
+    match self {
+      Self::NONE => Some("NONE"),
+      Self::regular_convex_polygon => Some("regular_convex_polygon"),
+      _ => None,
+    }
+  }
+}
+impl core::fmt::Debug for ArenaBounds {
+  fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    if let Some(name) = self.variant_name() {
+      f.write_str(name)
+    } else {
+      f.write_fmt(format_args!("<UNKNOWN {:?}>", self.0))
+    }
+  }
+}
+impl<'a> flatbuffers::Follow<'a> for ArenaBounds {
+  type Inner = Self;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    let b = flatbuffers::read_scalar_at::<u8>(buf, loc);
+    Self(b)
+  }
+}
+
+impl flatbuffers::Push for ArenaBounds {
+    type Output = ArenaBounds;
+    #[inline]
+    unsafe fn push(&self, dst: &mut [u8], _written_len: usize) {
+        flatbuffers::emplace_scalar::<u8>(dst, self.0);
+    }
+}
+
+impl flatbuffers::EndianScalar for ArenaBounds {
+  type Scalar = u8;
+  #[inline]
+  fn to_little_endian(self) -> u8 {
+    self.0.to_le()
+  }
+  #[inline]
+  #[allow(clippy::wrong_self_convention)]
+  fn from_little_endian(v: u8) -> Self {
+    let b = u8::from_le(v);
+    Self(b)
+  }
+}
+
+impl<'a> flatbuffers::Verifiable for ArenaBounds {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    u8::run_verifier(v, pos)
+  }
+}
+
+impl flatbuffers::SimpleToVerifyInSlice for ArenaBounds {}
+pub struct ArenaBoundsUnionTableOffset {}
+
 // struct Vec2, aligned to 4
 #[repr(transparent)]
 #[derive(Clone, Copy, PartialEq)]
@@ -1609,7 +1696,7 @@ impl<'a> flatbuffers::Follow<'a> for Entity<'a> {
 
 impl<'a> Entity<'a> {
   pub const VT_ID: flatbuffers::VOffsetT = 4;
-  pub const VT_OWNER: flatbuffers::VOffsetT = 6;
+  pub const VT_OWNER_ID: flatbuffers::VOffsetT = 6;
   pub const VT_IS_COMMANDABLE: flatbuffers::VOffsetT = 8;
   pub const VT_POSITION: flatbuffers::VOffsetT = 10;
   pub const VT_LINEAR_VELOCITY: flatbuffers::VOffsetT = 12;
@@ -1634,7 +1721,7 @@ impl<'a> Entity<'a> {
     if let Some(x) = args.linear_velocity { builder.add_linear_velocity(x); }
     if let Some(x) = args.position { builder.add_position(x); }
     builder.add_is_commandable(args.is_commandable);
-    builder.add_owner(args.owner);
+    builder.add_owner_id(args.owner_id);
     builder.finish()
   }
 
@@ -1647,11 +1734,11 @@ impl<'a> Entity<'a> {
     unsafe { self._tab.get::<u64>(Entity::VT_ID, Some(0)).unwrap()}
   }
   #[inline]
-  pub fn owner(&self) -> u8 {
+  pub fn owner_id(&self) -> u8 {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<u8>(Entity::VT_OWNER, Some(0)).unwrap()}
+    unsafe { self._tab.get::<u8>(Entity::VT_OWNER_ID, Some(0)).unwrap()}
   }
   #[inline]
   pub fn is_commandable(&self) -> bool {
@@ -1705,7 +1792,7 @@ impl flatbuffers::Verifiable for Entity<'_> {
     use self::flatbuffers::Verifiable;
     v.visit_table(pos)?
      .visit_field::<u64>("id", Self::VT_ID, false)?
-     .visit_field::<u8>("owner", Self::VT_OWNER, false)?
+     .visit_field::<u8>("owner_id", Self::VT_OWNER_ID, false)?
      .visit_field::<bool>("is_commandable", Self::VT_IS_COMMANDABLE, false)?
      .visit_field::<Vec2>("position", Self::VT_POSITION, false)?
      .visit_field::<Vec2>("linear_velocity", Self::VT_LINEAR_VELOCITY, false)?
@@ -1718,7 +1805,7 @@ impl flatbuffers::Verifiable for Entity<'_> {
 }
 pub struct EntityArgs<'a> {
     pub id: u64,
-    pub owner: u8,
+    pub owner_id: u8,
     pub is_commandable: bool,
     pub position: Option<&'a Vec2>,
     pub linear_velocity: Option<&'a Vec2>,
@@ -1731,7 +1818,7 @@ impl<'a> Default for EntityArgs<'a> {
   fn default() -> Self {
     EntityArgs {
       id: 0,
-      owner: 0,
+      owner_id: 0,
       is_commandable: false,
       position: None,
       linear_velocity: None,
@@ -1752,8 +1839,8 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> EntityBuilder<'a, 'b, A> {
     self.fbb_.push_slot::<u64>(Entity::VT_ID, id, 0);
   }
   #[inline]
-  pub fn add_owner(&mut self, owner: u8) {
-    self.fbb_.push_slot::<u8>(Entity::VT_OWNER, owner, 0);
+  pub fn add_owner_id(&mut self, owner_id: u8) {
+    self.fbb_.push_slot::<u8>(Entity::VT_OWNER_ID, owner_id, 0);
   }
   #[inline]
   pub fn add_is_commandable(&mut self, is_commandable: bool) {
@@ -1798,7 +1885,7 @@ impl core::fmt::Debug for Entity<'_> {
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ds = f.debug_struct("Entity");
       ds.field("id", &self.id());
-      ds.field("owner", &self.owner());
+      ds.field("owner_id", &self.owner_id());
       ds.field("is_commandable", &self.is_commandable());
       ds.field("position", &self.position());
       ds.field("linear_velocity", &self.linear_velocity());
@@ -1825,7 +1912,7 @@ impl<'a> flatbuffers::Follow<'a> for Projectile<'a> {
 
 impl<'a> Projectile<'a> {
   pub const VT_ID: flatbuffers::VOffsetT = 4;
-  pub const VT_OWNER: flatbuffers::VOffsetT = 6;
+  pub const VT_OWNER_ID: flatbuffers::VOffsetT = 6;
   pub const VT_POSITION: flatbuffers::VOffsetT = 8;
   pub const VT_LINEAR_VELOCITY: flatbuffers::VOffsetT = 10;
   pub const VT_DAMAGE: flatbuffers::VOffsetT = 12;
@@ -1848,7 +1935,7 @@ impl<'a> Projectile<'a> {
     builder.add_damage(args.damage);
     if let Some(x) = args.linear_velocity { builder.add_linear_velocity(x); }
     if let Some(x) = args.position { builder.add_position(x); }
-    builder.add_owner(args.owner);
+    builder.add_owner_id(args.owner_id);
     builder.finish()
   }
 
@@ -1861,11 +1948,11 @@ impl<'a> Projectile<'a> {
     unsafe { self._tab.get::<u64>(Projectile::VT_ID, Some(0)).unwrap()}
   }
   #[inline]
-  pub fn owner(&self) -> u8 {
+  pub fn owner_id(&self) -> u8 {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<u8>(Projectile::VT_OWNER, Some(0)).unwrap()}
+    unsafe { self._tab.get::<u8>(Projectile::VT_OWNER_ID, Some(0)).unwrap()}
   }
   #[inline]
   pub fn position(&self) -> Option<&'a Vec2> {
@@ -1912,7 +1999,7 @@ impl flatbuffers::Verifiable for Projectile<'_> {
     use self::flatbuffers::Verifiable;
     v.visit_table(pos)?
      .visit_field::<u64>("id", Self::VT_ID, false)?
-     .visit_field::<u8>("owner", Self::VT_OWNER, false)?
+     .visit_field::<u8>("owner_id", Self::VT_OWNER_ID, false)?
      .visit_field::<Vec2>("position", Self::VT_POSITION, false)?
      .visit_field::<Vec2>("linear_velocity", Self::VT_LINEAR_VELOCITY, false)?
      .visit_field::<f32>("damage", Self::VT_DAMAGE, false)?
@@ -1924,7 +2011,7 @@ impl flatbuffers::Verifiable for Projectile<'_> {
 }
 pub struct ProjectileArgs<'a> {
     pub id: u64,
-    pub owner: u8,
+    pub owner_id: u8,
     pub position: Option<&'a Vec2>,
     pub linear_velocity: Option<&'a Vec2>,
     pub damage: f32,
@@ -1936,7 +2023,7 @@ impl<'a> Default for ProjectileArgs<'a> {
   fn default() -> Self {
     ProjectileArgs {
       id: 0,
-      owner: 0,
+      owner_id: 0,
       position: None,
       linear_velocity: None,
       damage: 0.0,
@@ -1956,8 +2043,8 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> ProjectileBuilder<'a, 'b, A> {
     self.fbb_.push_slot::<u64>(Projectile::VT_ID, id, 0);
   }
   #[inline]
-  pub fn add_owner(&mut self, owner: u8) {
-    self.fbb_.push_slot::<u8>(Projectile::VT_OWNER, owner, 0);
+  pub fn add_owner_id(&mut self, owner_id: u8) {
+    self.fbb_.push_slot::<u8>(Projectile::VT_OWNER_ID, owner_id, 0);
   }
   #[inline]
   pub fn add_position(&mut self, position: &Vec2) {
@@ -1998,7 +2085,7 @@ impl core::fmt::Debug for Projectile<'_> {
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
     let mut ds = f.debug_struct("Projectile");
       ds.field("id", &self.id());
-      ds.field("owner", &self.owner());
+      ds.field("owner_id", &self.owner_id());
       ds.field("position", &self.position());
       ds.field("linear_velocity", &self.linear_velocity());
       ds.field("damage", &self.damage());
@@ -2735,6 +2822,333 @@ impl core::fmt::Debug for SingleBlockEntityUpdate<'_> {
       ds.finish()
   }
 }
+pub enum RegularConvexPolygonOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct RegularConvexPolygon<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for RegularConvexPolygon<'a> {
+  type Inner = RegularConvexPolygon<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> RegularConvexPolygon<'a> {
+  pub const VT_RADIUS: flatbuffers::VOffsetT = 4;
+  pub const VT_NUM_SIDES: flatbuffers::VOffsetT = 6;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    RegularConvexPolygon { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+    args: &'args RegularConvexPolygonArgs
+  ) -> flatbuffers::WIPOffset<RegularConvexPolygon<'bldr>> {
+    let mut builder = RegularConvexPolygonBuilder::new(_fbb);
+    builder.add_num_sides(args.num_sides);
+    builder.add_radius(args.radius);
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn radius(&self) -> f32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<f32>(RegularConvexPolygon::VT_RADIUS, Some(0.0)).unwrap()}
+  }
+  #[inline]
+  pub fn num_sides(&self) -> u32 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u32>(RegularConvexPolygon::VT_NUM_SIDES, Some(0)).unwrap()}
+  }
+}
+
+impl flatbuffers::Verifiable for RegularConvexPolygon<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<f32>("radius", Self::VT_RADIUS, false)?
+     .visit_field::<u32>("num_sides", Self::VT_NUM_SIDES, false)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct RegularConvexPolygonArgs {
+    pub radius: f32,
+    pub num_sides: u32,
+}
+impl<'a> Default for RegularConvexPolygonArgs {
+  #[inline]
+  fn default() -> Self {
+    RegularConvexPolygonArgs {
+      radius: 0.0,
+      num_sides: 0,
+    }
+  }
+}
+
+pub struct RegularConvexPolygonBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> RegularConvexPolygonBuilder<'a, 'b, A> {
+  #[inline]
+  pub fn add_radius(&mut self, radius: f32) {
+    self.fbb_.push_slot::<f32>(RegularConvexPolygon::VT_RADIUS, radius, 0.0);
+  }
+  #[inline]
+  pub fn add_num_sides(&mut self, num_sides: u32) {
+    self.fbb_.push_slot::<u32>(RegularConvexPolygon::VT_NUM_SIDES, num_sides, 0);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> RegularConvexPolygonBuilder<'a, 'b, A> {
+    let start = _fbb.start_table();
+    RegularConvexPolygonBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<RegularConvexPolygon<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for RegularConvexPolygon<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("RegularConvexPolygon");
+      ds.field("radius", &self.radius());
+      ds.field("num_sides", &self.num_sides());
+      ds.finish()
+  }
+}
+pub enum GameStartingParamsOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct GameStartingParams<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for GameStartingParams<'a> {
+  type Inner = GameStartingParams<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> GameStartingParams<'a> {
+  pub const VT_MY_ID: flatbuffers::VOffsetT = 4;
+  pub const VT_RANDOM_SEED: flatbuffers::VOffsetT = 6;
+  pub const VT_MEMORY_CAPACITY: flatbuffers::VOffsetT = 8;
+  pub const VT_ARENA_BOUNDS_TYPE: flatbuffers::VOffsetT = 10;
+  pub const VT_ARENA_BOUNDS: flatbuffers::VOffsetT = 12;
+  pub const VT_FUEL_PER_STEP: flatbuffers::VOffsetT = 14;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    GameStartingParams { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+    args: &'args GameStartingParamsArgs
+  ) -> flatbuffers::WIPOffset<GameStartingParams<'bldr>> {
+    let mut builder = GameStartingParamsBuilder::new(_fbb);
+    builder.add_fuel_per_step(args.fuel_per_step);
+    builder.add_memory_capacity(args.memory_capacity);
+    builder.add_random_seed(args.random_seed);
+    if let Some(x) = args.arena_bounds { builder.add_arena_bounds(x); }
+    builder.add_arena_bounds_type(args.arena_bounds_type);
+    builder.add_my_id(args.my_id);
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn my_id(&self) -> u8 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u8>(GameStartingParams::VT_MY_ID, Some(0)).unwrap()}
+  }
+  #[inline]
+  pub fn random_seed(&self) -> u64 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u64>(GameStartingParams::VT_RANDOM_SEED, Some(0)).unwrap()}
+  }
+  #[inline]
+  pub fn memory_capacity(&self) -> u64 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u64>(GameStartingParams::VT_MEMORY_CAPACITY, Some(0)).unwrap()}
+  }
+  #[inline]
+  pub fn arena_bounds_type(&self) -> ArenaBounds {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<ArenaBounds>(GameStartingParams::VT_ARENA_BOUNDS_TYPE, Some(ArenaBounds::NONE)).unwrap()}
+  }
+  #[inline]
+  pub fn arena_bounds(&self) -> Option<flatbuffers::Table<'a>> {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Table<'a>>>(GameStartingParams::VT_ARENA_BOUNDS, None)}
+  }
+  #[inline]
+  pub fn fuel_per_step(&self) -> u64 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u64>(GameStartingParams::VT_FUEL_PER_STEP, Some(0)).unwrap()}
+  }
+  #[inline]
+  #[allow(non_snake_case)]
+  pub fn arena_bounds_as_regular_convex_polygon(&self) -> Option<RegularConvexPolygon<'a>> {
+    if self.arena_bounds_type() == ArenaBounds::regular_convex_polygon {
+      self.arena_bounds().map(|t| {
+       // Safety:
+       // Created from a valid Table for this object
+       // Which contains a valid union in this slot
+       unsafe { RegularConvexPolygon::init_from_table(t) }
+     })
+    } else {
+      None
+    }
+  }
+
+}
+
+impl flatbuffers::Verifiable for GameStartingParams<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<u8>("my_id", Self::VT_MY_ID, false)?
+     .visit_field::<u64>("random_seed", Self::VT_RANDOM_SEED, false)?
+     .visit_field::<u64>("memory_capacity", Self::VT_MEMORY_CAPACITY, false)?
+     .visit_union::<ArenaBounds, _>("arena_bounds_type", Self::VT_ARENA_BOUNDS_TYPE, "arena_bounds", Self::VT_ARENA_BOUNDS, false, |key, v, pos| {
+        match key {
+          ArenaBounds::regular_convex_polygon => v.verify_union_variant::<flatbuffers::ForwardsUOffset<RegularConvexPolygon>>("ArenaBounds::regular_convex_polygon", pos),
+          _ => Ok(()),
+        }
+     })?
+     .visit_field::<u64>("fuel_per_step", Self::VT_FUEL_PER_STEP, false)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct GameStartingParamsArgs {
+    pub my_id: u8,
+    pub random_seed: u64,
+    pub memory_capacity: u64,
+    pub arena_bounds_type: ArenaBounds,
+    pub arena_bounds: Option<flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>>,
+    pub fuel_per_step: u64,
+}
+impl<'a> Default for GameStartingParamsArgs {
+  #[inline]
+  fn default() -> Self {
+    GameStartingParamsArgs {
+      my_id: 0,
+      random_seed: 0,
+      memory_capacity: 0,
+      arena_bounds_type: ArenaBounds::NONE,
+      arena_bounds: None,
+      fuel_per_step: 0,
+    }
+  }
+}
+
+pub struct GameStartingParamsBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GameStartingParamsBuilder<'a, 'b, A> {
+  #[inline]
+  pub fn add_my_id(&mut self, my_id: u8) {
+    self.fbb_.push_slot::<u8>(GameStartingParams::VT_MY_ID, my_id, 0);
+  }
+  #[inline]
+  pub fn add_random_seed(&mut self, random_seed: u64) {
+    self.fbb_.push_slot::<u64>(GameStartingParams::VT_RANDOM_SEED, random_seed, 0);
+  }
+  #[inline]
+  pub fn add_memory_capacity(&mut self, memory_capacity: u64) {
+    self.fbb_.push_slot::<u64>(GameStartingParams::VT_MEMORY_CAPACITY, memory_capacity, 0);
+  }
+  #[inline]
+  pub fn add_arena_bounds_type(&mut self, arena_bounds_type: ArenaBounds) {
+    self.fbb_.push_slot::<ArenaBounds>(GameStartingParams::VT_ARENA_BOUNDS_TYPE, arena_bounds_type, ArenaBounds::NONE);
+  }
+  #[inline]
+  pub fn add_arena_bounds(&mut self, arena_bounds: flatbuffers::WIPOffset<flatbuffers::UnionWIPOffset>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStartingParams::VT_ARENA_BOUNDS, arena_bounds);
+  }
+  #[inline]
+  pub fn add_fuel_per_step(&mut self, fuel_per_step: u64) {
+    self.fbb_.push_slot::<u64>(GameStartingParams::VT_FUEL_PER_STEP, fuel_per_step, 0);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> GameStartingParamsBuilder<'a, 'b, A> {
+    let start = _fbb.start_table();
+    GameStartingParamsBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<GameStartingParams<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for GameStartingParams<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("GameStartingParams");
+      ds.field("my_id", &self.my_id());
+      ds.field("random_seed", &self.random_seed());
+      ds.field("memory_capacity", &self.memory_capacity());
+      ds.field("arena_bounds_type", &self.arena_bounds_type());
+      match self.arena_bounds_type() {
+        ArenaBounds::regular_convex_polygon => {
+          if let Some(x) = self.arena_bounds_as_regular_convex_polygon() {
+            ds.field("arena_bounds", &x)
+          } else {
+            ds.field("arena_bounds", &"InvalidFlatbuffer: Union discriminant does not match value.")
+          }
+        },
+        _ => {
+          let x: Option<()> = None;
+          ds.field("arena_bounds", &x)
+        },
+      };
+      ds.field("fuel_per_step", &self.fuel_per_step());
+      ds.finish()
+  }
+}
 pub enum GameStateDeltaOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
@@ -2759,8 +3173,6 @@ impl<'a> GameStateDelta<'a> {
   pub const VT_NEW_PROJECTILES: flatbuffers::VOffsetT = 14;
   pub const VT_DEAD_PROJECTILES: flatbuffers::VOffsetT = 16;
   pub const VT_EXPLOSIONS: flatbuffers::VOffsetT = 18;
-  pub const VT_MY_ID: flatbuffers::VOffsetT = 20;
-  pub const VT_WINNER_ID: flatbuffers::VOffsetT = 22;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
@@ -2780,8 +3192,6 @@ impl<'a> GameStateDelta<'a> {
     if let Some(x) = args.entity_updates { builder.add_entity_updates(x); }
     if let Some(x) = args.new_entities { builder.add_new_entities(x); }
     if let Some(x) = args.flag_updates { builder.add_flag_updates(x); }
-    builder.add_winner_id(args.winner_id);
-    builder.add_my_id(args.my_id);
     builder.finish()
   }
 
@@ -2842,20 +3252,6 @@ impl<'a> GameStateDelta<'a> {
     // which contains a valid value in this slot
     unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Explosion>>>>(GameStateDelta::VT_EXPLOSIONS, None)}
   }
-  #[inline]
-  pub fn my_id(&self) -> u8 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<u8>(GameStateDelta::VT_MY_ID, Some(0)).unwrap()}
-  }
-  #[inline]
-  pub fn winner_id(&self) -> u8 {
-    // Safety:
-    // Created from valid Table for this object
-    // which contains a valid value in this slot
-    unsafe { self._tab.get::<u8>(GameStateDelta::VT_WINNER_ID, Some(0)).unwrap()}
-  }
 }
 
 impl flatbuffers::Verifiable for GameStateDelta<'_> {
@@ -2873,8 +3269,6 @@ impl flatbuffers::Verifiable for GameStateDelta<'_> {
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Projectile>>>>("new_projectiles", Self::VT_NEW_PROJECTILES, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<DeadProjectile>>>>("dead_projectiles", Self::VT_DEAD_PROJECTILES, false)?
      .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, flatbuffers::ForwardsUOffset<Explosion>>>>("explosions", Self::VT_EXPLOSIONS, false)?
-     .visit_field::<u8>("my_id", Self::VT_MY_ID, false)?
-     .visit_field::<u8>("winner_id", Self::VT_WINNER_ID, false)?
      .finish();
     Ok(())
   }
@@ -2888,8 +3282,6 @@ pub struct GameStateDeltaArgs<'a> {
     pub new_projectiles: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Projectile<'a>>>>>,
     pub dead_projectiles: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<DeadProjectile<'a>>>>>,
     pub explosions: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, flatbuffers::ForwardsUOffset<Explosion<'a>>>>>,
-    pub my_id: u8,
-    pub winner_id: u8,
 }
 impl<'a> Default for GameStateDeltaArgs<'a> {
   #[inline]
@@ -2903,8 +3295,6 @@ impl<'a> Default for GameStateDeltaArgs<'a> {
       new_projectiles: None,
       dead_projectiles: None,
       explosions: None,
-      my_id: 0,
-      winner_id: 0,
     }
   }
 }
@@ -2947,14 +3337,6 @@ impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> GameStateDeltaBuilder<'a, 'b, A
     self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(GameStateDelta::VT_EXPLOSIONS, explosions);
   }
   #[inline]
-  pub fn add_my_id(&mut self, my_id: u8) {
-    self.fbb_.push_slot::<u8>(GameStateDelta::VT_MY_ID, my_id, 0);
-  }
-  #[inline]
-  pub fn add_winner_id(&mut self, winner_id: u8) {
-    self.fbb_.push_slot::<u8>(GameStateDelta::VT_WINNER_ID, winner_id, 0);
-  }
-  #[inline]
   pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> GameStateDeltaBuilder<'a, 'b, A> {
     let start = _fbb.start_table();
     GameStateDeltaBuilder {
@@ -2980,7 +3362,102 @@ impl core::fmt::Debug for GameStateDelta<'_> {
       ds.field("new_projectiles", &self.new_projectiles());
       ds.field("dead_projectiles", &self.dead_projectiles());
       ds.field("explosions", &self.explosions());
-      ds.field("my_id", &self.my_id());
+      ds.finish()
+  }
+}
+pub enum EndGameOffset {}
+#[derive(Copy, Clone, PartialEq)]
+
+pub struct EndGame<'a> {
+  pub _tab: flatbuffers::Table<'a>,
+}
+
+impl<'a> flatbuffers::Follow<'a> for EndGame<'a> {
+  type Inner = EndGame<'a>;
+  #[inline]
+  unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
+    Self { _tab: flatbuffers::Table::new(buf, loc) }
+  }
+}
+
+impl<'a> EndGame<'a> {
+  pub const VT_WINNER_ID: flatbuffers::VOffsetT = 4;
+
+  #[inline]
+  pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
+    EndGame { _tab: table }
+  }
+  #[allow(unused_mut)]
+  pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
+    _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
+    args: &'args EndGameArgs
+  ) -> flatbuffers::WIPOffset<EndGame<'bldr>> {
+    let mut builder = EndGameBuilder::new(_fbb);
+    builder.add_winner_id(args.winner_id);
+    builder.finish()
+  }
+
+
+  #[inline]
+  pub fn winner_id(&self) -> u8 {
+    // Safety:
+    // Created from valid Table for this object
+    // which contains a valid value in this slot
+    unsafe { self._tab.get::<u8>(EndGame::VT_WINNER_ID, Some(0)).unwrap()}
+  }
+}
+
+impl flatbuffers::Verifiable for EndGame<'_> {
+  #[inline]
+  fn run_verifier(
+    v: &mut flatbuffers::Verifier, pos: usize
+  ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
+    use self::flatbuffers::Verifiable;
+    v.visit_table(pos)?
+     .visit_field::<u8>("winner_id", Self::VT_WINNER_ID, false)?
+     .finish();
+    Ok(())
+  }
+}
+pub struct EndGameArgs {
+    pub winner_id: u8,
+}
+impl<'a> Default for EndGameArgs {
+  #[inline]
+  fn default() -> Self {
+    EndGameArgs {
+      winner_id: 0,
+    }
+  }
+}
+
+pub struct EndGameBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+  fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
+  start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
+}
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> EndGameBuilder<'a, 'b, A> {
+  #[inline]
+  pub fn add_winner_id(&mut self, winner_id: u8) {
+    self.fbb_.push_slot::<u8>(EndGame::VT_WINNER_ID, winner_id, 0);
+  }
+  #[inline]
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> EndGameBuilder<'a, 'b, A> {
+    let start = _fbb.start_table();
+    EndGameBuilder {
+      fbb_: _fbb,
+      start_: start,
+    }
+  }
+  #[inline]
+  pub fn finish(self) -> flatbuffers::WIPOffset<EndGame<'a>> {
+    let o = self.fbb_.end_table(self.start_);
+    flatbuffers::WIPOffset::new(o.value())
+  }
+}
+
+impl core::fmt::Debug for EndGame<'_> {
+  fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+    let mut ds = f.debug_struct("EndGame");
       ds.field("winner_id", &self.winner_id());
       ds.finish()
   }
@@ -3081,75 +3558,4 @@ impl core::fmt::Debug for Path<'_> {
       ds.field("waypoints", &self.waypoints());
       ds.finish()
   }
-}
-#[inline]
-/// Verifies that a buffer of bytes contains a `GameStateDelta`
-/// and returns it.
-/// Note that verification is still experimental and may not
-/// catch every error, or be maximally performant. For the
-/// previous, unchecked, behavior use
-/// `root_as_game_state_delta_unchecked`.
-pub fn root_as_game_state_delta(buf: &[u8]) -> Result<GameStateDelta, flatbuffers::InvalidFlatbuffer> {
-  flatbuffers::root::<GameStateDelta>(buf)
-}
-#[inline]
-/// Verifies that a buffer of bytes contains a size prefixed
-/// `GameStateDelta` and returns it.
-/// Note that verification is still experimental and may not
-/// catch every error, or be maximally performant. For the
-/// previous, unchecked, behavior use
-/// `size_prefixed_root_as_game_state_delta_unchecked`.
-pub fn size_prefixed_root_as_game_state_delta(buf: &[u8]) -> Result<GameStateDelta, flatbuffers::InvalidFlatbuffer> {
-  flatbuffers::size_prefixed_root::<GameStateDelta>(buf)
-}
-#[inline]
-/// Verifies, with the given options, that a buffer of bytes
-/// contains a `GameStateDelta` and returns it.
-/// Note that verification is still experimental and may not
-/// catch every error, or be maximally performant. For the
-/// previous, unchecked, behavior use
-/// `root_as_game_state_delta_unchecked`.
-pub fn root_as_game_state_delta_with_opts<'b, 'o>(
-  opts: &'o flatbuffers::VerifierOptions,
-  buf: &'b [u8],
-) -> Result<GameStateDelta<'b>, flatbuffers::InvalidFlatbuffer> {
-  flatbuffers::root_with_opts::<GameStateDelta<'b>>(opts, buf)
-}
-#[inline]
-/// Verifies, with the given verifier options, that a buffer of
-/// bytes contains a size prefixed `GameStateDelta` and returns
-/// it. Note that verification is still experimental and may not
-/// catch every error, or be maximally performant. For the
-/// previous, unchecked, behavior use
-/// `root_as_game_state_delta_unchecked`.
-pub fn size_prefixed_root_as_game_state_delta_with_opts<'b, 'o>(
-  opts: &'o flatbuffers::VerifierOptions,
-  buf: &'b [u8],
-) -> Result<GameStateDelta<'b>, flatbuffers::InvalidFlatbuffer> {
-  flatbuffers::size_prefixed_root_with_opts::<GameStateDelta<'b>>(opts, buf)
-}
-#[inline]
-/// Assumes, without verification, that a buffer of bytes contains a GameStateDelta and returns it.
-/// # Safety
-/// Callers must trust the given bytes do indeed contain a valid `GameStateDelta`.
-pub unsafe fn root_as_game_state_delta_unchecked(buf: &[u8]) -> GameStateDelta {
-  flatbuffers::root_unchecked::<GameStateDelta>(buf)
-}
-#[inline]
-/// Assumes, without verification, that a buffer of bytes contains a size prefixed GameStateDelta and returns it.
-/// # Safety
-/// Callers must trust the given bytes do indeed contain a valid size prefixed `GameStateDelta`.
-pub unsafe fn size_prefixed_root_as_game_state_delta_unchecked(buf: &[u8]) -> GameStateDelta {
-  flatbuffers::size_prefixed_root_unchecked::<GameStateDelta>(buf)
-}
-#[inline]
-pub fn finish_game_state_delta_buffer<'a, 'b, A: flatbuffers::Allocator + 'a>(
-    fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
-    root: flatbuffers::WIPOffset<GameStateDelta<'a>>) {
-  fbb.finish(root, None);
-}
-
-#[inline]
-pub fn finish_size_prefixed_game_state_delta_buffer<'a, 'b, A: flatbuffers::Allocator + 'a>(fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>, root: flatbuffers::WIPOffset<GameStateDelta<'a>>) {
-  fbb.finish_size_prefixed(root, None);
 }
