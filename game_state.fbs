@@ -158,6 +158,6 @@ table EndGame {
 	winner_id: uint8; // 0 means game tied. my_id == winner_id means you won.
 }
 
-table Path {
-	waypoints: [Vec2];
+table Points {
+	points: [Vec2];
 }

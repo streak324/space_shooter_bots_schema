@@ -3462,100 +3462,100 @@ impl core::fmt::Debug for EndGame<'_> {
       ds.finish()
   }
 }
-pub enum PathOffset {}
+pub enum PointsOffset {}
 #[derive(Copy, Clone, PartialEq)]
 
-pub struct Path<'a> {
+pub struct Points<'a> {
   pub _tab: flatbuffers::Table<'a>,
 }
 
-impl<'a> flatbuffers::Follow<'a> for Path<'a> {
-  type Inner = Path<'a>;
+impl<'a> flatbuffers::Follow<'a> for Points<'a> {
+  type Inner = Points<'a>;
   #[inline]
   unsafe fn follow(buf: &'a [u8], loc: usize) -> Self::Inner {
     Self { _tab: flatbuffers::Table::new(buf, loc) }
   }
 }
 
-impl<'a> Path<'a> {
-  pub const VT_WAYPOINTS: flatbuffers::VOffsetT = 4;
+impl<'a> Points<'a> {
+  pub const VT_POINTS: flatbuffers::VOffsetT = 4;
 
   #[inline]
   pub unsafe fn init_from_table(table: flatbuffers::Table<'a>) -> Self {
-    Path { _tab: table }
+    Points { _tab: table }
   }
   #[allow(unused_mut)]
   pub fn create<'bldr: 'args, 'args: 'mut_bldr, 'mut_bldr, A: flatbuffers::Allocator + 'bldr>(
     _fbb: &'mut_bldr mut flatbuffers::FlatBufferBuilder<'bldr, A>,
-    args: &'args PathArgs<'args>
-  ) -> flatbuffers::WIPOffset<Path<'bldr>> {
-    let mut builder = PathBuilder::new(_fbb);
-    if let Some(x) = args.waypoints { builder.add_waypoints(x); }
+    args: &'args PointsArgs<'args>
+  ) -> flatbuffers::WIPOffset<Points<'bldr>> {
+    let mut builder = PointsBuilder::new(_fbb);
+    if let Some(x) = args.points { builder.add_points(x); }
     builder.finish()
   }
 
 
   #[inline]
-  pub fn waypoints(&self) -> Option<flatbuffers::Vector<'a, Vec2>> {
+  pub fn points(&self) -> Option<flatbuffers::Vector<'a, Vec2>> {
     // Safety:
     // Created from valid Table for this object
     // which contains a valid value in this slot
-    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, Vec2>>>(Path::VT_WAYPOINTS, None)}
+    unsafe { self._tab.get::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'a, Vec2>>>(Points::VT_POINTS, None)}
   }
 }
 
-impl flatbuffers::Verifiable for Path<'_> {
+impl flatbuffers::Verifiable for Points<'_> {
   #[inline]
   fn run_verifier(
     v: &mut flatbuffers::Verifier, pos: usize
   ) -> Result<(), flatbuffers::InvalidFlatbuffer> {
     use self::flatbuffers::Verifiable;
     v.visit_table(pos)?
-     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, Vec2>>>("waypoints", Self::VT_WAYPOINTS, false)?
+     .visit_field::<flatbuffers::ForwardsUOffset<flatbuffers::Vector<'_, Vec2>>>("points", Self::VT_POINTS, false)?
      .finish();
     Ok(())
   }
 }
-pub struct PathArgs<'a> {
-    pub waypoints: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, Vec2>>>,
+pub struct PointsArgs<'a> {
+    pub points: Option<flatbuffers::WIPOffset<flatbuffers::Vector<'a, Vec2>>>,
 }
-impl<'a> Default for PathArgs<'a> {
+impl<'a> Default for PointsArgs<'a> {
   #[inline]
   fn default() -> Self {
-    PathArgs {
-      waypoints: None,
+    PointsArgs {
+      points: None,
     }
   }
 }
 
-pub struct PathBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
+pub struct PointsBuilder<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> {
   fbb_: &'b mut flatbuffers::FlatBufferBuilder<'a, A>,
   start_: flatbuffers::WIPOffset<flatbuffers::TableUnfinishedWIPOffset>,
 }
-impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> PathBuilder<'a, 'b, A> {
+impl<'a: 'b, 'b, A: flatbuffers::Allocator + 'a> PointsBuilder<'a, 'b, A> {
   #[inline]
-  pub fn add_waypoints(&mut self, waypoints: flatbuffers::WIPOffset<flatbuffers::Vector<'b , Vec2>>) {
-    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(Path::VT_WAYPOINTS, waypoints);
+  pub fn add_points(&mut self, points: flatbuffers::WIPOffset<flatbuffers::Vector<'b , Vec2>>) {
+    self.fbb_.push_slot_always::<flatbuffers::WIPOffset<_>>(Points::VT_POINTS, points);
   }
   #[inline]
-  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> PathBuilder<'a, 'b, A> {
+  pub fn new(_fbb: &'b mut flatbuffers::FlatBufferBuilder<'a, A>) -> PointsBuilder<'a, 'b, A> {
     let start = _fbb.start_table();
-    PathBuilder {
+    PointsBuilder {
       fbb_: _fbb,
       start_: start,
     }
   }
   #[inline]
-  pub fn finish(self) -> flatbuffers::WIPOffset<Path<'a>> {
+  pub fn finish(self) -> flatbuffers::WIPOffset<Points<'a>> {
     let o = self.fbb_.end_table(self.start_);
     flatbuffers::WIPOffset::new(o.value())
   }
 }
 
-impl core::fmt::Debug for Path<'_> {
+impl core::fmt::Debug for Points<'_> {
   fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-    let mut ds = f.debug_struct("Path");
-      ds.field("waypoints", &self.waypoints());
+    let mut ds = f.debug_struct("Points");
+      ds.field("points", &self.points());
       ds.finish()
   }
 }

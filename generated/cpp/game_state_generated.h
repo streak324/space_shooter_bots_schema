@@ -67,8 +67,8 @@ struct GameStateDeltaBuilder;
 struct EndGame;
 struct EndGameBuilder;
 
-struct Path;
-struct PathBuilder;
+struct Points;
+struct PointsBuilder;
 
 enum ArenaBounds : uint8_t {
   ArenaBounds_NONE = 0,
@@ -1682,55 +1682,55 @@ inline ::flatbuffers::Offset<EndGame> CreateEndGame(
   return builder_.Finish();
 }
 
-struct Path FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef PathBuilder Builder;
+struct Points FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
+  typedef PointsBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_WAYPOINTS = 4
+    VT_POINTS = 4
   };
-  const ::flatbuffers::Vector<const Vec2 *> *waypoints() const {
-    return GetPointer<const ::flatbuffers::Vector<const Vec2 *> *>(VT_WAYPOINTS);
+  const ::flatbuffers::Vector<const Vec2 *> *points() const {
+    return GetPointer<const ::flatbuffers::Vector<const Vec2 *> *>(VT_POINTS);
   }
   bool Verify(::flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_WAYPOINTS) &&
-           verifier.VerifyVector(waypoints()) &&
+           VerifyOffset(verifier, VT_POINTS) &&
+           verifier.VerifyVector(points()) &&
            verifier.EndTable();
   }
 };
 
-struct PathBuilder {
-  typedef Path Table;
+struct PointsBuilder {
+  typedef Points Table;
   ::flatbuffers::FlatBufferBuilder &fbb_;
   ::flatbuffers::uoffset_t start_;
-  void add_waypoints(::flatbuffers::Offset<::flatbuffers::Vector<const Vec2 *>> waypoints) {
-    fbb_.AddOffset(Path::VT_WAYPOINTS, waypoints);
+  void add_points(::flatbuffers::Offset<::flatbuffers::Vector<const Vec2 *>> points) {
+    fbb_.AddOffset(Points::VT_POINTS, points);
   }
-  explicit PathBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
+  explicit PointsBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
   }
-  ::flatbuffers::Offset<Path> Finish() {
+  ::flatbuffers::Offset<Points> Finish() {
     const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Path>(end);
+    auto o = ::flatbuffers::Offset<Points>(end);
     return o;
   }
 };
 
-inline ::flatbuffers::Offset<Path> CreatePath(
+inline ::flatbuffers::Offset<Points> CreatePoints(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<const Vec2 *>> waypoints = 0) {
-  PathBuilder builder_(_fbb);
-  builder_.add_waypoints(waypoints);
+    ::flatbuffers::Offset<::flatbuffers::Vector<const Vec2 *>> points = 0) {
+  PointsBuilder builder_(_fbb);
+  builder_.add_points(points);
   return builder_.Finish();
 }
 
-inline ::flatbuffers::Offset<Path> CreatePathDirect(
+inline ::flatbuffers::Offset<Points> CreatePointsDirect(
     ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<Vec2> *waypoints = nullptr) {
-  auto waypoints__ = waypoints ? _fbb.CreateVectorOfStructs<Vec2>(*waypoints) : 0;
-  return CreatePath(
+    const std::vector<Vec2> *points = nullptr) {
+  auto points__ = points ? _fbb.CreateVectorOfStructs<Vec2>(*points) : 0;
+  return CreatePoints(
       _fbb,
-      waypoints__);
+      points__);
 }
 
 inline bool VerifyArenaBounds(::flatbuffers::Verifier &verifier, const void *obj, ArenaBounds type) {

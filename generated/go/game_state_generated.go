@@ -2199,42 +2199,42 @@ func EndGameAddWinnerId(builder *flatbuffers.Builder, winnerId byte) {
 func EndGameEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
-type Path struct {
+type Points struct {
 	_tab flatbuffers.Table
 }
 
-func GetRootAsPath(buf []byte, offset flatbuffers.UOffsetT) *Path {
+func GetRootAsPoints(buf []byte, offset flatbuffers.UOffsetT) *Points {
 	n := flatbuffers.GetUOffsetT(buf[offset:])
-	x := &Path{}
+	x := &Points{}
 	x.Init(buf, n+offset)
 	return x
 }
 
-func FinishPathBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+func FinishPointsBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
 	builder.Finish(offset)
 }
 
-func GetSizePrefixedRootAsPath(buf []byte, offset flatbuffers.UOffsetT) *Path {
+func GetSizePrefixedRootAsPoints(buf []byte, offset flatbuffers.UOffsetT) *Points {
 	n := flatbuffers.GetUOffsetT(buf[offset+flatbuffers.SizeUint32:])
-	x := &Path{}
+	x := &Points{}
 	x.Init(buf, n+offset+flatbuffers.SizeUint32)
 	return x
 }
 
-func FinishSizePrefixedPathBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
+func FinishSizePrefixedPointsBuffer(builder *flatbuffers.Builder, offset flatbuffers.UOffsetT) {
 	builder.FinishSizePrefixed(offset)
 }
 
-func (rcv *Path) Init(buf []byte, i flatbuffers.UOffsetT) {
+func (rcv *Points) Init(buf []byte, i flatbuffers.UOffsetT) {
 	rcv._tab.Bytes = buf
 	rcv._tab.Pos = i
 }
 
-func (rcv *Path) Table() flatbuffers.Table {
+func (rcv *Points) Table() flatbuffers.Table {
 	return rcv._tab
 }
 
-func (rcv *Path) Waypoints(obj *Vec2, j int) bool {
+func (rcv *Points) Points(obj *Vec2, j int) bool {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
 	if o != 0 {
 		x := rcv._tab.Vector(o)
@@ -2245,7 +2245,7 @@ func (rcv *Path) Waypoints(obj *Vec2, j int) bool {
 	return false
 }
 
-func (rcv *Path) WaypointsLength() int {
+func (rcv *Points) PointsLength() int {
 	o := flatbuffers.UOffsetT(rcv._tab.Offset(4))
 	if o != 0 {
 		return rcv._tab.VectorLen(o)
@@ -2253,15 +2253,15 @@ func (rcv *Path) WaypointsLength() int {
 	return 0
 }
 
-func PathStart(builder *flatbuffers.Builder) {
+func PointsStart(builder *flatbuffers.Builder) {
 	builder.StartObject(1)
 }
-func PathAddWaypoints(builder *flatbuffers.Builder, waypoints flatbuffers.UOffsetT) {
-	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(waypoints), 0)
+func PointsAddPoints(builder *flatbuffers.Builder, points flatbuffers.UOffsetT) {
+	builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(points), 0)
 }
-func PathStartWaypointsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
+func PointsStartPointsVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT {
 	return builder.StartVector(8, numElems, 4)
 }
-func PathEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
+func PointsEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT {
 	return builder.EndObject()
 }
